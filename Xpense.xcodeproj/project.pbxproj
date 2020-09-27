@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,23 @@
 		C32882602464894900F846DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C328825F2464894900F846DC /* Assets.xcassets */; };
 		C32882632464894900F846DC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C32882622464894900F846DC /* Preview Assets.xcassets */; };
 		C32882662464894900F846DC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C32882642464894900F846DC /* LaunchScreen.storyboard */; };
+		C3288274246489FD00F846DC /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328826F246489FD00F846DC /* APIService.swift */; };
+		C3288275246489FD00F846DC /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3288270246489FD00F846DC /* Util.swift */; };
+		C3288276246489FD00F846DC /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3288271246489FD00F846DC /* API.swift */; };
+		C3288277246489FD00F846DC /* URLImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3288272246489FD00F846DC /* URLImage.swift */; };
+		C3288278246489FD00F846DC /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3288273246489FD00F846DC /* Design.swift */; };
+		C328827A24648A3100F846DC /* XpenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328827924648A3100F846DC /* XpenseView.swift */; };
+		C328827C2469C3C400F846DC /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328827B2469C3C400F846DC /* SwiftUIView.swift */; };
+		C35D4197251F993800B45BD7 /* SunburstDiagram in Frameworks */ = {isa = PBXBuildFile; productRef = C35D4196251F993800B45BD7 /* SunburstDiagram */; };
+		C35D419D251F9D3800B45BD7 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D419C251F9D3800B45BD7 /* SettingsView.swift */; };
+		C35D41A0251FA96600B45BD7 /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D419F251FA96600B45BD7 /* CategoriesView.swift */; };
+		C35D41A3251FAAEE00B45BD7 /* CategoriesGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41A2251FAAEE00B45BD7 /* CategoriesGrid.swift */; };
+		C35D41A6251FAC2C00B45BD7 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41A5251FAC2C00B45BD7 /* Category.swift */; };
+		C35D41AA251FBC9000B45BD7 /* SFSafeSymbols in Frameworks */ = {isa = PBXBuildFile; productRef = C35D41A9251FBC9000B45BD7 /* SFSafeSymbols */; };
+		C35D41B12520F07F00B45BD7 /* AddExpenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41B02520F07F00B45BD7 /* AddExpenseView.swift */; };
+		C3F77DC2251E733100CA68BB /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC1251E733100CA68BB /* ProgressBar.swift */; };
+		C3F77DC5251E7D4400CA68BB /* MonthPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC4251E7D4400CA68BB /* MonthPicker.swift */; };
+		C3F77DC7251E870600CA68BB /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC6251E870600CA68BB /* Buttons.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +41,21 @@
 		C32882622464894900F846DC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C32882652464894900F846DC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C32882672464894900F846DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C328826F246489FD00F846DC /* APIService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		C3288270246489FD00F846DC /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
+		C3288271246489FD00F846DC /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		C3288272246489FD00F846DC /* URLImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLImage.swift; sourceTree = "<group>"; };
+		C3288273246489FD00F846DC /* Design.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
+		C328827924648A3100F846DC /* XpenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XpenseView.swift; sourceTree = "<group>"; };
+		C328827B2469C3C400F846DC /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
+		C35D419C251F9D3800B45BD7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		C35D419F251FA96600B45BD7 /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
+		C35D41A2251FAAEE00B45BD7 /* CategoriesGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesGrid.swift; sourceTree = "<group>"; };
+		C35D41A5251FAC2C00B45BD7 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		C35D41B02520F07F00B45BD7 /* AddExpenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExpenseView.swift; sourceTree = "<group>"; };
+		C3F77DC1251E733100CA68BB /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
+		C3F77DC4251E7D4400CA68BB /* MonthPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthPicker.swift; sourceTree = "<group>"; };
+		C3F77DC6251E870600CA68BB /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +63,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C35D41AA251FBC9000B45BD7 /* SFSafeSymbols in Frameworks */,
+				C35D4197251F993800B45BD7 /* SunburstDiagram in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,6 +90,9 @@
 		C32882582464894100F846DC /* Xpense */ = {
 			isa = PBXGroup;
 			children = (
+				C35D418B251F92B400B45BD7 /* Models */,
+				C328826E246489FD00F846DC /* Util */,
+				C328826D246489C900F846DC /* Views */,
 				C32882592464894100F846DC /* AppDelegate.swift */,
 				C328825B2464894100F846DC /* SceneDelegate.swift */,
 				C328825D2464894100F846DC /* ContentView.swift */,
@@ -75,6 +112,82 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		C328826D246489C900F846DC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C35D41AD2520F05200B45BD7 /* Xpense */,
+				C35D41AC2520F04000B45BD7 /* Settings */,
+				C3F77DC3251E7AD200CA68BB /* Common */,
+				C328827B2469C3C400F846DC /* SwiftUIView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C328826E246489FD00F846DC /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				C328826F246489FD00F846DC /* APIService.swift */,
+				C3288270246489FD00F846DC /* Util.swift */,
+				C3288271246489FD00F846DC /* API.swift */,
+				C3288272246489FD00F846DC /* URLImage.swift */,
+				C3288273246489FD00F846DC /* Design.swift */,
+				C3F77DC1251E733100CA68BB /* ProgressBar.swift */,
+			);
+			path = Util;
+			sourceTree = "<group>";
+		};
+		C35D418B251F92B400B45BD7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C35D41A5251FAC2C00B45BD7 /* Category.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C35D419A251F9CCC00B45BD7 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				C35D419F251FA96600B45BD7 /* CategoriesView.swift */,
+				C35D41A2251FAAEE00B45BD7 /* CategoriesGrid.swift */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
+		C35D41AC2520F04000B45BD7 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				C35D419A251F9CCC00B45BD7 /* Categories */,
+				C35D419C251F9D3800B45BD7 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		C35D41AD2520F05200B45BD7 /* Xpense */ = {
+			isa = PBXGroup;
+			children = (
+				C35D41AE2520F06000B45BD7 /* Add Expense */,
+				C328827924648A3100F846DC /* XpenseView.swift */,
+			);
+			path = Xpense;
+			sourceTree = "<group>";
+		};
+		C35D41AE2520F06000B45BD7 /* Add Expense */ = {
+			isa = PBXGroup;
+			children = (
+				C35D41B02520F07F00B45BD7 /* AddExpenseView.swift */,
+			);
+			path = "Add Expense";
+			sourceTree = "<group>";
+		};
+		C3F77DC3251E7AD200CA68BB /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				C3F77DC4251E7D4400CA68BB /* MonthPicker.swift */,
+				C3F77DC6251E870600CA68BB /* Buttons.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -91,6 +204,10 @@
 			dependencies = (
 			);
 			name = Xpense;
+			packageProductDependencies = (
+				C35D4196251F993800B45BD7 /* SunburstDiagram */,
+				C35D41A9251FBC9000B45BD7 /* SFSafeSymbols */,
+			);
 			productName = Xpense;
 			productReference = C32882562464894100F846DC /* Xpense.app */;
 			productType = "com.apple.product-type.application";
@@ -119,6 +236,10 @@
 				Base,
 			);
 			mainGroup = C328824D2464894100F846DC;
+			packageReferences = (
+				C35D4195251F993800B45BD7 /* XCRemoteSwiftPackageReference "SwiftSunburstDiagram" */,
+				C35D41A8251FBC9000B45BD7 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
+			);
 			productRefGroup = C32882572464894100F846DC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -146,8 +267,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3F77DC7251E870600CA68BB /* Buttons.swift in Sources */,
+				C3288277246489FD00F846DC /* URLImage.swift in Sources */,
+				C3F77DC2251E733100CA68BB /* ProgressBar.swift in Sources */,
+				C3288278246489FD00F846DC /* Design.swift in Sources */,
 				C328825A2464894100F846DC /* AppDelegate.swift in Sources */,
+				C3F77DC5251E7D4400CA68BB /* MonthPicker.swift in Sources */,
 				C328825C2464894100F846DC /* SceneDelegate.swift in Sources */,
+				C35D419D251F9D3800B45BD7 /* SettingsView.swift in Sources */,
+				C35D41A0251FA96600B45BD7 /* CategoriesView.swift in Sources */,
+				C35D41B12520F07F00B45BD7 /* AddExpenseView.swift in Sources */,
+				C328827C2469C3C400F846DC /* SwiftUIView.swift in Sources */,
+				C328827A24648A3100F846DC /* XpenseView.swift in Sources */,
+				C35D41A6251FAC2C00B45BD7 /* Category.swift in Sources */,
+				C35D41A3251FAAEE00B45BD7 /* CategoriesGrid.swift in Sources */,
+				C3288275246489FD00F846DC /* Util.swift in Sources */,
+				C3288274246489FD00F846DC /* APIService.swift in Sources */,
+				C3288276246489FD00F846DC /* API.swift in Sources */,
 				C328825E2464894100F846DC /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -289,6 +425,7 @@
 				DEVELOPMENT_TEAM = MQ3AEKK6HW;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Xpense/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -309,6 +446,7 @@
 				DEVELOPMENT_TEAM = MQ3AEKK6HW;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Xpense/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -342,6 +480,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C35D4195251F993800B45BD7 /* XCRemoteSwiftPackageReference "SwiftSunburstDiagram" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lludo/SwiftSunburstDiagram.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+		C35D41A8251FBC9000B45BD7 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/piknotech/SFSafeSymbols.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C35D4196251F993800B45BD7 /* SunburstDiagram */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C35D4195251F993800B45BD7 /* XCRemoteSwiftPackageReference "SwiftSunburstDiagram" */;
+			productName = SunburstDiagram;
+		};
+		C35D41A9251FBC9000B45BD7 /* SFSafeSymbols */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C35D41A8251FBC9000B45BD7 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */;
+			productName = SFSafeSymbols;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C328824E2464894100F846DC /* Project object */;
 }

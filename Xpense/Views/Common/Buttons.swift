@@ -39,7 +39,7 @@ struct PrimaryButton: View {
     
     var body: some View {
         Button(action: {
-            
+            self.action()
         }) {
             HStack {
                 Text(title)

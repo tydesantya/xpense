@@ -12,7 +12,7 @@ struct XpenseView: View {
     
     @State var show = false
     @State var progressValue: Float = 1.0
-    @State var showAddExpense = false
+    @State var showAddExpense: Bool = false
     
     var body: some View {
         ZStack {

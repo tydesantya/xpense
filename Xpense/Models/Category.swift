@@ -19,9 +19,6 @@ class Category {
         self.name = name
         self.icon = icon
         self.color = color
-        for symbol in SFSymbol.allCases {
-            self.icon = UIImage(systemSymbol: symbol)
-        }
     }
     
 }

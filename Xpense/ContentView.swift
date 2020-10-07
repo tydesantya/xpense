@@ -19,10 +19,14 @@ struct ContentView: View {
                     Image(systemName: "x.circle")
                     Text("Xpense")
                 }.tag(1)
+                WalletView().tabItem {
+                    Image(systemName: "creditcard")
+                    Text("Wallet")
+                }.tag(2)
                 SettingsView().tabItem {
                     Image(systemName: "gear")
                     Text("Settings")
-                }.tag(2)
+                }.tag(4)
             }
             .accentColor(.theme)
             .navigationBarTitle(self.navigationBarTitle)
@@ -31,6 +35,8 @@ struct ContentView: View {
                 case 1:
                     self.navigationBarTitle = "Xpense"
                 case 2:
+                    self.navigationBarTitle = "Wallet"
+                case 4:
                     self.navigationBarTitle = "Settings"
                 default:
                     break

@@ -28,7 +28,6 @@ struct ContentView: View {
                     Text("Settings")
                 }.tag(4)
             }
-            .accentColor(.theme)
             .navigationBarTitle(self.navigationBarTitle)
             .onChange(of: selection, perform: { value in
                 switch value {
@@ -43,6 +42,7 @@ struct ContentView: View {
                 }
             })
         }
+        .accentColor(.theme)
     }
 }
 

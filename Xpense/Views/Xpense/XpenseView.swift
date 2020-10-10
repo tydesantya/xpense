@@ -92,6 +92,12 @@ struct XpenseView: View {
                         
                     }.padding(.horizontal)
                     .padding(.top, .small)
+                    VStack {
+                        ForEach(0..<3) { index in
+                            TransactionCellView(category: Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple))
+                        }
+                    }
+                    .padding(.horizontal)
                 }
             }.edgesIgnoringSafeArea([.horizontal])
             if (self.show) {

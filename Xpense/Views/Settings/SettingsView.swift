@@ -18,7 +18,6 @@ struct SettingsView: View {
             VStack(alignment: .leading) {
                 Text("Transaction")
                     .font(.getFontFromDesign(design: .sectionTitle))
-                    .padding(.bottom)
                 VStack {
                     LazyVStack {
                         MenuView(iconName: "dollarsign.circle.fill", text: "Budget", action: self.menuTapped(title:))

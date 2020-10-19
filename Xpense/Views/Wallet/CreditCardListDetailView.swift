@@ -24,7 +24,7 @@ struct CreditCardListDetailView: View {
             VStack(spacing: 0) {
                 HStack {
                     VStack(alignment: .leading, spacing: .tiny) {
-                        Text("Credit Cards")
+                        Text("Debit Cards")
                             .font(.sectionTitle)
                             .bold()
                         Text("Total Balance: Rp. 100,000,000")
@@ -131,7 +131,7 @@ struct ViewPager: View {
         TabView {
             ForEach(0..<30) { i in
                 ZStack {
-                    PaymentMethodCard(backgroundColor: mandiriColor(), shadowColor: mandiriShadowColor())
+                    PaymentMethodCard(backgroundColor: mandiriColor())
                     VStack {
                         HStack(alignment: .top) {
                             VStack(alignment: .leading) {

@@ -156,11 +156,11 @@ struct AddExpenseView: View {
                         let width = CGFloat(150)
                         let height = CGFloat(80)
                         HStack {
-                            PaymentMethod(color: .systemGreen, title: "Rupiah")
+                            PaymentMethodCardView(color: .systemGreen, title: "Rupiah")
                                 .frame(width: width, height: height)
-                            PaymentMethod(color: .systemPurple, title: "OVO")
+                            PaymentMethodCardView(color: .systemPurple, title: "OVO")
                                 .frame(width: width, height: height)
-                            PaymentMethod(color: .systemBlue, title: "BCA")
+                            PaymentMethodCardView(color: .systemBlue, title: "BCA")
                                 .frame(width: width, height: height)
                         }
                         .padding(.horizontal)
@@ -207,7 +207,7 @@ struct AddExpenseView: View {
     }
 }
 
-struct PaymentMethod: View {
+struct PaymentMethodCardView: View {
     
     var color: UIColor
     var title: String

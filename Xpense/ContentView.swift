@@ -10,8 +10,16 @@ import SwiftUI
 
 struct ContentView: View {
     
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        sortDescriptors: [],
+        animation: .default)
+    private var paymentMethods: FetchedResults<PaymentMethod>
+    
     @State private var selection: Int = 1
     @State var navigationBarTitle: String = "Xpense"
+    @State var neverSetupCash = false
+    @State var showModally = true
     var body: some View {
         NavigationView {
             TabView(selection: $selection) {
@@ -42,7 +50,30 @@ struct ContentView: View {
                 }
             })
         }
+        .onAppear {
+            self.checkPaymentMethods()
+        }
+        .sheet(isPresented: self.$neverSetupCash, content: {
+            CreatePaymentMethodView(paymentMethodType: .cash, showSheetView: self.$neverSetupCash)
+                .presentation(isModal: self.$showModally) {
+                    print("Attempted to dismiss")
+                }
+                .accentColor(.theme)
+        })
         .accentColor(.theme)
+    }
+    
+    func deletePaymentMethods() {
+        for method in paymentMethods {
+            viewContext.delete(method)
+        }
+        try! viewContext.save()
+    }
+    
+    func checkPaymentMethods() {
+        if paymentMethods.count == 0 {
+            self.neverSetupCash = true
+        }
     }
 }
 

@@ -41,6 +41,7 @@
 		C35D41B9252E37D100B45BD7 /* CreditCardListDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41B8252E37CF00B45BD7 /* CreditCardListDetailView.swift */; };
 		C35D41BC2531D60900B45BD7 /* TransactionCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41BB2531D60800B45BD7 /* TransactionCellView.swift */; };
 		C38912062532BD4700A646AD /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38912052532BD4700A646AD /* Persistence.swift */; };
+		C389120B253E133000A646AD /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = C389120A253E133000A646AD /* Introspect */; };
 		C3F77DC2251E733100CA68BB /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC1251E733100CA68BB /* ProgressBar.swift */; };
 		C3F77DC5251E7D4400CA68BB /* MonthPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC4251E7D4400CA68BB /* MonthPicker.swift */; };
 		C3F77DC7251E870600CA68BB /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC6251E870600CA68BB /* Buttons.swift */; };
@@ -91,6 +92,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C3369DBB2532580B00CA5647 /* SPAlert in Frameworks */,
+				C389120B253E133000A646AD /* Introspect in Frameworks */,
 				C35D41AA251FBC9000B45BD7 /* SFSafeSymbols in Frameworks */,
 				C35D4197251F993800B45BD7 /* SunburstDiagram in Frameworks */,
 			);
@@ -281,6 +283,7 @@
 				C35D4196251F993800B45BD7 /* SunburstDiagram */,
 				C35D41A9251FBC9000B45BD7 /* SFSafeSymbols */,
 				C3369DBA2532580B00CA5647 /* SPAlert */,
+				C389120A253E133000A646AD /* Introspect */,
 			);
 			productName = Xpense;
 			productReference = C32882562464894100F846DC /* Xpense.app */;
@@ -314,6 +317,7 @@
 				C35D4195251F993800B45BD7 /* XCRemoteSwiftPackageReference "SwiftSunburstDiagram" */,
 				C35D41A8251FBC9000B45BD7 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
 				C3369DB92532580A00CA5647 /* XCRemoteSwiftPackageReference "SPAlert" */,
+				C3891209253E133000A646AD /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 			);
 			productRefGroup = C32882572464894100F846DC /* Products */;
 			projectDirPath = "";
@@ -594,6 +598,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		C3891209253E133000A646AD /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -611,6 +623,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C35D41A8251FBC9000B45BD7 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */;
 			productName = SFSafeSymbols;
+		};
+		C389120A253E133000A646AD /* Introspect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3891209253E133000A646AD /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = Introspect;
 		};
 /* End XCSwiftPackageProductDependency section */
 

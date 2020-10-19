@@ -8,6 +8,13 @@
 
 import SwiftUI
 
+enum WalletViewSheet: Identifiable {
+    case addCreditCard
+    case debitCardList
+    var id: Int {
+        hashValue
+    }
+}
 struct WalletView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
@@ -15,7 +22,9 @@ struct WalletView: View {
         sortDescriptors: [],
         animation: .default)
     private var paymentMethods: FetchedResults<PaymentMethod>
-    @State var showCreditCardList: Bool = false
+    
+    @State var showModally: Bool = true
+    @State var activeSheet: WalletViewSheet?
     
     var body: some View {
         GeometryReader { reader in
@@ -97,18 +106,9 @@ struct WalletView: View {
                         .frame(width: abs(reader.size.width - 100), height: 160)
                         .offset(y: 20.0)
                     }.onTapGesture {
-                        self.showCreditCardList.toggle()
+                        showDebitCardList()
                     }
-                    HStack {
-                        Text("Credit Cards")
-                            .font(Font.getFontFromDesign(design: .sectionTitle))
-                            .padding(.horizontal)
-                            .padding(.top, .medium)
-                        Spacer()
-                    }
-                    .padding(.top, .large)
-                    AddCardPlaceholder(text: "Add Credit Card")
-                        .frame(width: abs(reader.size.width - 100), height: 150)
+                    CreditCardWalletView(parentWidth: reader.size.width, showSheetAction: showAddCreditCard)
                     HStack {
                         Text("E-Wallet")
                             .font(Font.getFontFromDesign(design: .sectionTitle))
@@ -123,9 +123,12 @@ struct WalletView: View {
                 }
             }
         }
-        .sheet(isPresented: self.$showCreditCardList) {
-            NavigationView {
-                CreditCardListDetailView()
+        .sheet(item: $activeSheet) { item in
+            switch item {
+            case .debitCardList:
+                getDebitCardSheet()
+            default:
+                getAddCreditCardSheet()
             }
         }
     }
@@ -151,10 +154,34 @@ struct WalletView: View {
             }
             currency = method.balance?.currencyValue.currency ?? ""
         }
-        let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency)
-        return CurrencyHelper.string(from: totalBalance, currency: currencySign!)
+        let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency) ?? ""
+        return CurrencyHelper.string(from: totalBalance, currency: currencySign)
     }
     
+    func getAddCreditCardSheet() -> AnyView {
+        AnyView(
+            CreatePaymentMethodView(paymentMethodType: .creditCard, showSheetView: self.$activeSheet)
+                .presentation(isModal: self.$showModally) {
+                    print("Attempted to dismiss")
+                }
+                .accentColor(.theme)
+        )
+    }
+    
+    func getDebitCardSheet() -> AnyView {
+        AnyView(
+            NavigationView {
+                CreditCardListDetailView()
+            }
+        )
+    }
+    func showAddCreditCard() {
+        self.activeSheet = .addCreditCard
+    }
+    
+    func showDebitCardList() {
+        self.activeSheet = .debitCardList
+    }
 }
 
 struct PlaceHolderView: View {
@@ -213,6 +240,40 @@ struct AddCardPlaceholder: View {
     }
 }
 
+struct CreditCardWalletView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        sortDescriptors: [],
+        predicate: NSPredicate(format: "type == %ld", PaymentMethodType.creditCard.rawValue))
+    private var ccPaymentMethod: FetchedResults<PaymentMethod>
+    var parentWidth: CGFloat
+    var showSheetAction: () -> Void
+    
+    var body: some View {
+        let width = parentWidth > 0 ? parentWidth : 200
+        if (ccPaymentMethod.count > 0) {
+            
+        }
+        else {
+            VStack {
+                HStack {
+                    Text("Credit Cards")
+                        .font(Font.getFontFromDesign(design: .sectionTitle))
+                        .padding(.horizontal)
+                        .padding(.top, .medium)
+                    Spacer()
+                }
+                .padding(.top, .large)
+                AddCardPlaceholder(text: "Add Credit Card")
+                    .frame(width: abs(width - 100), height: 150)
+                    .onTapGesture {
+                        showSheetAction()
+                    }
+            }
+        }
+    }
+}
+
 struct CashWalletView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
@@ -221,6 +282,7 @@ struct CashWalletView: View {
         predicate: NSPredicate(format: "type == %ld", PaymentMethodType.cash.rawValue))
     private var cashPaymentMethod: FetchedResults<PaymentMethod>
     var parentWidth: CGFloat
+    
     var body: some View {
         if (cashPaymentMethod.count > 0) {
             let cashMethod = cashPaymentMethod.first

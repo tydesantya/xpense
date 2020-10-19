@@ -52,9 +52,10 @@ struct ContentView: View {
         }
         .onAppear {
             self.checkPaymentMethods()
+            self.deletePaymentMethods()
         }
         .sheet(isPresented: self.$neverSetupCash, content: {
-            CreatePaymentMethodView(paymentMethodType: .cash, showSheetView: self.$neverSetupCash)
+            CreatePaymentMethodView(paymentMethodType: .cash, sheetFlag: self.$neverSetupCash)
                 .presentation(isModal: self.$showModally) {
                     print("Attempted to dismiss")
                 }

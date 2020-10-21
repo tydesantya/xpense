@@ -11,6 +11,7 @@ import SPAlert
 
 struct CreatePaymentMethodView: View {
     
+    @Environment(\.managedObjectContext) private var viewContext
     @Binding var showSheetView: WalletViewSheet?
     @Binding var sheetFlag: Bool
     @State var amount: Double = 0
@@ -38,7 +39,7 @@ struct CreatePaymentMethodView: View {
                         ZStack(alignment: .center) {
                             PaymentMethodCard(backgroundColor: paymentMethodColor())
                             paymentMethodForegroundView()
-                        }.frame(width: abs(reader.size.width) - 100, height: 150)
+                        }.frame(width: abs(reader.size.width - 100), height: 150)
                         .padding()
                         amountInputView()
                         paymentMethodSetupComponents()
@@ -132,7 +133,7 @@ struct CreatePaymentMethodView: View {
         switch paymentMethodType {
         case .cash:
             return getCashForegroundView()
-        case .creditCard:
+        case .creditCard, .debitCard:
             return getCardForegroundView()
         default:
             return AnyView(EmptyView())
@@ -211,7 +212,7 @@ struct CreatePaymentMethodView: View {
     
     func amountInputView() -> AnyView {
         switch paymentMethodType {
-        case .cash:
+        case .cash, .debitCard:
             return getAmountInputView()
         case .creditCard:
             return AnyView(EmptyView())
@@ -223,7 +224,7 @@ struct CreatePaymentMethodView: View {
     func getAmountInputView() -> AnyView {
         AnyView(
             VStack {
-                Text("Enter amount")
+                Text("Enter Balance Amount")
                     .font(.footnote)
                     .foregroundColor(.init(.secondaryLabel))
                 CurrencyTextField(amount: self.$amount, currency: self.$currency)
@@ -266,6 +267,14 @@ struct CreatePaymentMethodView: View {
                     Text("Done").bold()
                 }
             )
+        case .debitCard:
+            return AnyView(
+                Button(action: {
+                    self.createDebitCardAndDismiss()
+                }) {
+                    Text("Done").bold()
+                }
+            )
         default:
             return AnyView(EmptyView())
         }
@@ -277,6 +286,8 @@ struct CreatePaymentMethodView: View {
             return "Cash"
         case .creditCard:
             return "Credit Card"
+        case .debitCard:
+            return "Debit Card"
         default:
             return ""
         }
@@ -297,7 +308,7 @@ struct CreatePaymentMethodView: View {
     
     func paymentMethodSetupComponents() -> AnyView {
         switch paymentMethodType {
-        case .creditCard:
+        case .creditCard, .debitCard:
             return AnyView(CardSetupComponents(colorSelection: $cardColorSelection, identifier: $identifierNumber, isIdentifierValidated: $isIdentifierValidated, cardName: $cardName))
         default:
             return AnyView(EmptyView())
@@ -306,14 +317,21 @@ struct CreatePaymentMethodView: View {
     
     func createCashAndDismiss() {
         if (amount > 0) {
-            let amountString = numOfDecimalPoint == 0 ? String(format: "%.0f", amount) : String(amount)
-            let currency = CurrencyValue(amount: amountString, currency: self.currencyText)
-            let displayCurrencyValue = DisplayCurrencyValue(currencyValue: currency, numOfDecimalPoint: self.numOfDecimalPoint, decimalSeparator: self.decimalSeparator, groupingSeparator: self.groupingSeparator)
-            let cash = CoreDataManager.shared.createPaymentMethod(balance: displayCurrencyValue, type: .cash, identifierNumber: "", name: "Cash", color: UIColor(cashColor()))
-            if let _ = cash {
+            let displayCurrencyValue = getDisplayCurrencyValueFromCurrentAmount()
+            let newPaymentMethod = PaymentMethod(context: viewContext)
+            newPaymentMethod.name = "Cash"
+            newPaymentMethod.balance = displayCurrencyValue
+            newPaymentMethod.type = PaymentMethodType.cash.rawValue
+            newPaymentMethod.identifierNumber = ""
+            newPaymentMethod.color = UIColor(cashColor()).encode()
+            
+            do {
+                try viewContext.save()
                 self.showSheetView = nil
                 self.sheetFlag = false
                 SPAlert.present(title: "Added to Wallet", preset: .done)
+            } catch let createError {
+                print("Failed to create PaymentMethod \(createError)")
             }
         }
         else {
@@ -330,21 +348,70 @@ struct CreatePaymentMethodView: View {
         }
         
         let ccIdentifier = isIdentifierValidated ? identifierNumber : "XXXX"
-        let amountString = numOfDecimalPoint == 0 ? String(format: "%.0f", amount) : String(amount)
-        let currency = CurrencyValue(amount: amountString, currency: self.currencyText)
-        let displayCurrencyValue = DisplayCurrencyValue(currencyValue: currency, numOfDecimalPoint: self.numOfDecimalPoint, decimalSeparator: self.decimalSeparator, groupingSeparator: self.groupingSeparator)
-        let cash = CoreDataManager.shared.createPaymentMethod(balance: displayCurrencyValue, type: .cash, identifierNumber: ccIdentifier, name: cardName, color: UIColor(cardColorSelection))
-        if let _ = cash {
+        let displayCurrencyValue = getDisplayCurrencyValueFromCurrentAmount()
+        
+        let newPaymentMethod = PaymentMethod(context: viewContext)
+        newPaymentMethod.name = cardName
+        newPaymentMethod.balance = displayCurrencyValue
+        newPaymentMethod.type = PaymentMethodType.creditCard.rawValue
+        newPaymentMethod.identifierNumber = ccIdentifier
+        newPaymentMethod.color = UIColor(cardColorSelection).encode()
+        
+        do {
+            try viewContext.save()
             self.showSheetView = nil
             self.sheetFlag = false
             SPAlert.present(title: "Added to Wallet", preset: .done)
+        } catch let createError {
+            print("Failed to create PaymentMethod \(createError)")
         }
+    }
+    
+    func createDebitCardAndDismiss() {
+        if (cardName.count == 0) {
+            validationAlertMessage = "Please enter your card name!"
+            showValidationAlert = true
+            return
+        }
+        
+        if (amount == 0) {
+            validationAlertMessage = "Please enter your card balance"
+            showValidationAlert = true
+            return
+        }
+        
+        let debitIdentifier = isIdentifierValidated ? identifierNumber : "XXXX"
+        let displayCurrencyValue = getDisplayCurrencyValueFromCurrentAmount()
+        
+        let newPaymentMethod = PaymentMethod(context: viewContext)
+        newPaymentMethod.name = cardName
+        newPaymentMethod.balance = displayCurrencyValue
+        newPaymentMethod.type = PaymentMethodType.debitCard.rawValue
+        newPaymentMethod.identifierNumber = debitIdentifier
+        newPaymentMethod.color = UIColor(cardColorSelection).encode()
+        
+        do {
+            try viewContext.save()
+            self.showSheetView = nil
+            self.sheetFlag = false
+            SPAlert.present(title: "Added to Wallet", preset: .done)
+        } catch let createError {
+            print("Failed to create PaymentMethod \(createError)")
+        }
+        
     }
     
     func cancel() {
         showSheetView = nil
         sheetFlag = false
     }
+    
+    func getDisplayCurrencyValueFromCurrentAmount() -> DisplayCurrencyValue {
+        let amountString = numOfDecimalPoint == 0 ? String(format: "%.0f", amount) : String(amount)
+        let currency = CurrencyValue(amount: amountString, currency: self.currencyText)
+        return DisplayCurrencyValue(currencyValue: currency, numOfDecimalPoint: self.numOfDecimalPoint, decimalSeparator: self.decimalSeparator, groupingSeparator: self.groupingSeparator)
+    }
+    
 }
 
 struct CreatePaymentMethodView_Previews: PreviewProvider {

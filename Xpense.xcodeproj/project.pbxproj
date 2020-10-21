@@ -38,10 +38,11 @@
 		C35D41AA251FBC9000B45BD7 /* SFSafeSymbols in Frameworks */ = {isa = PBXBuildFile; productRef = C35D41A9251FBC9000B45BD7 /* SFSafeSymbols */; };
 		C35D41B12520F07F00B45BD7 /* AddExpenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41B02520F07F00B45BD7 /* AddExpenseView.swift */; };
 		C35D41B5252CEA3900B45BD7 /* WalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41B4252CEA3800B45BD7 /* WalletView.swift */; };
-		C35D41B9252E37D100B45BD7 /* CreditCardListDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41B8252E37CF00B45BD7 /* CreditCardListDetailView.swift */; };
+		C35D41B9252E37D100B45BD7 /* CardListDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41B8252E37CF00B45BD7 /* CardListDetailView.swift */; };
 		C35D41BC2531D60900B45BD7 /* TransactionCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41BB2531D60800B45BD7 /* TransactionCellView.swift */; };
 		C38912062532BD4700A646AD /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38912052532BD4700A646AD /* Persistence.swift */; };
 		C389120B253E133000A646AD /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = C389120A253E133000A646AD /* Introspect */; };
+		C389120F2540A5C700A646AD /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = C389120E2540A5C700A646AD /* Common.swift */; };
 		C3F77DC2251E733100CA68BB /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC1251E733100CA68BB /* ProgressBar.swift */; };
 		C3F77DC5251E7D4400CA68BB /* MonthPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC4251E7D4400CA68BB /* MonthPicker.swift */; };
 		C3F77DC7251E870600CA68BB /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC6251E870600CA68BB /* Buttons.swift */; };
@@ -78,9 +79,10 @@
 		C35D41A5251FAC2C00B45BD7 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		C35D41B02520F07F00B45BD7 /* AddExpenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExpenseView.swift; sourceTree = "<group>"; };
 		C35D41B4252CEA3800B45BD7 /* WalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletView.swift; sourceTree = "<group>"; };
-		C35D41B8252E37CF00B45BD7 /* CreditCardListDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditCardListDetailView.swift; sourceTree = "<group>"; };
+		C35D41B8252E37CF00B45BD7 /* CardListDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardListDetailView.swift; sourceTree = "<group>"; };
 		C35D41BB2531D60800B45BD7 /* TransactionCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCellView.swift; sourceTree = "<group>"; };
 		C38912052532BD4700A646AD /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		C389120E2540A5C700A646AD /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		C3F77DC1251E733100CA68BB /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
 		C3F77DC4251E7D4400CA68BB /* MonthPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthPicker.swift; sourceTree = "<group>"; };
 		C3F77DC6251E870600CA68BB /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
@@ -195,6 +197,7 @@
 			children = (
 				C3369DB12532364300CA5647 /* ModalView.swift */,
 				C3369DB52532499B00CA5647 /* CurrencyTextField.swift */,
+				C389120E2540A5C700A646AD /* Common.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -247,7 +250,7 @@
 			isa = PBXGroup;
 			children = (
 				C35D41B4252CEA3800B45BD7 /* WalletView.swift */,
-				C35D41B8252E37CF00B45BD7 /* CreditCardListDetailView.swift */,
+				C35D41B8252E37CF00B45BD7 /* CardListDetailView.swift */,
 			);
 			path = Wallet;
 			sourceTree = "<group>";
@@ -356,12 +359,13 @@
 				C328825A2464894100F846DC /* AppDelegate.swift in Sources */,
 				C3F77DC5251E7D4400CA68BB /* MonthPicker.swift in Sources */,
 				C328825C2464894100F846DC /* SceneDelegate.swift in Sources */,
-				C35D41B9252E37D100B45BD7 /* CreditCardListDetailView.swift in Sources */,
+				C35D41B9252E37D100B45BD7 /* CardListDetailView.swift in Sources */,
 				C35D419D251F9D3800B45BD7 /* SettingsView.swift in Sources */,
 				C3369DB62532499B00CA5647 /* CurrencyTextField.swift in Sources */,
 				C35D41A0251FA96600B45BD7 /* CategoriesView.swift in Sources */,
 				C3369D8F2532069000CA5647 /* DisplayCurrencyValue.swift in Sources */,
 				C3369DAE2532244F00CA5647 /* CreatePaymentMethodView.swift in Sources */,
+				C389120F2540A5C700A646AD /* Common.swift in Sources */,
 				C35D41B12520F07F00B45BD7 /* AddExpenseView.swift in Sources */,
 				C35D41BC2531D60900B45BD7 /* TransactionCellView.swift in Sources */,
 				C3369DA1253213EF00CA5647 /* PaymentMethodTypes.swift in Sources */,

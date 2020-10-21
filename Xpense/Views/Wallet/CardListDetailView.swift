@@ -1,5 +1,5 @@
 //
-//  CreditCardListDetailView.swift
+//  CardListDetailView.swift
 //  Xpense
 //
 //  Created by Teddy Santya on 8/10/20.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct CreditCardListDetailView: View {
+struct CardListDetailView: View {
     
     @State var destinationView: AnyView?
     @State var navigate: Bool = false
@@ -22,6 +22,8 @@ struct CreditCardListDetailView: View {
                     EmptyView()
                 })
             VStack(spacing: 0) {
+                TrayIndicator()
+                    .background(Color.init(.secondarySystemBackground))
                 HStack {
                     VStack(alignment: .leading, spacing: .tiny) {
                         Text("Debit Cards")
@@ -122,7 +124,7 @@ struct CreditCardListDetailView: View {
 
 struct CreditCardListDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        CreditCardListDetailView()
+        CardListDetailView()
     }
 }
 

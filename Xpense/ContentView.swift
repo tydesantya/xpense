@@ -11,9 +11,7 @@ import SwiftUI
 struct ContentView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(
-        sortDescriptors: [],
-        animation: .default)
+    @FetchRequest(sortDescriptors: [])
     private var paymentMethods: FetchedResults<PaymentMethod>
     
     @State private var selection: Int = 1
@@ -52,7 +50,6 @@ struct ContentView: View {
         }
         .onAppear {
             self.checkPaymentMethods()
-            self.deletePaymentMethods()
         }
         .sheet(isPresented: self.$neverSetupCash, content: {
             CreatePaymentMethodView(paymentMethodType: .cash, sheetFlag: self.$neverSetupCash)

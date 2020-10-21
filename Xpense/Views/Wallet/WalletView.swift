@@ -8,10 +8,11 @@
 
 import SwiftUI
 
-enum WalletViewSheet: Identifiable {
+enum WalletViewSheet: Int, Identifiable {
     case addCreditCard
     case addDebitCard
     case debitCardList
+    case editCard
     var id: Int {
         hashValue
     }
@@ -117,7 +118,8 @@ struct WalletView: View {
     func getDebitCardSheet() -> AnyView {
         AnyView(
             NavigationView {
-                CardListDetailView()
+                CardListDetailView(paymentMethodType: .debitCard)
+                    .environment(\.managedObjectContext, self.viewContext)
             }
         )
     }
@@ -213,9 +215,9 @@ struct DebitCardWalletView: View {
                     Spacer()
                 }
                 ZStack {
-                    ForEach(0..<debitCardPaymentMethod.count) {
-                        index in
-                        getCardView(index: index, width: width)
+                    ForEach(debitCardPaymentMethod) {
+                        element in
+                        getCardView(paymentMethod:element, width: width)
                     }
                 }.onTapGesture {
                     debitDetailAction()
@@ -241,10 +243,11 @@ struct DebitCardWalletView: View {
         }
     }
     
-    func getCardView(index: Int, width: CGFloat) -> AnyView {
-        let offset = 10.0 * CGFloat(index)
-        let cardWidth = width - 100.0 - (20.0 * CGFloat(index))
-        let paymentMethod = debitCardPaymentMethod[index]
+    func getCardView(paymentMethod:PaymentMethod, width: CGFloat) -> AnyView {
+        let index = debitCardPaymentMethod.firstIndex(of: paymentMethod)
+        let offset = 10.0 * CGFloat(index!)
+        let reverseIndex = debitCardPaymentMethod.count - 1 - index!
+        let cardWidth = width - 100.0 - (20.0 * CGFloat(reverseIndex))
         return AnyView(
             ZStack {
                 PaymentMethodCard(backgroundColor: Color(UIColor.color(data: paymentMethod.color!)!))

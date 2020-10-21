@@ -27,6 +27,7 @@ struct CreatePaymentMethodView: View {
     @State var isIdentifierValidated: Bool = false
     @State var validationAlertMessage: String = ""
     @State var showValidationAlert: Bool = false
+    @State var editingPaymentMethod: PaymentMethod?
     var paymentMethodType: PaymentMethodType
     var numberFormatter: NumberFormatter!
     
@@ -94,7 +95,6 @@ struct CreatePaymentMethodView: View {
         }
     }
     
-    
     init(paymentMethodType: PaymentMethodType, showSheetView: Binding<WalletViewSheet?>) {
         self.paymentMethodType = paymentMethodType
         self._showSheetView = showSheetView
@@ -112,7 +112,7 @@ struct CreatePaymentMethodView: View {
         self.numberFormatter = CurrencyHelper.getNumberFormatterFor(currencyText, 0)
     }
     
-    init(paymentMethodType: PaymentMethodType, sheetFlag: Binding<Bool>) {
+    init(paymentMethodType: PaymentMethodType, sheetFlag: Binding<Bool>, paymentMethod: PaymentMethod? = nil) {
         self.paymentMethodType = paymentMethodType
         self._showSheetView = .init(get: { () -> WalletViewSheet? in
             return nil
@@ -124,8 +124,18 @@ struct CreatePaymentMethodView: View {
         _currencyText = .init(initialValue: defaultCurrency)
         _currency = .init(initialValue: CurrencyValue(amount: "0", currency: defaultCurrency))
         _currencySign = .init(initialValue: CurrencyHelper.getCurrencySignFromCurrency(defaultCurrency))
-        let initialColor = Color.init(UIColor.systemBlue.darker()!)
-        _cardColorSelection = .init(initialValue: initialColor)
+        if let paymentMethod = paymentMethod {
+            _cardColorSelection = .init(initialValue: Color(UIColor.color(data: paymentMethod.color!)!))
+            let initialAmount = Double(paymentMethod.balance?.currencyValue.amount ?? "0") ?? 0
+            _amount = .init(initialValue: initialAmount)
+            _cardName = .init(initialValue: paymentMethod.name ?? "asd")
+            _identifierNumber = .init(initialValue: paymentMethod.identifierNumber ?? "")
+            _editingPaymentMethod = .init(initialValue: paymentMethod)
+        }
+        else {
+            let initialColor = Color.init(UIColor.systemBlue.darker()!)
+            _cardColorSelection = .init(initialValue: initialColor)
+        }
         self.numberFormatter = CurrencyHelper.getNumberFormatterFor(currencyText, 0)
     }
     
@@ -318,7 +328,7 @@ struct CreatePaymentMethodView: View {
     func createCashAndDismiss() {
         if (amount > 0) {
             let displayCurrencyValue = getDisplayCurrencyValueFromCurrentAmount()
-            let newPaymentMethod = PaymentMethod(context: viewContext)
+            let newPaymentMethod = editingPaymentMethod ?? PaymentMethod(context: viewContext)
             newPaymentMethod.name = "Cash"
             newPaymentMethod.balance = displayCurrencyValue
             newPaymentMethod.type = PaymentMethodType.cash.rawValue
@@ -350,7 +360,7 @@ struct CreatePaymentMethodView: View {
         let ccIdentifier = isIdentifierValidated ? identifierNumber : "XXXX"
         let displayCurrencyValue = getDisplayCurrencyValueFromCurrentAmount()
         
-        let newPaymentMethod = PaymentMethod(context: viewContext)
+        let newPaymentMethod = editingPaymentMethod ?? PaymentMethod(context: viewContext)
         newPaymentMethod.name = cardName
         newPaymentMethod.balance = displayCurrencyValue
         newPaymentMethod.type = PaymentMethodType.creditCard.rawValue
@@ -383,7 +393,7 @@ struct CreatePaymentMethodView: View {
         let debitIdentifier = isIdentifierValidated ? identifierNumber : "XXXX"
         let displayCurrencyValue = getDisplayCurrencyValueFromCurrentAmount()
         
-        let newPaymentMethod = PaymentMethod(context: viewContext)
+        let newPaymentMethod = editingPaymentMethod ?? PaymentMethod(context: viewContext)
         newPaymentMethod.name = cardName
         newPaymentMethod.balance = displayCurrencyValue
         newPaymentMethod.type = PaymentMethodType.debitCard.rawValue

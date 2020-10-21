@@ -7,11 +7,21 @@
 //
 
 import SwiftUI
+import SPAlert
 
 struct CardListDetailView: View {
     
+    @State var paymentMethodType: PaymentMethodType
     @State var destinationView: AnyView?
     @State var navigate: Bool = false
+    @State var showingAlert: Bool = false
+    @State var createPaymentMethodFlag: Bool = false
+    @State var pagerSelection: Int = 0
+    @State var selectedPaymentMethod: PaymentMethod?
+    @State var editedPaymentMethod: PaymentMethod?
+    @Environment(\.managedObjectContext) private var viewContext
+    var fetchRequest: FetchRequest<PaymentMethod>
+    var paymentMethods : FetchedResults<PaymentMethod>{fetchRequest.wrappedValue}
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -26,14 +36,26 @@ struct CardListDetailView: View {
                     .background(Color.init(.secondarySystemBackground))
                 HStack {
                     VStack(alignment: .leading, spacing: .tiny) {
-                        Text("Debit Cards")
+                        Text(getTitle())
                             .font(.sectionTitle)
                             .bold()
-                        Text("Total Balance: Rp. 100,000,000")
+                        Text("Total Balance: \(getTotalWalletBalance())")
                     }
                     Spacer()
                     Button(action: {
-                        // Add Card
+                        let select = selectedPaymentMethod
+                        let edit = editedPaymentMethod
+                        
+                        selectedPaymentMethod = nil
+                        editedPaymentMethod = nil
+                        
+                        DispatchQueue.main.async {
+                            editedPaymentMethod = edit
+                            selectedPaymentMethod = select
+                            
+                            editedPaymentMethod = nil
+                            createPaymentMethodFlag.toggle()
+                        }
                     }) {
                         Image(systemSymbol: .plusCircleFill)
                             .resizable()
@@ -44,20 +66,33 @@ struct CardListDetailView: View {
                 }
                 .padding()
                 .background(Color.init(.secondarySystemBackground))
-                ViewPager()
+                ViewPager(paymentMethodType: paymentMethodType, selection: $pagerSelection)
+                    .environment(\.managedObjectContext, self.viewContext)
                     .frame(height: 220)
                 VStack(spacing: 0) {
                     HStack {
                         VStack(alignment: .leading, spacing: .tiny) {
-                            Text("Mandiri")
+                            Text(selectedPaymentMethod?.name ?? "empty")
                                 .font(.subheadline)
                                 .bold()
-                            Text("Balance: Rp. 100,000,000")
+                            Text("Balance: \(getBalanceFromPaymentMethod(selectedPaymentMethod))")
                                 .font(.footnote)
                         }
                         Spacer()
                         Button(action: {
-                            // Add Card
+                            let select = selectedPaymentMethod
+                            let edit = editedPaymentMethod
+                            
+                            selectedPaymentMethod = nil
+                            editedPaymentMethod = nil
+                            
+                            DispatchQueue.main.async {
+                                editedPaymentMethod = edit
+                                selectedPaymentMethod = select
+                                
+                                editedPaymentMethod = selectedPaymentMethod
+                                createPaymentMethodFlag.toggle()
+                            }
                         }) {
                             VStack {
                                 Image(systemSymbol: .pencil)
@@ -65,7 +100,21 @@ struct CardListDetailView: View {
                                     .scaledToFit()
                                     .frame(width: 15, height: 15)
                                     .foregroundColor(Color.init(.label))
-                                Text("Edit Card")
+                                Text("Edit")
+                                    .font(.caption2)
+                                    .foregroundColor(Color.init(.label))
+                            }
+                        }.padding(.trailing)
+                        Button(action: {
+                            showingAlert.toggle()
+                        }) {
+                            VStack {
+                                Image(systemSymbol: .trash)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 15, height: 15)
+                                    .foregroundColor(Color.init(.label))
+                                Text("Delete")
                                     .font(.caption2)
                                     .foregroundColor(Color.init(.label))
                             }
@@ -111,7 +160,22 @@ struct CardListDetailView: View {
                 .foregroundColor(.white)
             }
         }
+        .onChange(of: pagerSelection, perform: { value in
+            if pagerSelection >= 0 && pagerSelection < paymentMethods.count {
+                selectedPaymentMethod = paymentMethods[pagerSelection]
+            }
+        })
         .navigationBarHidden(true)
+        .sheet(isPresented: $createPaymentMethodFlag) {
+            CreatePaymentMethodView(paymentMethodType: paymentMethodType, sheetFlag: $createPaymentMethodFlag, paymentMethod: editedPaymentMethod)
+                .accentColor(.theme)
+        }
+        .alert(isPresented:$showingAlert) {
+            Alert(title: Text("Warning"), message: Text("Are you sure you want to delete this card?"), primaryButton: .destructive(Text("Delete")) {
+                pagerSelection -= 1
+                deleteSelectedCard()
+            }, secondaryButton: .cancel())
+        }
     }
     
     func navigateToView(_ destination: AnyView?) {
@@ -120,20 +184,77 @@ struct CardListDetailView: View {
             self.navigate.toggle()
         }
     }
+    
+    init(paymentMethodType: PaymentMethodType) {
+        _paymentMethodType = .init(initialValue: paymentMethodType)
+        fetchRequest = FetchRequest<PaymentMethod>(entity: PaymentMethod.entity(), sortDescriptors: [], predicate: NSPredicate(format: "type == %ld", paymentMethodType.rawValue))
+        _selectedPaymentMethod = .init(initialValue: nil)
+        _editedPaymentMethod = .init(initialValue: nil)
+    }
+    
+    func getTotalWalletBalance() -> String {
+        var totalBalance: Double = 0
+        var currency = ""
+        for method in paymentMethods {
+            if let amt = method.balance?.currencyValue.amount {
+                totalBalance += Double(amt) ?? 0
+            }
+            currency = method.balance?.currencyValue.currency ?? ""
+        }
+        let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency) ?? ""
+        return CurrencyHelper.string(from: totalBalance, currency: currencySign)
+    }
+    
+    func getBalanceFromPaymentMethod(_ paymentMethod: PaymentMethod?) -> String {
+        if let amt = paymentMethod?.balance?.currencyValue.amount, let currency = paymentMethod?.balance?.currencyValue.currency {
+            let balance = Double(amt) ?? 0
+            let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency) ?? ""
+            return CurrencyHelper.string(from: balance, currency: currencySign)
+        }
+        return ""
+    }
+    
+    func getTitle() -> String {
+        switch paymentMethodType {
+        case .creditCard:
+            return "Credit Cards"
+        case .debitCard:
+            return "Debit Cards"
+        default:
+            return ""
+        }
+    }
+    
+    func deleteSelectedCard() {
+        guard let paymentMethod = selectedPaymentMethod else { return }
+        viewContext.delete(paymentMethod)
+        do {
+            try viewContext.save()
+            SPAlert.present(title: "Card Deleted", preset: .done)
+        } catch let createError {
+            print("Failed to create PaymentMethod \(createError)")
+        }
+    }
 }
 
 struct CreditCardListDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        CardListDetailView()
+        CardListDetailView(paymentMethodType: .debitCard)
     }
 }
 
 struct ViewPager: View {
+    
+    @Binding var selection:Int
+    @Environment(\.managedObjectContext) private var viewContext
+    var fetchRequest: FetchRequest<PaymentMethod>
+    var cards : FetchedResults<PaymentMethod>{fetchRequest.wrappedValue}
+    
     var body: some View {
-        TabView {
-            ForEach(0..<30) { i in
+        TabView(selection: $selection){
+            ForEach(cards, id: \.id) { card in
                 ZStack {
-                    PaymentMethodCard(backgroundColor: mandiriColor())
+                    PaymentMethodCard(backgroundColor: Color(getColorFromCard(card: card)))
                     VStack {
                         HStack(alignment: .top) {
                             VStack(alignment: .leading) {
@@ -145,14 +266,14 @@ struct ViewPager: View {
                                     .frame(width: 50, height: 5)
                             }
                             Spacer()
-                            Text("Mandiri")
+                            Text(card.name ?? "")
                                 .bold()
                                 .font(.title3)
                                 .foregroundColor(.white)
                         }
                         Spacer()
                         VStack(alignment: .center) {
-                            Text("XXXX XXXX XXXX 4159")
+                            Text("XXXX XXXX XXXX \(card.identifierNumber ?? "XXXX")")
                                 .font(.title3)
                                 .foregroundColor(.white)
                         }
@@ -165,21 +286,38 @@ struct ViewPager: View {
                         }
                     }.padding()
                 }
+                .tabItem {
+                    Text("test")
+                }
+                .tag(cards.firstIndex(of: card)!)
+                .aspectRatio(CGSize(width: 2, height: 1), contentMode: .fit)
+                .padding(.top, 80)
+                .offset(y: -50)
             }
-            .aspectRatio(CGSize(width: 2, height: 1), contentMode: .fit)
-            .padding(.top, 80)
-            .offset(y: -50)
         }
+        .id(cards.count)
         .background(Color.init(.secondarySystemFill))
         .tabViewStyle(PageTabViewStyle())
         .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
+        .onAppear {
+            // WORKAROUND: simulate change of selection on appear !!
+            let value = selection
+            selection = -1
+            DispatchQueue.main.async {
+                selection = value
+            }
+        }
     }
     
-    func mandiriColor() -> Color {
-        return Color.init(UIColor.systemBlue.darker()!)
+    func getColorFromCard(card: PaymentMethod) -> UIColor {
+        if let data = card.color {
+            return UIColor.color(data: data)!
+        }
+        return UIColor.clear
     }
     
-    func mandiriShadowColor() -> Color {
-        return Color.init(UIColor.systemBlue).opacity(0.5)
+    init(paymentMethodType:PaymentMethodType, selection:Binding<Int>) {
+        _selection = selection
+        fetchRequest = FetchRequest<PaymentMethod>(entity: PaymentMethod.entity(), sortDescriptors: [], predicate: NSPredicate(format: "type == %ld", paymentMethodType.rawValue))
     }
 }

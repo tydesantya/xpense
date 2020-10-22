@@ -30,6 +30,7 @@ extension CGFloat {
     public static var normal: CGFloat = 12.0
     public static var medium: CGFloat = 16.0
     public static var large: CGFloat = 24.0
+    public static var extraLarge: CGFloat = 32.0
 }
 extension Font {
 
@@ -216,5 +217,19 @@ struct Blur: UIViewRepresentable {
 
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
         uiView.effect = UIBlurEffect(style: style)
+    }
+}
+
+extension String {
+    func image() -> UIImage? {
+        let size = CGSize(width: 40, height: 40)
+        UIGraphicsBeginImageContextWithOptions(size, false, 0)
+        UIColor.white.set()
+        let rect = CGRect(origin: .zero, size: size)
+        UIRectFill(CGRect(origin: .zero, size: size))
+        (self as AnyObject).draw(in: rect, withAttributes: [.font: UIFont.systemFont(ofSize: 40)])
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
     }
 }

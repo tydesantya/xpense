@@ -18,6 +18,7 @@ struct AddExpenseView: View {
         self._showSheetView = showSheetView
         UITextView.appearance().backgroundColor = .clear
     }
+    
     var body: some View {
         NavigationView {
             ScrollView {

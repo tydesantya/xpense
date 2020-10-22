@@ -118,7 +118,7 @@ struct WalletView: View {
     func getDebitCardSheet() -> AnyView {
         AnyView(
             NavigationView {
-                CardListDetailView(paymentMethodType: .debitCard)
+                CardListDetailView(paymentMethodType: .debitCard, presentedFlag: $activeSheet)
                     .environment(\.managedObjectContext, self.viewContext)
             }
         )

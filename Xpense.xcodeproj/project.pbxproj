@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C30958CD2541BCD6006C0CB5 /* NewCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30958CC2541BCD6006C0CB5 /* NewCategoryView.swift */; };
+		C30958D02541C528006C0CB5 /* NewCategoryStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30958CF2541C528006C0CB5 /* NewCategoryStyleView.swift */; };
+		C30958D32541CC82006C0CB5 /* EmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30958D22541CC82006C0CB5 /* EmojiTextField.swift */; };
 		C328825A2464894100F846DC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32882592464894100F846DC /* AppDelegate.swift */; };
 		C328825C2464894100F846DC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328825B2464894100F846DC /* SceneDelegate.swift */; };
 		C328825E2464894100F846DC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328825D2464894100F846DC /* ContentView.swift */; };
@@ -49,6 +52,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C30958CC2541BCD6006C0CB5 /* NewCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCategoryView.swift; sourceTree = "<group>"; };
+		C30958CF2541C528006C0CB5 /* NewCategoryStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCategoryStyleView.swift; sourceTree = "<group>"; };
+		C30958D22541CC82006C0CB5 /* EmojiTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiTextField.swift; sourceTree = "<group>"; };
 		C32882562464894100F846DC /* Xpense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Xpense.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C32882592464894100F846DC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C328825B2464894100F846DC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -198,6 +204,7 @@
 				C3369DB12532364300CA5647 /* ModalView.swift */,
 				C3369DB52532499B00CA5647 /* CurrencyTextField.swift */,
 				C389120E2540A5C700A646AD /* Common.swift */,
+				C30958D22541CC82006C0CB5 /* EmojiTextField.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -216,6 +223,8 @@
 			children = (
 				C35D419F251FA96600B45BD7 /* CategoriesView.swift */,
 				C35D41A2251FAAEE00B45BD7 /* CategoriesGrid.swift */,
+				C30958CC2541BCD6006C0CB5 /* NewCategoryView.swift */,
+				C30958CF2541C528006C0CB5 /* NewCategoryStyleView.swift */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -362,6 +371,7 @@
 				C35D41B9252E37D100B45BD7 /* CardListDetailView.swift in Sources */,
 				C35D419D251F9D3800B45BD7 /* SettingsView.swift in Sources */,
 				C3369DB62532499B00CA5647 /* CurrencyTextField.swift in Sources */,
+				C30958D02541C528006C0CB5 /* NewCategoryStyleView.swift in Sources */,
 				C35D41A0251FA96600B45BD7 /* CategoriesView.swift in Sources */,
 				C3369D8F2532069000CA5647 /* DisplayCurrencyValue.swift in Sources */,
 				C3369DAE2532244F00CA5647 /* CreatePaymentMethodView.swift in Sources */,
@@ -369,6 +379,7 @@
 				C35D41B12520F07F00B45BD7 /* AddExpenseView.swift in Sources */,
 				C35D41BC2531D60900B45BD7 /* TransactionCellView.swift in Sources */,
 				C3369DA1253213EF00CA5647 /* PaymentMethodTypes.swift in Sources */,
+				C30958CD2541BCD6006C0CB5 /* NewCategoryView.swift in Sources */,
 				C328827C2469C3C400F846DC /* SwiftUIView.swift in Sources */,
 				C328827A24648A3100F846DC /* XpenseView.swift in Sources */,
 				C35D41A6251FAC2C00B45BD7 /* Category.swift in Sources */,
@@ -376,6 +387,7 @@
 				C3369DA52532152500CA5647 /* CoreDataManager.swift in Sources */,
 				C3369D9E253212DF00CA5647 /* Financial.xcdatamodeld in Sources */,
 				C3288275246489FD00F846DC /* Util.swift in Sources */,
+				C30958D32541CC82006C0CB5 /* EmojiTextField.swift in Sources */,
 				C3288274246489FD00F846DC /* APIService.swift in Sources */,
 				C3288276246489FD00F846DC /* API.swift in Sources */,
 				C3369DB22532364300CA5647 /* ModalView.swift in Sources */,

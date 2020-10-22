@@ -13,6 +13,7 @@ struct CategoriesView: View {
     @State var segmentIndex: Int = 0
     let segments = ["Expenses", "Income"]
     @State var dataSource: [Category]
+    @State var addCategoryFlag: Bool =  false
     
     var body: some View {
         VStack {
@@ -28,7 +29,20 @@ struct CategoriesView: View {
             .pickerStyle(SegmentedPickerStyle())
             CategoriesGrid(data: $dataSource)
         }
+        .sheet(isPresented: $addCategoryFlag, content: {
+            NavigationView {
+                NewCategoryView(showSheetView: $addCategoryFlag)
+            }.accentColor(.theme)
+        })
         .navigationTitle("Categories")
+        .navigationBarItems(trailing:
+                                Button(action: {
+                                    addCategoryFlag.toggle()
+                                }) {
+                                    Image(systemSymbol: .plus)
+                                        .foregroundColor(.theme)
+                                }
+        )
     }
     
     func segmentChanged(_ index: Int) {

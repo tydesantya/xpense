@@ -19,6 +19,7 @@ struct CardListDetailView: View {
     @State var pagerSelection: Int = 0
     @State var selectedPaymentMethod: PaymentMethod?
     @State var editedPaymentMethod: PaymentMethod?
+    @Binding var presentedFlag: WalletViewSheet?
     @Environment(\.managedObjectContext) private var viewContext
     var fetchRequest: FetchRequest<PaymentMethod>
     var paymentMethods : FetchedResults<PaymentMethod>{fetchRequest.wrappedValue}
@@ -164,6 +165,9 @@ struct CardListDetailView: View {
             if pagerSelection >= 0 && pagerSelection < paymentMethods.count {
                 selectedPaymentMethod = paymentMethods[pagerSelection]
             }
+            if paymentMethods.count <= 0 {
+                presentedFlag = nil
+            }
         })
         .navigationBarHidden(true)
         .sheet(isPresented: $createPaymentMethodFlag) {
@@ -185,11 +189,12 @@ struct CardListDetailView: View {
         }
     }
     
-    init(paymentMethodType: PaymentMethodType) {
+    init(paymentMethodType: PaymentMethodType, presentedFlag: Binding<WalletViewSheet?>) {
         _paymentMethodType = .init(initialValue: paymentMethodType)
         fetchRequest = FetchRequest<PaymentMethod>(entity: PaymentMethod.entity(), sortDescriptors: [], predicate: NSPredicate(format: "type == %ld", paymentMethodType.rawValue))
         _selectedPaymentMethod = .init(initialValue: nil)
         _editedPaymentMethod = .init(initialValue: nil)
+        _presentedFlag = presentedFlag
     }
     
     func getTotalWalletBalance() -> String {
@@ -239,7 +244,11 @@ struct CardListDetailView: View {
 
 struct CreditCardListDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        CardListDetailView(paymentMethodType: .debitCard)
+        CardListDetailView(paymentMethodType: .debitCard, presentedFlag: .init(get: { () -> WalletViewSheet in
+            return .addCreditCard
+        }, set: { (flag) in
+            
+        }))
     }
 }
 

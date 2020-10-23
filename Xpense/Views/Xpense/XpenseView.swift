@@ -94,7 +94,7 @@ struct XpenseView: View {
                     .padding(.top, .small)
                     VStack {
                         ForEach(0..<3) { index in
-                            TransactionCellView(category: Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple))
+//                            TransactionCellView(category: Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple))
                         }
                     }
                     .padding(.horizontal)

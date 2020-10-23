@@ -67,12 +67,17 @@ class TFCoordinator: NSObject, UITextFieldDelegate {
         let currentString: NSString = (textField.text ?? "") as NSString
         let newString: NSString =
             currentString.replacingCharacters(in: range, with: string) as NSString
+        if (newString.length <= maxLength) {
+            parent.text = (newString) as String
+        }
         return newString.length <= maxLength
     }
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         NotificationCenter.default.post(Notification(name: Notification.Name(EmojiKeyboardNotification.didFocus.rawValue)))
     }
+    
+    
 }
 
 

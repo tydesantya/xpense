@@ -17,14 +17,15 @@ struct TransactionCellView: View {
     var body: some View {
         HStack(alignment: .bottom) {
             HStack(spacing: .medium) {
-                Image(uiImage: category.icon)
-                    .renderingMode(.template)
-                    .foregroundColor(.white)
-                    .frame(width: 40, height: 40)
-                    .background(
-                        Circle().fill(Color.init(category.color))
-                            .frame(width: 40, height: 40)
-                    )
+                // todo
+//                Image(uiImage: category.icon)
+//                    .renderingMode(.template)
+//                    .foregroundColor(.white)
+//                    .frame(width: 40, height: 40)
+//                    .background(
+//                        Circle().fill(Color.init(category.color))
+//                            .frame(width: 40, height: 40)
+//                    )
                 VStack(alignment: .leading) {
                     Text("Shopping")
                         .bold()
@@ -59,8 +60,8 @@ struct TransactionCellView: View {
     }
 }
 
-struct TransactionCellView_Previews: PreviewProvider {
-    static var previews: some View {
-        TransactionCellView(category: Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple))
-    }
-}
+//struct TransactionCellView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TransactionCellView(category: Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple))
+//    }
+//}

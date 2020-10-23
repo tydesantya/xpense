@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SettingsView: View {
     
+    @Environment(\.managedObjectContext) private var viewContext
     @State var navigate: Bool = false
     @State var destinationView: AnyView?
     
@@ -49,7 +50,11 @@ struct SettingsView: View {
         case "Budget":
             destinationView = AnyView(SwiftUIView())
         case "Categories":
-            destinationView = AnyView(CategoriesView(dataSource: [Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple)]))
+            print("temp todo")
+            destinationView = AnyView(
+                CategoriesView()
+                    .environment(\.managedObjectContext, self.viewContext)
+            )
         default:
             destinationView = nil
         }

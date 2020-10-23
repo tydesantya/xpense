@@ -10,16 +10,17 @@ import SwiftUI
 
 struct CategoriesView: View {
     
+    @Environment(\.managedObjectContext) private var viewContext
     @State var segmentIndex: Int = 0
-    let segments = ["Expenses", "Income"]
-    @State var dataSource: [Category]
+    let segments:[CategoryType] = CategoryType.allCases
     @State var addCategoryFlag: Bool =  false
+    @State var newCategoryType: CategoryType = .income
     
     var body: some View {
         VStack {
             Picker(selection: self.$segmentIndex, label: Text("")) {
                 ForEach(0..<self.segments.count) { index in
-                    Text(String(self.segments[index]))
+                    Text(self.segments[index].rawValue)
                 }
             }
             .padding()
@@ -27,36 +28,63 @@ struct CategoriesView: View {
                 self.segmentChanged(value)
             })
             .pickerStyle(SegmentedPickerStyle())
-            CategoriesGrid(data: $dataSource)
+            CategoriesGrid(fetchRequest: makeFetchRequest())
         }
         .sheet(isPresented: $addCategoryFlag, content: {
             NavigationView {
-                NewCategoryView(showSheetView: $addCategoryFlag)
+                NewCategoryView(showSheetView: $addCategoryFlag, categoryType: newCategoryType)
             }.accentColor(.theme)
         })
         .navigationTitle("Categories")
-        .navigationBarItems(trailing:
-                                Button(action: {
-                                    addCategoryFlag.toggle()
-                                }) {
-                                    Image(systemSymbol: .plus)
-                                        .foregroundColor(.theme)
-                                }
-        )
+        .toolbar(content: {
+            ToolbarItem(placement: .primaryAction) {
+                Menu {
+                    Section {
+                        Button(action: {
+                            newCategoryType = .income
+                            addCategoryFlag.toggle()
+                        }) {
+                            Label {
+                                Text("New Income Category")
+                            } icon: {
+                                Image(systemSymbol: .arrowDownCircleFill)
+                                    .foregroundColor(.init(.systemGreen))
+                            }
+                        }
+                        Button(action: {
+                            newCategoryType = .expense
+                            addCategoryFlag.toggle()
+                        }) {
+                            Label {
+                                Text("New Expense Category")
+                            } icon: {
+                                Image(systemSymbol: .arrowUpCircleFill)
+                                    .foregroundColor(.init(.systemRed))
+                            }
+                        }
+                    }
+                }
+                label: {
+                    Label("Add", systemImage: "plus").padding()
+                }
+            }
+        })
+    }
+    
+    func makeFetchRequest() -> FetchRequest<CategoryModel> {
+        let type = CategoryType.allCases[self.segmentIndex].rawValue
+        let predicate = NSPredicate(format: "type == %@", type)
+        
+        return FetchRequest<CategoryModel>(entity: CategoryModel.entity(), sortDescriptors: [], predicate: predicate, animation: .spring())
     }
     
     func segmentChanged(_ index: Int) {
         
     }
-    
-    func onAppear() {
-        let category = Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple)
-        self.dataSource = [category]
-    }
 }
 
 struct CategoriesView_Previews: PreviewProvider {
     static var previews: some View {
-        CategoriesView(dataSource: [Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple)])
+        CategoriesView()
     }
 }

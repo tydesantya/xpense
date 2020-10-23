@@ -32,6 +32,7 @@ struct AddExpenseView: View {
                         Image(systemSymbol: .bagFill)
                             .renderingMode(.template)
                             .resizable()
+                            .scaledToFit()
                             .frame(width: 50, height: 50)
                             .foregroundColor(.white)
                     }.padding(.top, .large)

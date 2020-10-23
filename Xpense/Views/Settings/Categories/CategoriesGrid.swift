@@ -7,20 +7,25 @@
 //
 
 import SwiftUI
+import SFSafeSymbols
 
 struct CategoriesGrid: View {
     
-    @Binding var data: [Category]
+    @Environment(\.managedObjectContext) private var viewContext
+    var fetchRequest: FetchRequest<CategoryModel>
+    private var data: FetchedResults<CategoryModel> {
+        fetchRequest.wrappedValue
+    }
     
     var flexibleLayout = [GridItem(.flexible()), GridItem(.flexible())]
     var body: some View {
         ScrollView {
             LazyVGrid(columns: flexibleLayout, spacing: .small) {
-                ForEach(0..<50) { index in
+                ForEach(data) { category in
                     Button(action: {
                         
                     }){
-                        CategoryItem(category: data[0])
+                        CategoryItem(category: category)
                     }
                 }
             }
@@ -31,40 +36,48 @@ struct CategoriesGrid: View {
 
 struct CategoryItem: View {
     
-    var category: Category
+    var category: CategoryModel
+    var customTextIcon: String? {
+        category.text
+    }
+    var categoryLighterColor: Color {
+        Color(UIColor.color(data: category.color!)!.lighter(by: 10.0)!)
+    }
+    var categoryColor: Color {
+        Color(UIColor.color(data: category.color!)!)
+    }
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 Spacer()
             }
-            Image(uiImage: category.icon)
-                .renderingMode(.template)
-                .foregroundColor(.white)
-                .frame(width: 40, height: 40)
-                .background(
-                    Circle().fill(Color.init(category.color))
-                        .frame(width: 40, height: 40)
-                )
-            Text(category.name)
+            ZStack {
+                Circle().fill(Color.init(UIColor.color(data: category.color!)!))
+                    .frame(width: 40, height: 40)
+                if let text = customTextIcon {
+                    Text(text)
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                }
+                else {
+                    if let symbolName = category.symbolName {
+                        Image(systemSymbol: SFSymbol(rawValue: symbolName) ?? .bagFill)
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(.white)
+                    }
+                }
+            }
+            Text(category.name ?? "")
                 .foregroundColor(.white)
         }
         .padding()
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 50)
         .background(
-            LinearGradient(gradient: Gradient(colors: [.init(category.color.lighter(by: 10.0)!), .init(category.color)]), startPoint: .center, endPoint: .trailing)
+            LinearGradient(gradient: Gradient(colors: [categoryLighterColor, categoryColor]), startPoint: .center, endPoint: .trailing)
         )
         .cornerRadius(.normal)
-    }
-}
-
-struct CategoriesGrid_Previews: PreviewProvider {
-    
-    
-    static var previews: some View {
-        CategoriesGrid(data: Binding(get: {
-            return [Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple)]
-        }, set: { (_) in
-            
-        }))
     }
 }

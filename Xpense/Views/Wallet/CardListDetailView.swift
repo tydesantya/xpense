@@ -132,7 +132,8 @@ struct CardListDetailView: View {
                                 Spacer()
                             }
                             ForEach(0..<50) { index in
-                                TransactionCellView(category: Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple), navigationDestination: navigateToView(_:))
+                                //todo
+//                                TransactionCellView(category: Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple), navigationDestination: navigateToView(_:))
                             }
                         }
                         .padding()

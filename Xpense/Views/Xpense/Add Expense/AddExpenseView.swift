@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SFSafeSymbols
+import SPAlert
 
 struct AddExpenseView: View {
     
@@ -216,7 +217,7 @@ struct AddExpenseView: View {
             }) {
                 Text("Cancel").bold()
             }, trailing: Button(action: {
-                self.showSheetView = false
+                createTransaction()
             }) {
                 Text("Add").bold()
             })
@@ -241,6 +242,42 @@ struct AddExpenseView: View {
         } catch let createError {
             print("Failed to edit Category \(createError)")
         }
+    }
+    
+    func createTransaction() {
+        let transaction = TransactionModel(context: viewContext)
+        transaction.amount = getDisplayCurrencyValueFromAmount(amt: amount)
+        transaction.note = notes
+        transaction.category = selectedCategory
+        transaction.paymentMethod = selectedPaymentMethod
+        transaction.date = Date()
+        
+        deductSelectedPaymentMethodWithCurrentAmount()
+        do {
+            try viewContext.save()
+            SPAlert.present(title: "Added Transaction", preset: .done)
+            self.showSheetView = false
+        } catch let createError {
+            print("Failed to edit Category \(createError)")
+        }
+    }
+    
+    func deductSelectedPaymentMethodWithCurrentAmount() {
+        let initialAmountString: String = selectedPaymentMethod?.balance?.currencyValue.amount ?? ""
+        let initialAmount = Double(initialAmountString) ?? 0
+        
+        let deductedCurrentAmount = initialAmount - amount
+        let balance = getDisplayCurrencyValueFromAmount(amt: deductedCurrentAmount)
+        selectedPaymentMethod?.balance = balance
+    }
+    
+    func getDisplayCurrencyValueFromAmount(amt: Double) -> DisplayCurrencyValue {
+        let numOfDecimalPoint = selectedPaymentMethod?.balance?.numOfDecimalPoint
+        let decimalSeparator = selectedPaymentMethod?.balance?.decimalSeparator
+        let groupingSeparator = selectedPaymentMethod?.balance?.groupingSeparator
+        let amountString = numOfDecimalPoint == 0 ? String(format: "%.0f", amt) : String(amt)
+        let currency = CurrencyValue(amount: amountString, currency: selectedPaymentMethod?.balance?.currencyValue.currency ?? "")
+        return DisplayCurrencyValue(currencyValue: currency, numOfDecimalPoint: numOfDecimalPoint ?? 0, decimalSeparator: decimalSeparator ?? ",", groupingSeparator: groupingSeparator ?? ".")
     }
 }
 

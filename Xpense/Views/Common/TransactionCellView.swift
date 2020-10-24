@@ -7,37 +7,63 @@
 //
 
 import SwiftUI
+import SFSafeSymbols
 
 struct TransactionCellView: View {
     
-    var category: Category
+    var transaction: TransactionModel
+    var category: CategoryModel {
+        transaction.category!
+    }
     
     var navigationDestination: ((AnyView?) -> Void)? = nil
     
     var body: some View {
         HStack(alignment: .bottom) {
             HStack(spacing: .medium) {
-                // todo
-//                Image(uiImage: category.icon)
-//                    .renderingMode(.template)
-//                    .foregroundColor(.white)
-//                    .frame(width: 40, height: 40)
-//                    .background(
-//                        Circle().fill(Color.init(category.color))
-//                            .frame(width: 40, height: 40)
-//                    )
+                ZStack {
+                    let customTextIcon = category.text
+                    let symbolSelection:SFSymbol = SFSymbol(rawValue: category.symbolName ?? "") ?? .archiveboxFill
+                    Circle()
+                        .fill(
+                            LinearGradient(gradient: .init(colors: [Color(UIColor.color(data: category.lighterColor!)!), Color(UIColor.color(data: category.color!)!)]), startPoint: .top, endPoint: .bottom)
+                        )
+                        .frame(width: 40, height: 40)
+                    if let text = customTextIcon {
+                        Text(text)
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                    }
+                    else {
+                        Image(systemSymbol: symbolSelection)
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(.white)
+                        .foregroundColor(.white)
+                    }
+                }
                 VStack(alignment: .leading) {
-                    Text("Shopping")
+                    Text(category.name ?? "")
                         .bold()
-                    Text("-Rp. 100,000")
-                        .font(.title)
-                        .bold()
-                        .foregroundColor(.init(.systemRed))
+                    if category.type == CategoryType.income.rawValue {
+                        Text(getTransactionAmount())
+                            .font(.title)
+                            .bold()
+                            .foregroundColor(.init(.systemGreen))
+                    }
+                    else {
+                        Text("-\(getTransactionAmount())")
+                            .font(.title)
+                            .bold()
+                            .foregroundColor(.init(.systemRed))
+                    }
                 }
             }
             Spacer()
             HStack {
-                Text("Thursday")
+                Text(transaction.date?.todayShortFormat() ?? "")
                 Image(systemSymbol: .chevronRight)
             }
             .foregroundColor(.init(.secondaryLabel))
@@ -55,13 +81,16 @@ struct TransactionCellView: View {
         }
     }
     
+    
+    func getTransactionAmount() -> String {
+        let amount: String = transaction.amount?.currencyValue.amount ?? "0"
+        let transactionAmount = Double(amount) ?? 0
+        let currency = transaction.amount?.currencyValue.currency ?? ""
+        let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency)
+        return CurrencyHelper.string(from: transactionAmount, currency: currencySign!)
+    }
+    
     func generateDestinationView() -> AnyView {
         return AnyView(SwiftUIView())
     }
 }
-
-//struct TransactionCellView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TransactionCellView(category: Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple))
-//    }
-//}

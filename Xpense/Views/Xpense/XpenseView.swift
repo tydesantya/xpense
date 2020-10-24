@@ -7,9 +7,13 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct XpenseView: View {
     
+    @Environment(\.managedObjectContext) private var viewContext
+    var fetchRequest: FetchRequest<TransactionModel>
+    var transactions : FetchedResults<TransactionModel>{fetchRequest.wrappedValue}
     @State var show = false
     @State var progressValue: Float = 1.0
     @State var showAddExpense: Bool = false
@@ -72,11 +76,7 @@ struct XpenseView: View {
                             
                         }
                     }
-                    .padding(.horizontal)
-                    PrimaryButton(title: "Add Transaction") {
-                        self.showAddExpense.toggle()
-                    }
-                    .padding(.horizontal)
+                    .padding([.horizontal, .bottom])
                     HStack {
                         Text("Transactions")
                             .font(Font.getFontFromDesign(design: .sectionTitle))
@@ -93,8 +93,10 @@ struct XpenseView: View {
                     }.padding(.horizontal)
                     .padding(.top, .small)
                     VStack {
-                        ForEach(0..<3) { index in
-//                            TransactionCellView(category: Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple))
+                        let limit = transactions.count > 3 ? 4 : transactions.count
+                        ForEach(0..<limit) { index in
+                            let transaction = transactions[index]
+                            TransactionCellView(transaction: transaction)
                         }
                     }
                     .padding(.horizontal)
@@ -125,6 +127,13 @@ struct XpenseView: View {
                 self.progressValue = 0.5
             }
         })
+    }
+    
+    init() {
+        let request: NSFetchRequest<TransactionModel> = TransactionModel.fetchRequest()
+        request.fetchLimit = 3
+        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        fetchRequest = FetchRequest<TransactionModel>(fetchRequest: request)
     }
 }
 

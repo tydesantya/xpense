@@ -20,7 +20,6 @@ struct TrayIndicator: View {
                     .padding(.top, .small)
                 Spacer()
             }
-            SearchBar(text: $text)
         }
     }
 }

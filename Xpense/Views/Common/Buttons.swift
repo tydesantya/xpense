@@ -57,6 +57,23 @@ struct PrimaryButton: View {
     }
 }
 
+struct PillButton: View {
+    
+    var body: some View {
+        Button(action: {
+            
+        }, label: {
+            Text("Add Transaction")
+                .foregroundColor(.white)
+                .padding(.horizontal)
+                .padding(.vertical, .small)
+        })
+        .background(Capsule()
+                        .fill(Color.theme)
+        )
+    }
+}
+
 struct Buttons_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
@@ -66,6 +83,7 @@ struct Buttons_Previews: PreviewProvider {
             PrimaryButton {
                 
             }
+            PillButton()
         }
     }
 }

@@ -15,6 +15,9 @@ struct CategoriesView: View {
     let segments:[CategoryType] = CategoryType.allCases
     @State var addCategoryFlag: Bool =  false
     @State var newCategoryType: CategoryType = .income
+    @State var selectedCategory: CategoryModel? = nil
+    @State private var refreshID = UUID()
+    var selectionAction:((CategoryModel) -> Void)? = nil
     
     var body: some View {
         VStack {
@@ -28,11 +31,12 @@ struct CategoriesView: View {
                 self.segmentChanged(value)
             })
             .pickerStyle(SegmentedPickerStyle())
-            CategoriesGrid(fetchRequest: makeFetchRequest())
+            CategoriesGrid(fetchRequest: makeFetchRequest(), categoryTapAction: onCategoryTapped(category:))
+                .id(refreshID)
         }
         .sheet(isPresented: $addCategoryFlag, content: {
             NavigationView {
-                NewCategoryView(showSheetView: $addCategoryFlag, categoryType: newCategoryType)
+                NewCategoryView(showSheetView: $addCategoryFlag, existingCategory: $selectedCategory, categoryType: newCategoryType, refreshFlagUUID: $refreshID).environment(\.managedObjectContext, self.viewContext)
             }.accentColor(.theme)
         })
         .navigationTitle("Categories")
@@ -41,6 +45,7 @@ struct CategoriesView: View {
                 Menu {
                     Section {
                         Button(action: {
+                            selectedCategory = nil
                             newCategoryType = .income
                             addCategoryFlag.toggle()
                         }) {
@@ -48,10 +53,10 @@ struct CategoriesView: View {
                                 Text("New Income Category")
                             } icon: {
                                 Image(systemSymbol: .arrowDownCircleFill)
-                                    .foregroundColor(.init(.systemGreen))
                             }
                         }
                         Button(action: {
+                            selectedCategory = nil
                             newCategoryType = .expense
                             addCategoryFlag.toggle()
                         }) {
@@ -59,13 +64,12 @@ struct CategoriesView: View {
                                 Text("New Expense Category")
                             } icon: {
                                 Image(systemSymbol: .arrowUpCircleFill)
-                                    .foregroundColor(.init(.systemRed))
                             }
                         }
                     }
                 }
                 label: {
-                    Label("Add", systemImage: "plus").padding()
+                    Label("Add", systemImage: "rectangle.stack.fill.badge.plus").padding()
                 }
             }
         })
@@ -74,8 +78,25 @@ struct CategoriesView: View {
     func makeFetchRequest() -> FetchRequest<CategoryModel> {
         let type = CategoryType.allCases[self.segmentIndex].rawValue
         let predicate = NSPredicate(format: "type == %@", type)
-        
-        return FetchRequest<CategoryModel>(entity: CategoryModel.entity(), sortDescriptors: [], predicate: predicate, animation: .spring())
+        let sort = NSSortDescriptor(key: "timeStamp", ascending: true)
+        return FetchRequest<CategoryModel>(entity: CategoryModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
+    }
+    
+    func onCategoryTapped(category: CategoryModel) {
+        if let action = selectionAction {
+            action(category)
+        }
+        else {
+            //workaround
+            selectedCategory = nil
+            selectedCategory = category
+            
+            DispatchQueue.main.async {
+                newCategoryType = .expense
+                selectedCategory = category
+                addCategoryFlag.toggle()
+            }
+        }
     }
     
     func segmentChanged(_ index: Int) {

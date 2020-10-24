@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SFSafeSymbols
+import SPAlert
 
 struct CategoriesGrid: View {
     
@@ -16,20 +17,52 @@ struct CategoriesGrid: View {
     private var data: FetchedResults<CategoryModel> {
         fetchRequest.wrappedValue
     }
+    var categoryTapAction:(CategoryModel) -> Void
+    @State var showDeleteConfirmation = false
+    @State var longPressedCategory: CategoryModel? = nil
     
     var flexibleLayout = [GridItem(.flexible()), GridItem(.flexible())]
     var body: some View {
         ScrollView {
             LazyVGrid(columns: flexibleLayout, spacing: .small) {
                 ForEach(data) { category in
-                    Button(action: {
-                        
-                    }){
-                        CategoryItem(category: category)
-                    }
+                    CategoryItem(category: category)
+                        .onTapGesture {
+                            categoryTapAction(category)
+                        }
+                        .contextMenu {
+                            Button(action: {
+                                longPressedCategory = category
+                                showDeleteConfirmation.toggle()
+                            }) {
+                                Label {
+                                    Text("Delete").foregroundColor(.red)
+                                } icon: {
+                                    Image(systemName: "trash").foregroundColor(.red)
+                                }.foregroundColor(.red)
+                            }
+                        }
+                        .actionSheet(isPresented: $showDeleteConfirmation, content: {
+                            ActionSheet(title: Text("Delete Confirmation"), message: Text("Are you sure you want to delete ?"), buttons: [
+                                .destructive(Text("Delete")) {
+                                    deleteCategory(longPressedCategory!)
+                                },
+                                .cancel()
+                            ])
+                        })
                 }
             }
             .padding(.horizontal)
+        }
+    }
+    
+    func deleteCategory(_ category: CategoryModel) {
+        do {
+            viewContext.delete(category)
+            try viewContext.save()
+            SPAlert.present(title: "Deleted Category", preset: .done)
+        } catch let createError {
+            print("Failed to delete Category \(createError)")
         }
     }
 }
@@ -71,6 +104,7 @@ struct CategoryItem: View {
                 }
             }
             Text(category.name ?? "")
+                .bold()
                 .foregroundColor(.white)
         }
         .padding()

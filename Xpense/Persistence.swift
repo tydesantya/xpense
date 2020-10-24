@@ -51,4 +51,19 @@ struct PersistenceController {
             }
         })
     }
+    
+    func validateCategoriesSeed() {
+        let context = container.viewContext
+        let fetchRequest = NSFetchRequest<CategoryModel>(entityName: "Category")
+        
+        do {
+            let categories = try context.fetch(fetchRequest)
+            if categories.count == 0 {
+                seedCategories()
+            }
+        } catch let fetchError {
+            print("Failed to fetch PaymentMethods \(fetchError)")
+        }
+    }
+    
 }

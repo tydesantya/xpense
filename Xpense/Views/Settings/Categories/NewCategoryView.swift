@@ -18,13 +18,15 @@ struct NewCategoryView: View {
     @State var categoryName: String = ""
     @State var newStyleSheet: Bool = false
     @State var newStyleSheetType: CategoryStyleType = .emoji
-    @State var color: Color = Color(UIColor.systemPurple)
+    @State var color: Color = Color(UIColor.systemGreen)
     var lighterColor: Color {
         Color(UIColor(color).lighter()!)
     }
     @State var customTextIcon: String? = nil
     @State var symbolSelection: SFSymbol = .bagFill
+    @Binding var existingCategory: CategoryModel?
     var categoryType: CategoryType
+    @Binding var refreshFlagUUID: UUID
     
     var body: some View {
         VStack {
@@ -102,12 +104,13 @@ struct NewCategoryView: View {
             }.padding()
             ProvidedCategoriesScrollView(colorSelection: $color, customTextIcon: $customTextIcon, symbolSelection: $symbolSelection, moreIconAction: onMoreIconTapped)
         }
+        .onAppear {
+            onAppear()
+        }
         .sheet(isPresented: $newStyleSheet, content: {
-            NavigationView {
-                NewCategoryStyleView(type: $newStyleSheetType, showSheetFlag: $newStyleSheet, completion: onUserSelectTextOrEmojiWithText)
-            }.accentColor(.theme)
+            NewCategoryStyleView(type: $newStyleSheetType, showSheetFlag: $newStyleSheet, completion: onUserSelectTextOrEmojiWithText).accentColor(.theme)
         })
-        .navigationBarTitle(Text("New \(categoryType.rawValue)"), displayMode: .inline)
+        .navigationBarTitle(Text(getNavigationBarTitle()), displayMode: .inline)
         .navigationBarItems(leading: Button(action: {
             self.showSheetView = false
         }) {
@@ -117,6 +120,22 @@ struct NewCategoryView: View {
         }) {
             Text("Done").bold()
         })
+    }
+    
+    func onAppear() {
+        if let category = existingCategory {
+            categoryName = category.name ?? ""
+            symbolSelection = SFSymbol(rawValue: category.symbolName ?? "") ?? .bagFill
+            color = Color(UIColor.color(data: category.color!)!)
+            customTextIcon = category.text
+        }
+    }
+    
+    func getNavigationBarTitle() -> String {
+        if let category = existingCategory {
+            return "Edit \(category.name ?? "")"
+        }
+        return "New \(categoryType.rawValue)"
     }
     
     func onUserSelectTextOrEmojiWithText(text: String?, color: Color, symbol: SFSymbol?) {
@@ -133,6 +152,15 @@ struct NewCategoryView: View {
     }
     
     func onDoneTapped() {
+        if let category = existingCategory {
+            editExistingCategory(category)
+        }
+        else {
+            createNewCategory()
+        }
+    }
+    
+    func createNewCategory() {
         let category = CategoryModel(context: viewContext)
         category.name = categoryName
         category.type = categoryType.rawValue
@@ -140,6 +168,7 @@ struct NewCategoryView: View {
         category.color = UIColor(color).encode()
         category.lighterColor = UIColor(lighterColor).encode()
         category.text = customTextIcon
+        category.timeStamp = Date()
         
         do {
             try viewContext.save()
@@ -147,6 +176,23 @@ struct NewCategoryView: View {
             SPAlert.present(title: "Added Category", preset: .done)
         } catch let createError {
             print("Failed to create Category \(createError)")
+        }
+    }
+    
+    func editExistingCategory(_ category: CategoryModel) {
+        category.name = categoryName
+        category.symbolName = symbolSelection.rawValue
+        category.color = UIColor(color).encode()
+        category.lighterColor = UIColor(lighterColor).encode()
+        category.text = customTextIcon
+        
+        do {
+            try viewContext.save()
+            refreshFlagUUID = UUID()
+            self.showSheetView = false
+            SPAlert.present(title: "Edited Category", preset: .done)
+        } catch let createError {
+            print("Failed to edit Category \(createError)")
         }
     }
 }
@@ -285,7 +331,15 @@ struct NewCategoryView_Previews: PreviewProvider {
                 return true
             }, set: { (flag) in
                 
-            }), categoryType: .income)
+            }), existingCategory: .init(get: { () -> CategoryModel? in
+                return nil
+            }, set: { (flag) in
+                
+            }), categoryType: .income, refreshFlagUUID: .init(get: { () -> UUID in
+                return UUID()
+            }, set: { (id) in
+                
+            }))
         }.accentColor(.theme)
         .environment(\.colorScheme, .dark)
     }

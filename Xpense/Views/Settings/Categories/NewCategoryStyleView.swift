@@ -17,8 +17,8 @@ enum CategoryStyleType: String {
 
 struct NewCategoryStyleView: View {
     
-    @State var colorSelection: Color = Color(UIColor.systemPurple)
-    @State var colorSelectionLighter: Color = Color(UIColor.systemPurple.lighter()!)
+    @State var colorSelection: Color = Color(UIColor.systemGreen)
+    @State var colorSelectionLighter: Color = Color(UIColor.systemGreen.lighter()!)
     @State var inputText: String = ""
     @State var latestInputText: String = ""
     @Binding var type: CategoryStyleType
@@ -47,6 +47,26 @@ struct NewCategoryStyleView: View {
     
     var body: some View {
         VStack {
+            HStack {
+                Button(action: {
+                    self.showSheetFlag = false
+                }) {
+                    Text("Cancel").bold()
+                }
+                Spacer()
+                Button(action: {
+                    if self.type == .icon {
+                        self.completion(nil, colorSelection, symbolSelection)
+                    }
+                    else {
+                        self.completion(inputText, colorSelection, nil)
+                    }
+                    self.showSheetFlag = false
+                }) {
+                    Text("Done").bold()
+                }.disabled(inputText.count == 0 && self.type != .icon)
+            }
+            .padding()
             ZStack {
                 Circle()
                     .fill(
@@ -111,21 +131,21 @@ struct NewCategoryStyleView: View {
                 }
             }
         }.navigationBarTitle(Text(""), displayMode: .inline)
-        .navigationBarItems(leading: Button(action: {
-            self.showSheetFlag = false
-        }) {
-            Text("Cancel").bold()
-        }, trailing: Button(action: {
-            if self.type == .icon {
-                self.completion(nil, colorSelection, symbolSelection)
-            }
-            else {
-                self.completion(inputText, colorSelection, nil)
-            }
-            self.showSheetFlag = false
-        }) {
-            Text("Done").bold()
-        }.disabled(inputText.count == 0 && self.type != .icon))
+//        .navigationBarItems(leading: Button(action: {
+//            self.showSheetFlag = false
+//        }) {
+//            Text("Cancel").bold()
+//        }, trailing: Button(action: {
+//            if self.type == .icon {
+//                self.completion(nil, colorSelection, symbolSelection)
+//            }
+//            else {
+//                self.completion(inputText, colorSelection, nil)
+//            }
+//            self.showSheetFlag = false
+//        }) {
+//            Text("Done").bold()
+//        }.disabled(inputText.count == 0 && self.type != .icon))
         .onAppear {
             segmentChanged(0)
         }

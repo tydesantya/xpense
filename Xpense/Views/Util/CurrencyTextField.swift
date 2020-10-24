@@ -30,8 +30,10 @@ struct CurrencyTextField: View {
                 let amt = CurrencyHelper.getAmountFrom(formattedCurrencyString: value, currency: self.currencySign)
                 guard let balanceAmount = amt else { return amountInputText = latestInputText }
                 amount = balanceAmount
-                if (balanceAmount > 0) {
-                    amountInputText = CurrencyHelper.string(from: balanceAmount, currency: self.currencySign)
+            })
+            .onChange(of: amount, perform: { value in
+                if (value > 0) {
+                    amountInputText = CurrencyHelper.string(from: value, currency: self.currencySign)
                     latestInputText = amountInputText
                 }
                 else {

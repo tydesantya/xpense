@@ -73,7 +73,7 @@ struct XpenseView: View {
                         }
                     }
                     .padding(.horizontal)
-                    PrimaryButton(title: "Add Expense") {
+                    PrimaryButton(title: "Add Transaction") {
                         self.showAddExpense.toggle()
                     }
                     .padding(.horizontal)
@@ -125,9 +125,6 @@ struct XpenseView: View {
                 self.progressValue = 0.5
             }
         })
-        .sheet(isPresented: self.$showAddExpense) {
-            AddExpenseView(showSheetView: self.$showAddExpense)
-        }
     }
 }
 

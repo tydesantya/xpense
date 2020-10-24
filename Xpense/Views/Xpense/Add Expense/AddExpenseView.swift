@@ -7,15 +7,37 @@
 //
 
 import SwiftUI
+import SFSafeSymbols
 
 struct AddExpenseView: View {
     
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(sortDescriptors: [])
+    private var paymentMethods: FetchedResults<PaymentMethod>
     @Binding var showSheetView: Bool
-    @State var amount: String = ""
+    @State var amount: Double = 0
+    @State var currency: CurrencyValue
     @State var notes: String = ""
+    @State var selectedPaymentMethod: PaymentMethod? = nil
+    var amountTemplates: [Double] {
+        [
+            10000,
+            20000,
+            50000,
+            100000
+        ]
+    }
+    
+    
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "lastUsed", ascending: false)])
+    private var categories: FetchedResults<CategoryModel>
+    @State var selectedCategory: CategoryModel? = nil
+    @State var categorySelectNavigation = false
     
     init(showSheetView:Binding<Bool>) {
         self._showSheetView = showSheetView
+        let defaultCurrency = "IDR"
+        _currency = .init(initialValue: CurrencyValue(amount: "0", currency: defaultCurrency))
         UITextView.appearance().backgroundColor = .clear
     }
     
@@ -24,130 +46,136 @@ struct AddExpenseView: View {
             ScrollView {
                 VStack(alignment: .center) {
                     ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(gradient: .init(colors: [lighterPurple(), .init(.systemPurple)]), startPoint: .top, endPoint: .bottom)
-                            )
-                            .frame(width: 100, height: 100)
-                        Image(systemSymbol: .bagFill)
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 50, height: 50)
-                            .foregroundColor(.white)
-                    }.padding(.top, .large)
-                    Text("Shopping")
-                        .bold()
-                        .padding(.top, .small)
-                    HStack {
-                        Spacer()
-                        ForEach(0 ..< 3) { item in
-                            VStack {
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(gradient: .init(colors: [lighterOrange(), .init(.systemOrange)]), startPoint: .top, endPoint: .bottom)
-                                        )
-                                        .frame(width: 50, height: 50)
-                                    Image(systemSymbol: .archiveboxFill)
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .frame(width: 25, height: 25)
-                                        .foregroundColor(.white)
-                                }.padding(.top, .large)
-                                Text("Food")
-                                    .bold()
-                                    .font(.caption)
-                                    .padding(.top, .tiny)
-                                    .padding(.bottom, .medium)
+                        if let selectedCategory = selectedCategory {
+                            let selectedCategoryColor = Color(UIColor.color(data: selectedCategory.color!)!)
+                            let selectedCategoryLighterColor = Color(UIColor.color(data: selectedCategory.lighterColor!)!)
+                            Circle()
+                                .fill(
+                                    LinearGradient(gradient: .init(colors: [selectedCategoryLighterColor, selectedCategoryColor]), startPoint: .top, endPoint: .bottom)
+                                )
+                                .frame(width: 100, height: 100)
+                            if let text = selectedCategory.text {
+                                Text(text)
+                                    .font(.system(size: 50, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
                             }
-                            Spacer()
-                        }
-                        VStack {
-                            ZStack {
-                                Circle()
-                                    .fill(
-                                        Color.blue.opacity(0.5)
-                                    )
-                                    .frame(width: 50, height: 50)
-                                Image(systemSymbol: .ellipsis)
+                            else {
+                                let symbolSelection:SFSymbol = SFSymbol(rawValue: selectedCategory.symbolName ?? "") ?? .archiveboxFill
+                                Image(systemSymbol: symbolSelection)
                                     .renderingMode(.template)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 25, height: 25)
-                                    .foregroundColor(.blue)
-                            }.padding(.top, .large)
-                            Text("More")
-                                .bold()
-                                .font(.caption)
-                                .padding(.top, .tiny)
-                                .padding(.bottom, .medium)
+                                    .frame(width: 50, height: 50)
+                                    .foregroundColor(.white)
+                                .foregroundColor(.white)
+                            }
                         }
+                    }.padding(.top, .large)
+                    Text(selectedCategory?.name ?? "")
+                        .bold()
+                        .padding(.top, .small)
+                    HStack(alignment: .top) {
+                        Spacer()
+                        ForEach(0 ..< (categories.count > 5 ? 4 : categories.count)) { i in
+                            let category = categories[i]
+                            if category != selectedCategory {
+                                let customTextIcon = category.text
+                                let symbolSelection:SFSymbol = SFSymbol(rawValue: category.symbolName ?? "") ?? .archiveboxFill
+                                Button(action: {
+                                    selectedCategory = category
+                                }) {
+                                    VStack {
+                                        ZStack {
+                                            Circle()
+                                                .fill(
+                                                    LinearGradient(gradient: .init(colors: [Color(UIColor.color(data: category.lighterColor!)!), Color(UIColor.color(data: category.color!)!)]), startPoint: .top, endPoint: .bottom)
+                                                )
+                                                .frame(width: 50, height: 50)
+                                            if let text = customTextIcon {
+                                                Text(text)
+                                                    .font(.system(size: 25, weight: .bold, design: .rounded))
+                                                    .foregroundColor(.white)
+                                            }
+                                            else {
+                                                Image(systemSymbol: symbolSelection)
+                                                    .renderingMode(.template)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 25, height: 25)
+                                                    .foregroundColor(.white)
+                                                .foregroundColor(.white)
+                                            }
+                                        }.padding(.top, .large)
+                                        Text(category.name ?? "")
+                                            .bold()
+                                            .font(.caption)
+                                            .padding(.top, .tiny)
+                                            .padding(.bottom, .medium)
+                                            .frame(width: 50)
+                                            .foregroundColor(Color(UIColor.label))
+                                    }
+                                }
+                                Spacer()
+                            }
+                        }
+                        NavigationLink(
+                            destination: CategoriesView(selectionAction: onCategoriesViewSelectedCategory)
+                                .environment(\.managedObjectContext, self.viewContext),
+                            isActive: self.$categorySelectNavigation,
+                            label: {
+                                VStack {
+                                    ZStack {
+                                        Circle()
+                                            .fill(
+                                                Color.blue.opacity(0.5)
+                                            )
+                                            .frame(width: 50, height: 50)
+                                        Image(systemSymbol: .ellipsis)
+                                            .renderingMode(.template)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 25, height: 25)
+                                            .foregroundColor(.blue)
+                                    }.padding(.top, .large)
+                                    Text("More")
+                                        .bold()
+                                        .font(.caption)
+                                        .padding(.top, .tiny)
+                                        .padding(.bottom, .medium)
+                                        .foregroundColor(Color(UIColor.label))
+                                }
+                            })
                         Spacer()
                     }
                     VStack {
                         Text("Enter amount")
                             .font(.footnote)
                             .foregroundColor(.init(.secondaryLabel))
-                        TextField("Rp. 0", text: self.$amount)
-                            .keyboardType(.numberPad)
-                            .padding()
-                            .background(Color.init(.secondarySystemBackground))
-                            .cornerRadius(.normal)
+                        CurrencyTextField(amount: self.$amount, currency: self.$currency)
+                            .background(Color.init(.secondarySystemBackground)
+                                            .cornerRadius(.normal))
                     }.padding(.horizontal)
                     HStack {
-                        VStack {
-                            Image(systemName: "cylinder.split.1x2.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30)
-                                .padding(.top)
-                                .padding(.bottom, .tiny)
-                            Text("Rp. 10,000")
-                                .padding(.bottom)
-                        }.frame(minWidth: 50, maxWidth: .infinity, minHeight: 80, maxHeight: 80)
-                        .background(Color.init(.secondarySystemBackground))
-                        .cornerRadius(.normal)
-                        .font(.caption)
-                        VStack {
-                            Image(systemName: "cylinder.split.1x2.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30)
-                                .padding(.top)
-                                .padding(.bottom, .tiny)
-                            Text("Rp. 20,000")
-                                .padding(.bottom)
-                        }.frame(minWidth: 50, maxWidth: .infinity, minHeight: 80, maxHeight: 80)
-                        .background(Color.init(.secondarySystemBackground))
-                        .cornerRadius(.normal)
-                        .font(.caption)
-                        VStack {
-                            Image(systemName: "cylinder.split.1x2.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30)
-                                .padding(.top)
-                                .padding(.bottom, .tiny)
-                            Text("Rp. 50,000")
-                                .padding(.bottom)
-                        }.frame(minWidth: 50, maxWidth: .infinity, minHeight: 80, maxHeight: 80)
-                        .background(Color.init(.secondarySystemBackground))
-                        .cornerRadius(.normal)
-                        .font(.caption)
-                        VStack {
-                            Image(systemName: "cylinder.split.1x2.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30)
-                                .padding(.top)
-                                .padding(.bottom, .tiny)
-                            Text("Rp. 100,000")
-                                .padding(.bottom)
-                        }.frame(minWidth: 50, maxWidth: .infinity, minHeight: 80, maxHeight: 80)
-                        .background(Color.init(.secondarySystemBackground))
-                        .cornerRadius(.normal)
-                        .font(.caption)
+                        ForEach(amountTemplates, id:\.self) { amnt in
+                            Button(action: {
+                                self.amount = amnt
+                            }) {
+                                VStack {
+                                    Image(systemName: "cylinder.split.1x2.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 30, height: 30)
+                                        .padding(.top)
+                                        .padding(.bottom, .tiny)
+                                    Text(CurrencyHelper.string(from: amnt, currency: CurrencyHelper.getCurrencySignFromCurrency(self.currency.currency)!))
+                                        .padding(.bottom)
+                                }.foregroundColor(Color(UIColor.label))
+                                .frame(minWidth: 50, maxWidth: .infinity, minHeight: 80, maxHeight: 80)
+                                .background(Color.init(.secondarySystemBackground))
+                                .cornerRadius(.normal)
+                                .font(.caption)
+                            }
+                        }
                     }
                     .padding(.horizontal)
                     Text("Select Payment Method")
@@ -157,16 +185,14 @@ struct AddExpenseView: View {
                     ScrollView (.horizontal, showsIndicators: false) {
                         let width = CGFloat(150)
                         let height = CGFloat(80)
-                        HStack {
-                            PaymentMethodCardView(color: .systemGreen, title: "Rupiah")
-                                .frame(width: width, height: height)
-                            PaymentMethodCardView(color: .systemPurple, title: "OVO")
-                                .frame(width: width, height: height)
-                            PaymentMethodCardView(color: .systemBlue, title: "BCA")
-                                .frame(width: width, height: height)
+                        LazyHStack {
+                            ForEach(paymentMethods) { paymentMethod in
+                                PaymentMethodCardView(paymentMethod: paymentMethod, selectedPaymentMethod: $selectedPaymentMethod)
+                                    .frame(width: width, height: height)
+                            }
                         }
                         .padding(.horizontal)
-                    }.frame(height: 80)
+                    }
                     ZStack {
                         Color.init(.secondarySystemBackground)
                             .cornerRadius(.normal)
@@ -194,35 +220,66 @@ struct AddExpenseView: View {
             }) {
                 Text("Add").bold()
             })
+            .onAppear {
+                if selectedPaymentMethod == nil {
+                    selectedPaymentMethod = paymentMethods.first
+                }
+                if selectedCategory == nil {
+                    selectedCategory = categories.first
+                }
+            }
         }
         .accentColor(.theme)
     }
     
-    func lighterPurple() -> Color {
-        let lighterPurple = UIColor.systemPurple.lighter(by: 10.0)
-        return Color.init(lighterPurple!)
-    }
-    
-    func lighterOrange() -> Color {
-        let lighterOrange = UIColor.systemOrange.lighter(by: 10.0)
-        return Color.init(lighterOrange!)
+    func onCategoriesViewSelectedCategory(_ category: CategoryModel) {
+        category.lastUsed = Date()
+        selectedCategory = category
+        do {
+            try viewContext.save()
+            categorySelectNavigation.toggle()
+        } catch let createError {
+            print("Failed to edit Category \(createError)")
+        }
     }
 }
 
 struct PaymentMethodCardView: View {
     
-    var color: UIColor
-    var title: String
+    var paymentMethod: PaymentMethod
+    @Binding var selectedPaymentMethod: PaymentMethod?
     
     var body: some View {
-        ZStack(alignment:.bottomTrailing) {
-            RoundedRectangle(cornerRadius: 10.0)
-                .fill(LinearGradient(gradient: Gradient(colors: [Color.init(color.lighter(by: 10.0)!), Color.init(color), Color.init(color.darker(by: 30.0)!)]), startPoint: .topLeading, endPoint: .bottomTrailing))
-            Text(title)
-                .font(.callout)
-                .bold()
-                .padding()
-                .foregroundColor(.white)
+        Button(action: {
+            selectedPaymentMethod = paymentMethod
+        }) {
+            ZStack {
+                PaymentMethodCard(backgroundColor: Color.init(UIColor.color(data: paymentMethod.color!)!))
+                VStack {
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading) {
+                            PlaceHolderView()
+                                .frame(width: 75, height: 5)
+                            PlaceHolderView()
+                                .frame(width: 50, height: 5)
+                            PlaceHolderView()
+                                .frame(width: 25, height: 5)
+                        }
+                        Spacer()
+                        if selectedPaymentMethod == paymentMethod {
+                            Image(systemSymbol: .checkmarkSealFill)
+                                .foregroundColor(.white)
+                        }
+                    }
+                    HStack {
+                        Spacer()
+                        Text(paymentMethod.name ?? "")
+                            .font(.callout)
+                            .bold()
+                            .foregroundColor(.white)
+                    }
+                }.padding(.horizontal, .normal)
+            }
         }
     }
 }

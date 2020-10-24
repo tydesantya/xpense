@@ -18,6 +18,7 @@ struct ContentView: View {
     @State var navigationBarTitle: String = "Xpense"
     @State var neverSetupCash = false
     @State var showModally = true
+    @State var addTransaction = false
     var body: some View {
         NavigationView {
             TabView(selection: $selection) {
@@ -33,7 +34,18 @@ struct ContentView: View {
                     Image(systemName: "gear")
                     Text("Settings")
                 }.tag(4)
+            }.sheet(isPresented: self.$addTransaction) {
+                AddExpenseView(showSheetView: self.$addTransaction)
+                    .environment(\.managedObjectContext, self.viewContext)
             }
+            .navigationBarItems(trailing: Button(action: {
+                self.addTransaction.toggle()
+            }, label: {
+                Image(systemName: "note.text.badge.plus")
+                    .resizable()
+                    .scaledToFit()
+                    .scaleEffect(1.2)
+            }))
             .navigationBarTitle(self.navigationBarTitle)
             .onChange(of: selection, perform: { value in
                 switch value {
@@ -57,6 +69,7 @@ struct ContentView: View {
                     print("Attempted to dismiss")
                 }
                 .accentColor(.theme)
+                .environment(\.managedObjectContext, self.viewContext)
         })
         .accentColor(.theme)
     }

@@ -43,27 +43,7 @@ struct CardListDetailView: View {
                         Text("Total Balance: \(getTotalWalletBalance())")
                     }
                     Spacer()
-                    Button(action: {
-                        let select = selectedPaymentMethod
-                        let edit = editedPaymentMethod
-                        
-                        selectedPaymentMethod = nil
-                        editedPaymentMethod = nil
-                        
-                        DispatchQueue.main.async {
-                            editedPaymentMethod = edit
-                            selectedPaymentMethod = select
-                            
-                            editedPaymentMethod = nil
-                            createPaymentMethodFlag.toggle()
-                        }
-                    }) {
-                        Image(systemSymbol: .plusCircleFill)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 25, height: 25)
-                            .foregroundColor(.theme)
-                    }
+                    getAddCardButton()
                 }
                 .padding()
                 .background(Color.init(.secondarySystemBackground))
@@ -80,64 +60,12 @@ struct CardListDetailView: View {
                                 .font(.footnote)
                         }
                         Spacer()
-                        Button(action: {
-                            let select = selectedPaymentMethod
-                            let edit = editedPaymentMethod
-                            
-                            selectedPaymentMethod = nil
-                            editedPaymentMethod = nil
-                            
-                            DispatchQueue.main.async {
-                                editedPaymentMethod = edit
-                                selectedPaymentMethod = select
-                                
-                                editedPaymentMethod = selectedPaymentMethod
-                                createPaymentMethodFlag.toggle()
-                            }
-                        }) {
-                            VStack {
-                                Image(systemSymbol: .pencil)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 15, height: 15)
-                                    .foregroundColor(Color.init(.label))
-                                Text("Edit")
-                                    .font(.caption2)
-                                    .foregroundColor(Color.init(.label))
-                            }
-                        }.padding(.trailing)
-                        Button(action: {
-                            showingAlert.toggle()
-                        }) {
-                            VStack {
-                                Image(systemSymbol: .trash)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 15, height: 15)
-                                    .foregroundColor(Color.init(.label))
-                                Text("Delete")
-                                    .font(.caption2)
-                                    .foregroundColor(Color.init(.label))
-                            }
-                        }
+                        getCardActionView()
                     }
                     .padding()
                     Divider()
-                    ScrollView {
-                        LazyVStack {
-                            HStack {
-                                Text("Transactions")
-                                    .font(.subheadline)
-                                    .bold()
-                                Spacer()
-                            }
-                            ForEach(0..<50) { index in
-                                //todo
-//                                TransactionCellView(category: Category(name: "Shopping", icon: UIImage(systemName: "bag.fill")!, color: .purple), navigationDestination: navigateToView(_:))
-                            }
-                        }
-                        .padding()
-                        .background(Color.init(.systemBackground))
+                    if let method = selectedPaymentMethod {
+                        PaymentMethodTransactionsView(fetchRequest: makeTransactionsRequest(selectedPaymentMethod: method))
                     }
                 }
                 .background(Color.init(.secondarySystemBackground))
@@ -220,8 +148,93 @@ struct CardListDetailView: View {
         return ""
     }
     
+    func getAddCardButton() -> AnyView {
+        switch paymentMethodType {
+        case .creditCard, .debitCard:
+            return AnyView(
+                Button(action: {
+                    let select = selectedPaymentMethod
+                    let edit = editedPaymentMethod
+                    
+                    selectedPaymentMethod = nil
+                    editedPaymentMethod = nil
+                    
+                    DispatchQueue.main.async {
+                        editedPaymentMethod = edit
+                        selectedPaymentMethod = select
+                        
+                        editedPaymentMethod = nil
+                        createPaymentMethodFlag.toggle()
+                    }
+                }) {
+                    Image(systemSymbol: .plusCircleFill)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 25, height: 25)
+                        .foregroundColor(.theme)
+                }
+            )
+        default:
+            return AnyView(EmptyView())
+        }
+    }
+    
+    func getCardActionView() -> AnyView {
+        switch paymentMethodType {
+        case .debitCard, .creditCard:
+            return AnyView(
+                HStack {
+                    Button(action: {
+                        let select = selectedPaymentMethod
+                        let edit = editedPaymentMethod
+                        
+                        selectedPaymentMethod = nil
+                        editedPaymentMethod = nil
+                        
+                        DispatchQueue.main.async {
+                            editedPaymentMethod = edit
+                            selectedPaymentMethod = select
+                            
+                            editedPaymentMethod = selectedPaymentMethod
+                            createPaymentMethodFlag.toggle()
+                        }
+                    }) {
+                        VStack {
+                            Image(systemSymbol: .pencil)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 15, height: 15)
+                                .foregroundColor(Color.init(.label))
+                            Text("Edit")
+                                .font(.caption2)
+                                .foregroundColor(Color.init(.label))
+                        }
+                    }.padding(.trailing)
+                    Button(action: {
+                        showingAlert.toggle()
+                    }) {
+                        VStack {
+                            Image(systemSymbol: .trash)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 15, height: 15)
+                                .foregroundColor(Color.init(.label))
+                            Text("Delete")
+                                .font(.caption2)
+                                .foregroundColor(Color.init(.label))
+                        }
+                    }
+                }
+            )
+        default:
+            return AnyView(EmptyView())
+        }
+    }
+    
     func getTitle() -> String {
         switch paymentMethodType {
+        case .cash:
+            return "Cash"
         case .creditCard:
             return "Credit Cards"
         case .debitCard:
@@ -240,6 +253,12 @@ struct CardListDetailView: View {
         } catch let createError {
             print("Failed to create PaymentMethod \(createError)")
         }
+    }
+    
+    func makeTransactionsRequest(selectedPaymentMethod: PaymentMethod) -> FetchRequest<TransactionModel> {
+        let predicate = NSPredicate(format: "paymentMethod == %@", selectedPaymentMethod)
+        let sort = NSSortDescriptor(key: "date", ascending: false)
+        return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
     }
 }
 
@@ -281,19 +300,7 @@ struct ViewPager: View {
                                 .font(.title3)
                                 .foregroundColor(.white)
                         }
-                        Spacer()
-                        VStack(alignment: .center) {
-                            Text("XXXX XXXX XXXX \(card.identifierNumber ?? "XXXX")")
-                                .font(.title3)
-                                .foregroundColor(.white)
-                        }
-                        Spacer()
-                        HStack {
-                            Text("Teddy Santya")
-                                .bold()
-                                .foregroundColor(.white)
-                            Spacer()
-                        }
+                        getCardBottomDesignFromCard(card: card)
                     }.padding()
                 }
                 .tabItem {
@@ -319,6 +326,42 @@ struct ViewPager: View {
         }
     }
     
+    func getCardBottomDesignFromCard(card: PaymentMethod) -> AnyView {
+        let type = PaymentMethodType(rawValue: card.type)
+        switch type {
+        case .debitCard, .creditCard:
+            return AnyView(
+                VStack {
+                    Spacer()
+                    VStack(alignment: .center) {
+                        Text("XXXX XXXX XXXX \(card.identifierNumber ?? "XXXX")")
+                            .font(.title3)
+                            .foregroundColor(.white)
+                    }
+                    Spacer()
+                    HStack {
+                        Text("Teddy Santya")
+                            .bold()
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                }
+            )
+        default:
+            let currency = card.balance?.currencyValue.currency ?? ""
+            let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency)
+            return AnyView(
+                HStack {
+                    Spacer()
+                    Text(currencySign ?? "")
+                        .font(.hugeTitle)
+                        .foregroundColor(.white)
+                        .opacity(0.5)
+                }
+            )
+        }
+    }
+    
     func getColorFromCard(card: PaymentMethod) -> UIColor {
         if let data = card.color {
             return UIColor.color(data: data)!
@@ -330,4 +373,39 @@ struct ViewPager: View {
         _selection = selection
         fetchRequest = FetchRequest<PaymentMethod>(entity: PaymentMethod.entity(), sortDescriptors: [], predicate: NSPredicate(format: "type == %ld", paymentMethodType.rawValue))
     }
+}
+
+
+private struct PaymentMethodTransactionsView: View {
+    
+    var fetchRequest: FetchRequest<TransactionModel>
+    private var data: FetchedResults<TransactionModel> {
+        fetchRequest.wrappedValue
+    }
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack {
+                HStack {
+                    Text("Transactions")
+                        .font(.subheadline)
+                        .bold()
+                    Spacer()
+                }
+                if (data.count > 0) {
+                    ForEach(data) { trnsaction in
+                        TransactionCellView(transaction: trnsaction)
+                    }
+                }
+                else {
+                    VStack {
+                        Text("No Transactions")
+                    }.frame(minHeight: 200)
+                }
+            }
+            .padding()
+            .background(Color.init(.systemBackground))
+        }
+    }
+    
 }

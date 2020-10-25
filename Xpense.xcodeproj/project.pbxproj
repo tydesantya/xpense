@@ -44,6 +44,7 @@
 		C35D41BC2531D60900B45BD7 /* TransactionCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41BB2531D60800B45BD7 /* TransactionCellView.swift */; };
 		C380513125436E6000580A1E /* Persistence+CategorySeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C380513025436E6000580A1E /* Persistence+CategorySeed.swift */; };
 		C381C4B32544A557002DB1D7 /* DateFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4B22544A557002DB1D7 /* DateFormat.swift */; };
+		C381C4B62545D0B4002DB1D7 /* TransactionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */; };
 		C38912062532BD4700A646AD /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38912052532BD4700A646AD /* Persistence.swift */; };
 		C389120B253E133000A646AD /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = C389120A253E133000A646AD /* Introspect */; };
 		C389120F2540A5C700A646AD /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = C389120E2540A5C700A646AD /* Common.swift */; };
@@ -90,6 +91,7 @@
 		C35D41BB2531D60800B45BD7 /* TransactionCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCellView.swift; sourceTree = "<group>"; };
 		C380513025436E6000580A1E /* Persistence+CategorySeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Persistence+CategorySeed.swift"; sourceTree = "<group>"; };
 		C381C4B22544A557002DB1D7 /* DateFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormat.swift; sourceTree = "<group>"; };
+		C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListView.swift; sourceTree = "<group>"; };
 		C38912052532BD4700A646AD /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		C389120E2540A5C700A646AD /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		C3E7ED712543429D005A41BE /* CategoryType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryType.swift; sourceTree = "<group>"; };
@@ -277,6 +279,7 @@
 				C3F77DC6251E870600CA68BB /* Buttons.swift */,
 				C35D41BB2531D60800B45BD7 /* TransactionCellView.swift */,
 				C3369DAD2532244F00CA5647 /* CreatePaymentMethodView.swift */,
+				C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -379,6 +382,7 @@
 				C35D419D251F9D3800B45BD7 /* SettingsView.swift in Sources */,
 				C3369DB62532499B00CA5647 /* CurrencyTextField.swift in Sources */,
 				C30958D02541C528006C0CB5 /* NewCategoryStyleView.swift in Sources */,
+				C381C4B62545D0B4002DB1D7 /* TransactionListView.swift in Sources */,
 				C35D41A0251FA96600B45BD7 /* CategoriesView.swift in Sources */,
 				C3369D8F2532069000CA5647 /* DisplayCurrencyValue.swift in Sources */,
 				C3369DAE2532244F00CA5647 /* CreatePaymentMethodView.swift in Sources */,

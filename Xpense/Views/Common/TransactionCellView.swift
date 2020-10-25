@@ -15,11 +15,14 @@ struct TransactionCellView: View {
     var category: CategoryModel {
         transaction.category!
     }
+    var paymentMethod: PaymentMethod {
+        transaction.paymentMethod!
+    }
     
     var navigationDestination: ((AnyView?) -> Void)? = nil
     
     var body: some View {
-        HStack(alignment: .bottom) {
+        HStack {
             HStack(spacing: .medium) {
                 ZStack {
                     let customTextIcon = category.text
@@ -49,22 +52,30 @@ struct TransactionCellView: View {
                         .bold()
                     if category.type == CategoryType.income.rawValue {
                         Text(getTransactionAmount())
-                            .font(.title)
-                            .bold()
+                            .font(.header)
                             .foregroundColor(.init(.systemGreen))
                     }
                     else {
                         Text("-\(getTransactionAmount())")
-                            .font(.title)
-                            .bold()
+                            .font(.header)
                             .foregroundColor(.init(.systemRed))
                     }
                 }
             }
             Spacer()
-            HStack {
-                Text(transaction.date?.todayShortFormat() ?? "")
-                Image(systemSymbol: .chevronRight)
+            VStack(alignment: .trailing) {
+                Text(paymentMethod.name ?? "")
+                    .font(.callout)
+                    .bold()
+                    .foregroundColor(.white)
+                    .padding(.horizontal)
+                    .padding(.vertical, .tiny)
+                    .background(Capsule().fill(Color(UIColor.color(data: paymentMethod.color!)!)))
+                Spacer()
+                HStack {
+                    Text(transaction.date?.todayShortFormat() ?? "")
+                    Image(systemSymbol: .chevronRight)
+                }.padding(.top, .tiny)
             }
             .foregroundColor(.init(.secondaryLabel))
             .font(.caption)

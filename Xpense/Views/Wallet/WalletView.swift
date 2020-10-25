@@ -9,6 +9,7 @@
 import SwiftUI
 
 enum WalletViewSheet: Int, Identifiable {
+    case cashDetail
     case addCreditCard
     case addDebitCard
     case debitCardList
@@ -53,7 +54,7 @@ struct WalletView: View {
                             .cornerRadius(.medium)
                     )
                     .padding(.horizontal)
-                    CashWalletView(parentWidth: reader.size.width)
+                    CashWalletView(parentWidth: reader.size.width, cashTapAction: showCashDetail)
                     DebitCardWalletView(parentWidth: reader.size.width, addDebitAction: showAddDebitCard, debitDetailAction: showDebitCardList)
                     CreditCardWalletView(parentWidth: reader.size.width, showSheetAction: showAddCreditCard)
                     HStack {
@@ -72,6 +73,8 @@ struct WalletView: View {
         }
         .sheet(item: $activeSheet) { item in
             switch item {
+            case .cashDetail:
+                getCashCardSheet()
             case .debitCardList:
                 getDebitCardSheet()
             case .addDebitCard:
@@ -124,6 +127,15 @@ struct WalletView: View {
         )
     }
     
+    func getCashCardSheet() -> AnyView {
+        AnyView(
+            NavigationView {
+                CardListDetailView(paymentMethodType: .cash, presentedFlag: $activeSheet)
+                    .environment(\.managedObjectContext, self.viewContext)
+            }
+        )
+    }
+    
     func showAddCreditCard() {
         self.activeSheet = .addCreditCard
     }
@@ -134,6 +146,10 @@ struct WalletView: View {
     
     func showDebitCardList() {
         self.activeSheet = .debitCardList
+    }
+    
+    func showCashDetail() {
+        self.activeSheet = .cashDetail
     }
 }
 
@@ -233,7 +249,7 @@ struct DebitCardWalletView: View {
                         .padding(.top, .medium)
                     Spacer()
                 }
-                .padding(.top, .large)
+                .padding(.top)
                 AddCardPlaceholder(text: "Add Debit Card")
                     .frame(width: abs(width - 100), height: 150)
                     .onTapGesture {
@@ -308,10 +324,10 @@ struct CreditCardWalletView: View {
                     Text("Credit Cards")
                         .font(Font.getFontFromDesign(design: .sectionTitle))
                         .padding(.horizontal)
-                        .padding(.top, .medium)
+                        .padding(.top, .small)
                     Spacer()
                 }
-                .padding(.top, .large)
+                .padding(.top)
                 AddCardPlaceholder(text: "Add Credit Card")
                     .frame(width: abs(width - 100), height: 150)
                     .onTapGesture {
@@ -330,6 +346,7 @@ struct CashWalletView: View {
         predicate: NSPredicate(format: "type == %ld", PaymentMethodType.cash.rawValue))
     private var cashPaymentMethod: FetchedResults<PaymentMethod>
     var parentWidth: CGFloat
+    var cashTapAction: () -> Void
     
     var body: some View {
         if (cashPaymentMethod.count > 0) {
@@ -378,6 +395,9 @@ struct CashWalletView: View {
                         }
                     }.padding()
                 }.frame(width: abs(width - 100), height: 150)
+                .onTapGesture {
+                    cashTapAction()
+                }
             }
         }
         else {

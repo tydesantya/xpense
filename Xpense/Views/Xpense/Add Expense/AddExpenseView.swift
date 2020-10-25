@@ -15,11 +15,14 @@ struct AddExpenseView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(sortDescriptors: [])
     private var paymentMethods: FetchedResults<PaymentMethod>
+    
     @Binding var showSheetView: Bool
+    @Binding var refreshFlag: UUID
     @State var amount: Double = 0
     @State var currency: CurrencyValue
     @State var notes: String = ""
     @State var selectedPaymentMethod: PaymentMethod? = nil
+    @State var showValidationAlert = false
     var amountTemplates: [Double] {
         [
             10000,
@@ -35,8 +38,9 @@ struct AddExpenseView: View {
     @State var selectedCategory: CategoryModel? = nil
     @State var categorySelectNavigation = false
     
-    init(showSheetView:Binding<Bool>) {
+    init(showSheetView:Binding<Bool>, refreshFlag:Binding<UUID>) {
         self._showSheetView = showSheetView
+        _refreshFlag = refreshFlag
         let defaultCurrency = "IDR"
         _currency = .init(initialValue: CurrencyValue(amount: "0", currency: defaultCurrency))
         UITextView.appearance().backgroundColor = .clear
@@ -217,7 +221,12 @@ struct AddExpenseView: View {
             }) {
                 Text("Cancel").bold()
             }, trailing: Button(action: {
-                createTransaction()
+                if amount == 0 {
+                    showValidationAlert.toggle()
+                }
+                else {
+                    createTransaction()
+                }
             }) {
                 Text("Add").bold()
             })
@@ -229,6 +238,8 @@ struct AddExpenseView: View {
                     selectedCategory = categories.first
                 }
             }
+        }.alert(isPresented: $showValidationAlert) {
+            Alert(title: Text("Error"), message: Text("Please enter transaction amount!"), dismissButton: .default(Text("Got it")))
         }
         .accentColor(.theme)
     }
@@ -251,10 +262,12 @@ struct AddExpenseView: View {
         transaction.category = selectedCategory
         transaction.paymentMethod = selectedPaymentMethod
         transaction.date = Date()
+        selectedCategory!.lastUsed = Date()
         
         deductSelectedPaymentMethodWithCurrentAmount()
         do {
             try viewContext.save()
+            refreshFlag = UUID()
             SPAlert.present(title: "Added Transaction", preset: .done)
             self.showSheetView = false
         } catch let createError {
@@ -327,6 +340,10 @@ struct AddExpenseView_Previews: PreviewProvider {
         AddExpenseView(showSheetView: Binding<Bool>(get: {
             return true
         }, set: { (flag) in
+            
+        }), refreshFlag: .init(get: { () -> UUID in
+            return UUID()
+        }, set: { (uuid) in
             
         }))
         .environment(\.colorScheme, .dark)

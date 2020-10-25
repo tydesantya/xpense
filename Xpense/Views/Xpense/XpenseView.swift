@@ -17,6 +17,10 @@ struct XpenseView: View {
     @State var show = false
     @State var progressValue: Float = 1.0
     @State var showAddExpense: Bool = false
+    @Binding var refreshFlag: UUID
+    var transactionLimit: Int {
+        transactions.count > 3 ? 3 : transactions.count
+    }
     
     var body: some View {
         ZStack {
@@ -81,24 +85,18 @@ struct XpenseView: View {
                         Text("Transactions")
                             .font(Font.getFontFromDesign(design: .sectionTitle))
                         Spacer()
-                        Button(action: {
-                            withAnimation {
-                                self.show.toggle()
-                            }
-                        }) {
+                        NavigationLink(destination: TransactionListView()) {
                             Text("See All")
                                 .font(.getFontFromDesign(design: .buttonTitle))
                         }
-                        
                     }.padding(.horizontal)
                     .padding(.top, .small)
-                    VStack {
-                        let limit = transactions.count > 3 ? 4 : transactions.count
-                        ForEach(0..<limit) { index in
+                    LazyVStack {
+                        ForEach(0..<transactionLimit) { index in
                             let transaction = transactions[index]
                             TransactionCellView(transaction: transaction)
                         }
-                    }
+                    }.id(refreshFlag)
                     .padding(.horizontal)
                 }
             }.edgesIgnoringSafeArea([.horizontal])
@@ -129,7 +127,8 @@ struct XpenseView: View {
         })
     }
     
-    init() {
+    init(uuid: Binding<UUID>) {
+        _refreshFlag = uuid
         let request: NSFetchRequest<TransactionModel> = TransactionModel.fetchRequest()
         request.fetchLimit = 3
         request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
@@ -139,6 +138,10 @@ struct XpenseView: View {
 
 struct XpenseView_Previews: PreviewProvider {
     static var previews: some View {
-        XpenseView()
+        XpenseView(uuid: .init(get: { () -> UUID in
+            return UUID()
+        }, set: { (uuid) in
+            
+        }))
     }
 }

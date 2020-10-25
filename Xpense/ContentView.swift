@@ -19,10 +19,11 @@ struct ContentView: View {
     @State var neverSetupCash = false
     @State var showModally = true
     @State var addTransaction = false
+    @State var addTransactionRefreshFlag = UUID()
     var body: some View {
         NavigationView {
             TabView(selection: $selection) {
-                XpenseView().tabItem {
+                XpenseView(uuid: $addTransactionRefreshFlag).tabItem {
                     Image(systemName: "x.circle")
                     Text("Xpense")
                 }.tag(1)
@@ -35,7 +36,7 @@ struct ContentView: View {
                     Text("Settings")
                 }.tag(4)
             }.sheet(isPresented: self.$addTransaction) {
-                AddExpenseView(showSheetView: self.$addTransaction)
+                AddExpenseView(showSheetView: self.$addTransaction, refreshFlag: $addTransactionRefreshFlag)
                     .environment(\.managedObjectContext, self.viewContext)
             }
             .navigationBarItems(trailing: Button(action: {

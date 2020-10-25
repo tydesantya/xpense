@@ -278,8 +278,9 @@ struct AddExpenseView: View {
     func deductSelectedPaymentMethodWithCurrentAmount() {
         let initialAmountString: String = selectedPaymentMethod?.balance?.currencyValue.amount ?? ""
         let initialAmount = Double(initialAmountString) ?? 0
+        let categoryType = CategoryType(rawValue: selectedCategory?.type ?? "") ?? .expense
+        let deductedCurrentAmount = categoryType == .expense ? initialAmount - amount : initialAmount + amount
         
-        let deductedCurrentAmount = initialAmount - amount
         let balance = getDisplayCurrencyValueFromAmount(amt: deductedCurrentAmount)
         selectedPaymentMethod?.balance = balance
     }

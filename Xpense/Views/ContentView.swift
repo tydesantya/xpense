@@ -31,6 +31,10 @@ struct ContentView: View {
                     Image(systemName: "creditcard")
                     Text("Wallet")
                 }.tag(2)
+                ChartsView().tabItem {
+                    Image(systemName: "chart.bar.xaxis")
+                    Text("Charts")
+                }.tag(3)
                 SettingsView().tabItem {
                     Image(systemName: "gear")
                     Text("Settings")
@@ -54,6 +58,8 @@ struct ContentView: View {
                     self.navigationBarTitle = "Xpense"
                 case 2:
                     self.navigationBarTitle = "Wallet"
+                case 3:
+                    self.navigationBarTitle = "Charts"
                 case 4:
                     self.navigationBarTitle = "Settings"
                 default:

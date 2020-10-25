@@ -45,6 +45,7 @@
 		C380513125436E6000580A1E /* Persistence+CategorySeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C380513025436E6000580A1E /* Persistence+CategorySeed.swift */; };
 		C381C4B32544A557002DB1D7 /* DateFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4B22544A557002DB1D7 /* DateFormat.swift */; };
 		C381C4B62545D0B4002DB1D7 /* TransactionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */; };
+		C381C4C0254601FD002DB1D7 /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4BF254601FD002DB1D7 /* ChartsView.swift */; };
 		C38912062532BD4700A646AD /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38912052532BD4700A646AD /* Persistence.swift */; };
 		C389120B253E133000A646AD /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = C389120A253E133000A646AD /* Introspect */; };
 		C389120F2540A5C700A646AD /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = C389120E2540A5C700A646AD /* Common.swift */; };
@@ -92,6 +93,7 @@
 		C380513025436E6000580A1E /* Persistence+CategorySeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Persistence+CategorySeed.swift"; sourceTree = "<group>"; };
 		C381C4B22544A557002DB1D7 /* DateFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormat.swift; sourceTree = "<group>"; };
 		C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListView.swift; sourceTree = "<group>"; };
+		C381C4BF254601FD002DB1D7 /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
 		C38912052532BD4700A646AD /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		C389120E2540A5C700A646AD /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		C3E7ED712543429D005A41BE /* CategoryType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryType.swift; sourceTree = "<group>"; };
@@ -136,7 +138,6 @@
 			children = (
 				C32882672464894900F846DC /* Info.plist */,
 				C32882592464894100F846DC /* AppDelegate.swift */,
-				C328825D2464894100F846DC /* ContentView.swift */,
 				C38912052532BD4700A646AD /* Persistence.swift */,
 				C328825B2464894100F846DC /* SceneDelegate.swift */,
 				C328825F2464894900F846DC /* Assets.xcassets */,
@@ -161,9 +162,11 @@
 		C328826D246489C900F846DC /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C328825D2464894100F846DC /* ContentView.swift */,
 				C3369DB02532363600CA5647 /* Util */,
 				C35D41AD2520F05200B45BD7 /* Xpense */,
 				C35D41B3252CEA2200B45BD7 /* Wallet */,
+				C381C4BE254601ED002DB1D7 /* Charts */,
 				C35D41AC2520F04000B45BD7 /* Settings */,
 				C3F77DC3251E7AD200CA68BB /* Common */,
 				C328827B2469C3C400F846DC /* SwiftUIView.swift */,
@@ -249,8 +252,9 @@
 		C35D41AD2520F05200B45BD7 /* Xpense */ = {
 			isa = PBXGroup;
 			children = (
-				C35D41AE2520F06000B45BD7 /* Add Expense */,
+				C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */,
 				C328827924648A3100F846DC /* XpenseView.swift */,
+				C35D41AE2520F06000B45BD7 /* Add Expense */,
 			);
 			path = Xpense;
 			sourceTree = "<group>";
@@ -272,6 +276,14 @@
 			path = Wallet;
 			sourceTree = "<group>";
 		};
+		C381C4BE254601ED002DB1D7 /* Charts */ = {
+			isa = PBXGroup;
+			children = (
+				C381C4BF254601FD002DB1D7 /* ChartsView.swift */,
+			);
+			path = Charts;
+			sourceTree = "<group>";
+		};
 		C3F77DC3251E7AD200CA68BB /* Common */ = {
 			isa = PBXGroup;
 			children = (
@@ -279,7 +291,6 @@
 				C3F77DC6251E870600CA68BB /* Buttons.swift */,
 				C35D41BB2531D60800B45BD7 /* TransactionCellView.swift */,
 				C3369DAD2532244F00CA5647 /* CreatePaymentMethodView.swift */,
-				C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -375,6 +386,7 @@
 				C3369DA92532226000CA5647 /* CurrencyHelper.swift in Sources */,
 				C35D41B5252CEA3900B45BD7 /* WalletView.swift in Sources */,
 				C3288278246489FD00F846DC /* Design.swift in Sources */,
+				C381C4C0254601FD002DB1D7 /* ChartsView.swift in Sources */,
 				C328825A2464894100F846DC /* AppDelegate.swift in Sources */,
 				C3F77DC5251E7D4400CA68BB /* MonthPicker.swift in Sources */,
 				C328825C2464894100F846DC /* SceneDelegate.swift in Sources */,

@@ -33,7 +33,6 @@
 		C3369DB22532364300CA5647 /* ModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3369DB12532364300CA5647 /* ModalView.swift */; };
 		C3369DB62532499B00CA5647 /* CurrencyTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3369DB52532499B00CA5647 /* CurrencyTextField.swift */; };
 		C3369DBB2532580B00CA5647 /* SPAlert in Frameworks */ = {isa = PBXBuildFile; productRef = C3369DBA2532580B00CA5647 /* SPAlert */; };
-		C35D4197251F993800B45BD7 /* SunburstDiagram in Frameworks */ = {isa = PBXBuildFile; productRef = C35D4196251F993800B45BD7 /* SunburstDiagram */; };
 		C35D419D251F9D3800B45BD7 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D419C251F9D3800B45BD7 /* SettingsView.swift */; };
 		C35D41A0251FA96600B45BD7 /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D419F251FA96600B45BD7 /* CategoriesView.swift */; };
 		C35D41A3251FAAEE00B45BD7 /* CategoriesGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41A2251FAAEE00B45BD7 /* CategoriesGrid.swift */; };
@@ -110,7 +109,6 @@
 				C3369DBB2532580B00CA5647 /* SPAlert in Frameworks */,
 				C389120B253E133000A646AD /* Introspect in Frameworks */,
 				C35D41AA251FBC9000B45BD7 /* SFSafeSymbols in Frameworks */,
-				C35D4197251F993800B45BD7 /* SunburstDiagram in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,7 +310,6 @@
 			);
 			name = Xpense;
 			packageProductDependencies = (
-				C35D4196251F993800B45BD7 /* SunburstDiagram */,
 				C35D41A9251FBC9000B45BD7 /* SFSafeSymbols */,
 				C3369DBA2532580B00CA5647 /* SPAlert */,
 				C389120A253E133000A646AD /* Introspect */,
@@ -346,7 +343,6 @@
 			);
 			mainGroup = C328824D2464894100F846DC;
 			packageReferences = (
-				C35D4195251F993800B45BD7 /* XCRemoteSwiftPackageReference "SwiftSunburstDiagram" */,
 				C35D41A8251FBC9000B45BD7 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
 				C3369DB92532580A00CA5647 /* XCRemoteSwiftPackageReference "SPAlert" */,
 				C3891209253E133000A646AD /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
@@ -624,14 +620,6 @@
 				minimumVersion = 2.1.4;
 			};
 		};
-		C35D4195251F993800B45BD7 /* XCRemoteSwiftPackageReference "SwiftSunburstDiagram" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/lludo/SwiftSunburstDiagram.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.0;
-			};
-		};
 		C35D41A8251FBC9000B45BD7 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/piknotech/SFSafeSymbols.git";
@@ -655,11 +643,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C3369DB92532580A00CA5647 /* XCRemoteSwiftPackageReference "SPAlert" */;
 			productName = SPAlert;
-		};
-		C35D4196251F993800B45BD7 /* SunburstDiagram */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C35D4195251F993800B45BD7 /* XCRemoteSwiftPackageReference "SwiftSunburstDiagram" */;
-			productName = SunburstDiagram;
 		};
 		C35D41A9251FBC9000B45BD7 /* SFSafeSymbols */ = {
 			isa = XCSwiftPackageProductDependency;

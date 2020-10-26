@@ -65,7 +65,7 @@ struct TransactionCellView: View {
             Spacer()
             VStack(alignment: .trailing) {
                 Text(paymentMethod.name ?? "")
-                    .font(.callout)
+                    .font(.footnote)
                     .bold()
                     .foregroundColor(.white)
                     .padding(.horizontal)

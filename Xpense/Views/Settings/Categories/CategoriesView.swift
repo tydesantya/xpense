@@ -69,7 +69,7 @@ struct CategoriesView: View {
                     }
                 }
                 label: {
-                    Label("Add", systemImage: "rectangle.stack.fill.badge.plus").padding()
+                    Label("Add", systemImage: "rectangle.stack.fill.badge.plus")
                 }
             }
         })

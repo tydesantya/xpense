@@ -24,7 +24,6 @@ struct TransactionListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \TransactionModel.date, ascending: false)])
     private var transactions: FetchedResults<TransactionModel>
-    @State private var monthlyTransactions: [String:MonthlyTransaction] = [:]
     
     var body: some View {
         ScrollView {

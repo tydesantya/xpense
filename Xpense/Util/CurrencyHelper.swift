@@ -14,7 +14,7 @@ class CurrencyHelper {
         formatter.numberStyle = .decimal
         formatter.usesGroupingSeparator = true
         
-        formatter.maximumFractionDigits = 2
+        formatter.maximumFractionDigits = numOfDecimalPoints
         formatter.minimumFractionDigits = numOfDecimalPoints
         formatter.groupingSeparator = "."
         formatter.decimalSeparator = ","

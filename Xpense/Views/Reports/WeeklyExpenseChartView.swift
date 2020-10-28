@@ -1,8 +1,8 @@
 //
-//  ChartsView.swift
+//  WeeklyExpenseChartView.swift
 //  Xpense
 //
-//  Created by Teddy Santya on 26/10/20.
+//  Created by Teddy Santya on 29/10/20.
 //  Copyright © 2020 Teddy Santya. All rights reserved.
 //
 
@@ -21,10 +21,9 @@ private struct DailyTransaction: Hashable {
     }
 }
 
-struct ChartsView: View {
-    
+struct WeeklyExpenseChartView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \TransactionModel.date, ascending: false)])
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \TransactionModel.date, ascending: false)], predicate: NSPredicate(format: "category.type == %@", CategoryType.expense.rawValue))
     private var transactions: FetchedResults<TransactionModel>
     
     let config = ChartConfiguration()
@@ -35,12 +34,6 @@ struct ChartsView: View {
     var body: some View {
         ScrollView {
             VStack {
-                HStack {
-                    Text("Weekly Expenses")
-                        .font(.sectionTitle)
-                        .padding()
-                    Spacer()
-                }
                 ZStack(alignment: .bottom) {
                     TabView(selection: $tabSelection) {
                         let prevIndex = lastTabSelection + 1
@@ -49,7 +42,7 @@ struct ChartsView: View {
                                 .tag(prevIndex)
                         }
                         if lastTabSelection < activeData.count {
-                            getChartViewFromWeekMapping(activeData[tabSelection])
+                            getChartViewFromWeekMapping(activeData[lastTabSelection])
                                 .tag(lastTabSelection)
                         }
                         let nextIndex = lastTabSelection - 1
@@ -71,28 +64,22 @@ struct ChartsView: View {
                     }
                     Rectangle().fill(Color(UIColor.systemBackground)).frame(width: 200, height: 25)
                 }
-                HStack {
-                    Text("Monthly Report")
-                        .font(.sectionTitle)
-                        .padding()
-                    Spacer()
+                .padding(.top)
+                if lastTabSelection < activeData.count {
+                    WeeklyExpenseDetailView(weekMapping: activeData[lastTabSelection])
                 }
-                ChartsHomePieView()
             }
         }.id(transactions.count)
         .onAppear {
             activeData = update(transactions)
             refreshFlag = UUID()
         }
-    }
-    
-    private func getChartViewFromWeekMapping(_ weekMapping: [Date: DailyTransaction]) {
-        
+        .navigationTitle("Weekly Expense")
     }
     
     private func getChartViewFromWeekMapping(_ weekMapping: [Date: DailyTransaction]) -> CustomBarChartView {
         let config = ChartConfiguration()
-        config.data.color = .theme
+        config.data.color = Color(UIColor.systemRed)
         return CustomBarChartView(weekMapping: weekMapping, config: config)
     }
     
@@ -160,9 +147,9 @@ struct ChartsView: View {
     }
 }
 
-struct ChartsView_Previews: PreviewProvider {
+struct WeeklyExpenseChartView_Previews: PreviewProvider {
     static var previews: some View {
-        ChartsView()
+        WeeklyExpenseChartView()
     }
 }
 
@@ -221,5 +208,115 @@ private struct CustomBarChartView: View {
                 }
             }
         }.padding(.bottom, .extraLarge)
+    }
+}
+
+private struct WeeklyExpenseDetailView: View {
+    
+    var weekMapping: [Date: DailyTransaction]
+    
+    var body: some View {
+        LazyVStack {
+            let averages = getAverageAmountOfTheWeekAndPerDayAndTotal()
+            HStack(alignment: .center) {
+                Text("Total")
+                Text(averages.4)
+                    .font(.sectionTitle)
+                    .foregroundColor(Color(UIColor.systemRed))
+                Spacer()
+            }
+            .padding(.bottom)
+            .offset(y: -.large)
+            Divider()
+                .offset(y: -.large)
+            HStack(alignment: .bottom, spacing: .medium) {
+                VStack(alignment: .leading, spacing: .tiny) {
+                    Text("")
+                        .font(.footnote)
+                    Text("Divided by")
+                        .font(.footnote)
+                    Text("Average")
+                        .font(.footnote)
+                }
+                VStack(alignment: .leading, spacing: .tiny) {
+                    Text("Weekly Expense")
+                        .font(.footnote)
+                    Text("\(averages.2) transaction(s)")
+                        .font(.footnote)
+                    Text(averages.0)
+                        .font(.footnote).bold()
+                        .foregroundColor(Color(UIColor.systemRed))
+                }
+                VStack(alignment: .leading, spacing: .tiny) {
+                    Text("Daily Expense")
+                        .font(.footnote)
+                    Text("\(averages.3) day(s)")
+                        .font(.footnote)
+                    Text(averages.1)
+                        .font(.footnote).bold()
+                        .foregroundColor(Color(UIColor.systemRed))
+                }
+                Spacer()
+            }
+            ForEach(Array(weekMapping.keys).sorted(by: <), id: \.self) {
+                key in
+                let day = key.dayFormat()
+                let dayTransaction = weekMapping[key]!
+                let transactions = dayTransaction.transactions
+                let dayTotal = dayTransaction.totalExpense
+                let dayTotalAmount = CurrencyHelper.string(from: dayTotal, currency: CurrencyHelper.getCurrencySignFromCurrency(transactions.first?.amount?.currencyValue.currency ?? "") ?? "")
+                if transactions.count > 0 {
+                    HStack {
+                        Text(day).font(.sectionTitle)
+                        Spacer()
+                        Text(dayTotalAmount)
+                            .foregroundColor(Color(UIColor.systemRed))
+                    }
+                    .padding(.top)
+                    ForEach(transactions) {
+                        transaction in
+                        TransactionCellView(transaction: transaction)
+                    }
+                }
+            }
+        }
+        .padding()
+    }
+    
+    func getAverageAmountOfTheWeekAndPerDayAndTotal() -> (String, String, Int, Int, String) {
+        var transactionsCount = 0
+        var totalAmount: Double = 0.0
+        let keys = Array(weekMapping.keys)
+        var currency = ""
+        var totalDays = keys.count
+        for key in keys {
+            let dayTransaction = weekMapping[key]!
+            for transaction in dayTransaction.transactions {
+                let amountString = transaction.amount?.currencyValue.amount ?? ""
+                let amount = Double(amountString) ?? 0
+                if transaction.category?.type == CategoryType.expense.rawValue {
+                    totalAmount += amount
+                    transactionsCount += 1
+                    if currency.count == 0 {
+                        currency = CurrencyHelper.getCurrencySignFromCurrency(transaction.amount?.currencyValue.currency ?? "") ?? ""
+                    }
+                }
+            }
+            if key.startOfWeek(using: .iso8601) == Date().startOfWeek(using: .iso8601) {
+                totalDays = getElapsedDayOfThisWeek()
+            }
+        }
+        let averageAmountOfTheWeek = totalAmount / Double(transactionsCount)
+        let averageAmountPerDay = totalAmount / Double(totalDays)
+        let averageAmountOfTheWeekString = CurrencyHelper.string(from: averageAmountOfTheWeek, currency: currency)
+        let averageAmountPerDayString = CurrencyHelper.string(from: averageAmountPerDay, currency: currency)
+        let totalAmountString = CurrencyHelper.string(from: totalAmount, currency: currency)
+        return (averageAmountOfTheWeekString, averageAmountPerDayString, transactionsCount, totalDays, totalAmountString)
+    }
+    
+    func getElapsedDayOfThisWeek() -> Int {
+        let startOfWeek = Date().startOfWeek(using: .iso8601)
+        let components = Calendar.current.dateComponents([.day], from: startOfWeek, to: Date())
+        return components.day ?? 0
     }
 }

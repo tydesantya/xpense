@@ -167,6 +167,7 @@ struct PlaceHolderView: View {
 
 struct PaymentMethodCard: View {
     var backgroundColor: Color
+    var shadow: CGFloat = 10.0
     
     var body: some View {
         ZStack {

@@ -305,7 +305,7 @@ struct PaymentMethodCardView: View {
             selectedPaymentMethod = paymentMethod
         }) {
             ZStack {
-                PaymentMethodCard(backgroundColor: Color.init(UIColor.color(data: paymentMethod.color!)!))
+                PaymentMethodCard(backgroundColor: Color.init(UIColor.color(data: paymentMethod.color!)!), shadow: 0.0)
                 VStack {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading) {

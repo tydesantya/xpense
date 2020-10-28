@@ -11,6 +11,9 @@ import SFSafeSymbols
 
 struct ReportsView: View {
     
+    @State var navigate: Bool = false
+    @State var destinationView: AnyView?
+    
     @Environment(\.managedObjectContext) private var viewContext
     var weeklyExpenseFetchRequest: FetchRequest<TransactionModel>
     var weeklyExpenseTransactions : FetchedResults<TransactionModel>{weeklyExpenseFetchRequest.wrappedValue}
@@ -56,6 +59,9 @@ struct ReportsView: View {
                                 Text("Total Expense This Week").font(.footnote)
                                     .padding(.top, .tiny)
                             }.padding()
+                        }.onTapGesture {
+                            destinationView = AnyView(WeeklyExpenseChartView())
+                            navigate = true
                         }
                     }
                     let totalIncomeThisMonth = getTotalIncomeThisMonth()
@@ -129,6 +135,12 @@ struct ReportsView: View {
                         MonthlyHighlightReportView(largestWeeklyExpenseTuple: largestWeeklyExpenseTuple, largestMonthlyExpenseTuple: largestMonthlyExpenseTuple, largestMonthlyIncomeTuple: getLargestMonthlyIncome(), totalMonthlyIncome: totalIncomeThisMonth)
                     }
                 }.padding()
+                NavigationLink(
+                    destination: destinationView,
+                    isActive: self.$navigate,
+                    label: {
+                        EmptyView()
+                    })
             }
         }
     }
@@ -275,19 +287,19 @@ struct ReportsView: View {
     }
     
     func getElapsedDayOfThisWeek() -> String {
-        let startOfWeek = Date().startOfWeek()
-        let components = Calendar.current.dateComponents([.day], from: startOfWeek, to: Date())
+        let startOfWeek = Date().startOfWeek(using: .iso8601)
+        let components = Calendar.iso8601.dateComponents([.day], from: startOfWeek, to: Date())
         return String(components.day ?? 0)
     }
     
     init() {
         // weekly income
-        let startOfWeek = Date().startOfWeek()
+        let startOfWeek = Date().startOfWeek(using: .iso8601)
         var components = DateComponents()
         components.year = 0
         components.month = 0
         components.day = 6
-        let endOfWeek = Calendar.current.date(byAdding: components, to: startOfWeek)
+        let endOfWeek = Calendar.iso8601.date(byAdding: components, to: startOfWeek)
         let sort = NSSortDescriptor(key: "date", ascending: true)
         let expenseType = CategoryType.expense.rawValue
         let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfWeek as NSDate , endOfWeek! as NSDate, expenseType)
@@ -298,7 +310,7 @@ struct ReportsView: View {
         components.year = 0
         components.month = 1
         components.day = -1
-        let endOfMonth = Calendar.current.date(byAdding: components, to: startOfMonth)
+        let endOfMonth = Calendar.iso8601.date(byAdding: components, to: startOfMonth)
         let incomeType = CategoryType.income.rawValue
         let monthlyIncomePredicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfMonth as NSDate , endOfMonth! as NSDate, incomeType)
         monthlyIncomeFetchRequest = FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: monthlyIncomePredicate, animation: .spring())

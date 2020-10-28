@@ -33,10 +33,20 @@ public class DisplayCurrencyValue: NSObject, NSSecureCoding {
     public static var supportsSecureCoding: Bool {
         return true
     }
+    
     init(currencyValue: CurrencyValue, numOfDecimalPoint: Int, decimalSeparator: String, groupingSeparator: String) {
         self.currencyValue = currencyValue
         self.numOfDecimalPoint = numOfDecimalPoint
         self.decimalSeparator = decimalSeparator
         self.groupingSeparator = groupingSeparator
+    }
+    
+    func toString() -> String {
+        let amountString = currencyValue.amount
+        let amount = Double(amountString) ?? 0
+        let currency = currencyValue.currency
+        let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency)
+        let string = CurrencyHelper.string(from: amount, currency: currencySign ?? "")
+        return string
     }
 }

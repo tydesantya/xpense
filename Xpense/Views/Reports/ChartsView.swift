@@ -77,6 +77,7 @@ struct ChartsView: View {
                         .padding()
                     Spacer()
                 }
+                ChartsHomePieView()
             }
         }.id(transactions.count)
         .onAppear {
@@ -206,10 +207,10 @@ private struct CustomBarChartView: View {
                         self.config.xAxis.ticksColor = Color(UIColor.secondarySystemBackground)
                         
                         self.config.yAxis.labelsColor = Color(UIColor.label)
-                        self.config.yAxis.ticksDash = [2, 4]
-                        self.config.yAxis.ticksColor = Color(UIColor.secondarySystemBackground)
+                        self.config.yAxis.ticksDash = [4, 4]
+                        self.config.yAxis.ticksColor = .gray
                         self.config.yAxis.formatter = { (value, decimals) in
-                            return ""
+                            return "\(CurrencyHelper.string(from: value, currency: ""))"
                         }
                         self.config.labelsCTFont = CTFontCreateWithName(("Helvetica" as CFString), 10, nil)
                         self.config.data.entries = param

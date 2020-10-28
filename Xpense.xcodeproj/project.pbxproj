@@ -45,11 +45,15 @@
 		C381C4B32544A557002DB1D7 /* DateFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4B22544A557002DB1D7 /* DateFormat.swift */; };
 		C381C4B62545D0B4002DB1D7 /* TransactionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */; };
 		C381C4C0254601FD002DB1D7 /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4BF254601FD002DB1D7 /* ChartsView.swift */; };
-		C381C4C625460472002DB1D7 /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = C381C4C525460472002DB1D7 /* SwiftUICharts */; };
 		C381C4CA254760BC002DB1D7 /* BarChart in Frameworks */ = {isa = PBXBuildFile; productRef = C381C4C9254760BC002DB1D7 /* BarChart */; };
+		C381C4CD254895C0002DB1D7 /* ChartsHomePieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4CC254895C0002DB1D7 /* ChartsHomePieView.swift */; };
+		C381C4D125489ADF002DB1D7 /* SunburstDiagram in Frameworks */ = {isa = PBXBuildFile; productRef = C381C4D025489ADF002DB1D7 /* SunburstDiagram */; };
+		C381C4D625489C14002DB1D7 /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = C381C4D525489C14002DB1D7 /* SwiftUICharts */; };
+		C381C4D92549C973002DB1D7 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4D82549C973002DB1D7 /* ReportsView.swift */; };
 		C38912062532BD4700A646AD /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38912052532BD4700A646AD /* Persistence.swift */; };
 		C389120B253E133000A646AD /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = C389120A253E133000A646AD /* Introspect */; };
 		C389120F2540A5C700A646AD /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = C389120E2540A5C700A646AD /* Common.swift */; };
+		C3CCD16A2549E2C500578B52 /* CategoryIconDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CCD1692549E2C500578B52 /* CategoryIconDisplayView.swift */; };
 		C3E7ED722543429D005A41BE /* CategoryType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E7ED712543429D005A41BE /* CategoryType.swift */; };
 		C3F77DC2251E733100CA68BB /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC1251E733100CA68BB /* ProgressBar.swift */; };
 		C3F77DC5251E7D4400CA68BB /* MonthPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC4251E7D4400CA68BB /* MonthPicker.swift */; };
@@ -95,8 +99,11 @@
 		C381C4B22544A557002DB1D7 /* DateFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormat.swift; sourceTree = "<group>"; };
 		C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListView.swift; sourceTree = "<group>"; };
 		C381C4BF254601FD002DB1D7 /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
+		C381C4CC254895C0002DB1D7 /* ChartsHomePieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsHomePieView.swift; sourceTree = "<group>"; };
+		C381C4D82549C973002DB1D7 /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
 		C38912052532BD4700A646AD /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		C389120E2540A5C700A646AD /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
+		C3CCD1692549E2C500578B52 /* CategoryIconDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconDisplayView.swift; sourceTree = "<group>"; };
 		C3E7ED712543429D005A41BE /* CategoryType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryType.swift; sourceTree = "<group>"; };
 		C3F77DC1251E733100CA68BB /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
 		C3F77DC4251E7D4400CA68BB /* MonthPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthPicker.swift; sourceTree = "<group>"; };
@@ -108,9 +115,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C381C4D125489ADF002DB1D7 /* SunburstDiagram in Frameworks */,
 				C3369DBB2532580B00CA5647 /* SPAlert in Frameworks */,
-				C381C4C625460472002DB1D7 /* SwiftUICharts in Frameworks */,
 				C381C4CA254760BC002DB1D7 /* BarChart in Frameworks */,
+				C381C4D625489C14002DB1D7 /* SwiftUICharts in Frameworks */,
 				C389120B253E133000A646AD /* Introspect in Frameworks */,
 				C35D41AA251FBC9000B45BD7 /* SFSafeSymbols in Frameworks */,
 			);
@@ -168,7 +176,7 @@
 				C3369DB02532363600CA5647 /* Util */,
 				C35D41AD2520F05200B45BD7 /* Xpense */,
 				C35D41B3252CEA2200B45BD7 /* Wallet */,
-				C381C4BE254601ED002DB1D7 /* Charts */,
+				C381C4BE254601ED002DB1D7 /* Reports */,
 				C35D41AC2520F04000B45BD7 /* Settings */,
 				C3F77DC3251E7AD200CA68BB /* Common */,
 				C328827B2469C3C400F846DC /* SwiftUIView.swift */,
@@ -278,12 +286,14 @@
 			path = Wallet;
 			sourceTree = "<group>";
 		};
-		C381C4BE254601ED002DB1D7 /* Charts */ = {
+		C381C4BE254601ED002DB1D7 /* Reports */ = {
 			isa = PBXGroup;
 			children = (
 				C381C4BF254601FD002DB1D7 /* ChartsView.swift */,
+				C381C4CC254895C0002DB1D7 /* ChartsHomePieView.swift */,
+				C381C4D82549C973002DB1D7 /* ReportsView.swift */,
 			);
-			path = Charts;
+			path = Reports;
 			sourceTree = "<group>";
 		};
 		C3F77DC3251E7AD200CA68BB /* Common */ = {
@@ -293,6 +303,7 @@
 				C3F77DC6251E870600CA68BB /* Buttons.swift */,
 				C35D41BB2531D60800B45BD7 /* TransactionCellView.swift */,
 				C3369DAD2532244F00CA5647 /* CreatePaymentMethodView.swift */,
+				C3CCD1692549E2C500578B52 /* CategoryIconDisplayView.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -317,8 +328,9 @@
 				C35D41A9251FBC9000B45BD7 /* SFSafeSymbols */,
 				C3369DBA2532580B00CA5647 /* SPAlert */,
 				C389120A253E133000A646AD /* Introspect */,
-				C381C4C525460472002DB1D7 /* SwiftUICharts */,
 				C381C4C9254760BC002DB1D7 /* BarChart */,
+				C381C4D025489ADF002DB1D7 /* SunburstDiagram */,
+				C381C4D525489C14002DB1D7 /* SwiftUICharts */,
 			);
 			productName = Xpense;
 			productReference = C32882562464894100F846DC /* Xpense.app */;
@@ -352,8 +364,9 @@
 				C35D41A8251FBC9000B45BD7 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
 				C3369DB92532580A00CA5647 /* XCRemoteSwiftPackageReference "SPAlert" */,
 				C3891209253E133000A646AD /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
-				C381C4C425460472002DB1D7 /* XCRemoteSwiftPackageReference "ChartView" */,
 				C381C4C8254760BC002DB1D7 /* XCRemoteSwiftPackageReference "BarChart" */,
+				C381C4CF25489ADF002DB1D7 /* XCRemoteSwiftPackageReference "SwiftSunburstDiagram" */,
+				C381C4D425489C14002DB1D7 /* XCRemoteSwiftPackageReference "ChartView" */,
 			);
 			productRefGroup = C32882572464894100F846DC /* Products */;
 			projectDirPath = "";
@@ -407,7 +420,10 @@
 				C35D41B12520F07F00B45BD7 /* AddExpenseView.swift in Sources */,
 				C35D41BC2531D60900B45BD7 /* TransactionCellView.swift in Sources */,
 				C3369DA1253213EF00CA5647 /* PaymentMethodTypes.swift in Sources */,
+				C381C4D92549C973002DB1D7 /* ReportsView.swift in Sources */,
+				C381C4CD254895C0002DB1D7 /* ChartsHomePieView.swift in Sources */,
 				C30958CD2541BCD6006C0CB5 /* NewCategoryView.swift in Sources */,
+				C3CCD16A2549E2C500578B52 /* CategoryIconDisplayView.swift in Sources */,
 				C328827C2469C3C400F846DC /* SwiftUIView.swift in Sources */,
 				C380513125436E6000580A1E /* Persistence+CategorySeed.swift in Sources */,
 				C328827A24648A3100F846DC /* XpenseView.swift in Sources */,
@@ -636,20 +652,28 @@
 				minimumVersion = 1.2.0;
 			};
 		};
-		C381C4C425460472002DB1D7 /* XCRemoteSwiftPackageReference "ChartView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AppPear/ChartView";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.5.4;
-			};
-		};
 		C381C4C8254760BC002DB1D7 /* XCRemoteSwiftPackageReference "BarChart" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/dawigr/BarChart.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.3.0;
+			};
+		};
+		C381C4CF25489ADF002DB1D7 /* XCRemoteSwiftPackageReference "SwiftSunburstDiagram" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lludo/SwiftSunburstDiagram.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+		C381C4D425489C14002DB1D7 /* XCRemoteSwiftPackageReference "ChartView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AppPear/ChartView";
+			requirement = {
+				branch = "2.0.0-beta.1";
+				kind = branch;
 			};
 		};
 		C3891209253E133000A646AD /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
@@ -673,15 +697,20 @@
 			package = C35D41A8251FBC9000B45BD7 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */;
 			productName = SFSafeSymbols;
 		};
-		C381C4C525460472002DB1D7 /* SwiftUICharts */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C381C4C425460472002DB1D7 /* XCRemoteSwiftPackageReference "ChartView" */;
-			productName = SwiftUICharts;
-		};
 		C381C4C9254760BC002DB1D7 /* BarChart */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C381C4C8254760BC002DB1D7 /* XCRemoteSwiftPackageReference "BarChart" */;
 			productName = BarChart;
+		};
+		C381C4D025489ADF002DB1D7 /* SunburstDiagram */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C381C4CF25489ADF002DB1D7 /* XCRemoteSwiftPackageReference "SwiftSunburstDiagram" */;
+			productName = SunburstDiagram;
+		};
+		C381C4D525489C14002DB1D7 /* SwiftUICharts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C381C4D425489C14002DB1D7 /* XCRemoteSwiftPackageReference "ChartView" */;
+			productName = SwiftUICharts;
 		};
 		C389120A253E133000A646AD /* Introspect */ = {
 			isa = XCSwiftPackageProductDependency;

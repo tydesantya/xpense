@@ -27,6 +27,17 @@ extension Date {
         return dateFormatter.string(from: self)
     }
     
+    func dateTimeFormat() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.autoupdatingCurrent // Using system locale
+        dateFormatter.doesRelativeDateFormatting = true // Enabling relative date formatting
+        
+        // other dataFormatter settings here, irrelevant for example
+        dateFormatter.timeStyle = .short
+        dateFormatter.dateStyle = .short
+        return dateFormatter.string(from: self)
+    }
+    
     func byAdding(component: Calendar.Component, value: Int, wrappingComponents: Bool = false, using calendar: Calendar = .current) -> Date? {
         calendar.date(byAdding: component, value: value, to: self, wrappingComponents: wrappingComponents)
     }
@@ -35,6 +46,9 @@ extension Date {
     }
     func startOfWeek(using calendar: Calendar = .current) -> Date {
         calendar.date(from: dateComponents([.yearForWeekOfYear, .weekOfYear], using: calendar))!
+    }
+    func startOfMonth(using calendar: Calendar = .current) -> Date {
+        calendar.date(from: dateComponents([.year, .month], using: calendar))!
     }
     var noon: Date {
         Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: self)!

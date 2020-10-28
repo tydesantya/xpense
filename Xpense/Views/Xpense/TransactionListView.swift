@@ -62,7 +62,7 @@ struct TransactionListView: View {
         return formatter
     }
     
-    private func update(_ result : FetchedResults<TransactionModel>)-> [MonthlyTransaction]{
+    private func update(_ result : FetchedResults<TransactionModel>)-> [MonthlyTransaction] {
         return Dictionary(grouping: result){ (transaction : TransactionModel) -> String in
             let monthYear = dateFormatter.string(from: transaction.date!)
             // group by date

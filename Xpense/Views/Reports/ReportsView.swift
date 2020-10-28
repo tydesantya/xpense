@@ -214,10 +214,10 @@ struct ReportsView: View {
         return ""
     }
     
-    func getLargestWeeklyExpense() -> (String, TransactionModel) {
+    func getLargestWeeklyExpense() -> (String, TransactionModel?) {
         var amount: Double = 0.0
         var currencySign = ""
-        var largestTransaction: TransactionModel!
+        var largestTransaction: TransactionModel?
         for transaction in weeklyExpenseTransactions {
             let amountString = transaction.amount?.currencyValue.amount ?? "0"
             let currencyString = transaction.amount?.currencyValue.currency ?? ""
@@ -233,10 +233,10 @@ struct ReportsView: View {
         return (CurrencyHelper.string(from: amount, currency: currencySign), largestTransaction)
     }
     
-    func getLargestMonthlyExpense() -> (String, TransactionModel) {
+    func getLargestMonthlyExpense() -> (String, TransactionModel?) {
         var amount: Double = 0.0
         var currencySign = ""
-        var largestTransaction: TransactionModel!
+        var largestTransaction: TransactionModel?
         for transaction in monthlyExpenseTransactions {
             let amountString = transaction.amount?.currencyValue.amount ?? "0"
             let currencyString = transaction.amount?.currencyValue.currency ?? ""
@@ -252,10 +252,10 @@ struct ReportsView: View {
         return (CurrencyHelper.string(from: amount, currency: currencySign), largestTransaction)
     }
     
-    func getLargestMonthlyIncome() -> (String, TransactionModel) {
+    func getLargestMonthlyIncome() -> (String, TransactionModel?) {
         var amount: Double = 0.0
         var currencySign = ""
-        var largestTransaction: TransactionModel!
+        var largestTransaction: TransactionModel?
         for transaction in monthlyIncomeTransactions {
             let amountString = transaction.amount?.currencyValue.amount ?? "0"
             let currencyString = transaction.amount?.currencyValue.currency ?? ""
@@ -322,7 +322,7 @@ struct ReportsView: View {
 
 private struct WeeklyHighlightReportView: View {
     
-    var largestWeeklyExpenseTuple: (String, TransactionModel)
+    var largestWeeklyExpenseTuple: (String, TransactionModel?)
     var elapsedDayOfThisWeek: String
     var averageWeeklyExpense: String
     
@@ -344,7 +344,7 @@ private struct WeeklyHighlightReportView: View {
                 Text("The largest expense amount is \(largestWeeklyExpenseTuple.0) from")
                     .font(.footnote)
                 let transaction = largestWeeklyExpenseTuple.1
-                let category = transaction.category!
+                let category = transaction!.category!
                 let customTextIcon = category.text
                 let symbolSelection:SFSymbol = SFSymbol(rawValue: category.symbolName ?? "") ?? .archiveboxFill
                 HStack {
@@ -369,7 +369,7 @@ private struct WeeklyHighlightReportView: View {
                             .foregroundColor(.white)
                         }
                     }
-                    Text("\(category.name ?? ""): \(transaction.date!.dateTimeFormat())").font(.footnote)
+                    Text("\(category.name ?? ""): \(transaction!.date!.dateTimeFormat())").font(.footnote)
                 }
             }.padding()
         }
@@ -378,9 +378,9 @@ private struct WeeklyHighlightReportView: View {
 
 private struct MonthlyHighlightReportView: View {
     
-    var largestWeeklyExpenseTuple: (String, TransactionModel)
-    var largestMonthlyExpenseTuple: (String, TransactionModel)
-    var largestMonthlyIncomeTuple: (String, TransactionModel)
+    var largestWeeklyExpenseTuple: (String, TransactionModel?)
+    var largestMonthlyExpenseTuple: (String, TransactionModel?)
+    var largestMonthlyIncomeTuple: (String, TransactionModel?)
     var totalMonthlyIncome: String
     
     var body: some View {
@@ -398,25 +398,28 @@ private struct MonthlyHighlightReportView: View {
                 Divider()
                 Text("You earned a total of \(totalMonthlyIncome) this month").fixedSize(horizontal: false, vertical: true).padding(.bottom, .tiny)
                     .font(.footnote)
-                let largestIncomeCategory = largestMonthlyIncomeTuple.1.category!
-                let largestIncomeTransaction = largestWeeklyExpenseTuple.1
-                Text(largestMonthlyIncomeTuple.0 == totalMonthlyIncome ? "Purely from a single income of " : "Highlighting the largest income of the month of").fixedSize(horizontal: false, vertical: true).font(.footnote)
-                HStack {
-                    CategoryIconDisplayView(category: largestIncomeCategory, iconWidth: 20, iconHeight: 20)
-                    Text("\(largestIncomeCategory.name ?? ""): \(largestIncomeTransaction.date!.dateTimeFormat())").font(.footnote)
-                }
-                if largestWeeklyExpenseTuple == largestMonthlyExpenseTuple {
-                    Text("While the largest expense of this month is the same largest expense of this week").fixedSize(horizontal: false, vertical: true).padding(.bottom, .tiny)
-                        .font(.footnote)
-                }
-                else {
-                    Text("While largest expense amount is \(largestMonthlyExpenseTuple.0) from")
-                        .font(.footnote)
-                    let transaction = largestMonthlyExpenseTuple.1
-                    let category = transaction.category!
-                    HStack {
-                        CategoryIconDisplayView(category: category, iconWidth: 20, iconHeight: 20)
-                        Text("\(category.name ?? ""): \(transaction.date!.dateTimeFormat())").font(.footnote)
+                if let transaction = largestMonthlyIncomeTuple.1 {
+                    if let largestIncomeCategory = transaction.category {
+                        let largestIncomeTransaction = largestWeeklyExpenseTuple.1
+                        Text(largestMonthlyIncomeTuple.0 == totalMonthlyIncome ? "Purely from a single income of " : "Highlighting the largest income of the month of").fixedSize(horizontal: false, vertical: true).font(.footnote)
+                        HStack {
+                            CategoryIconDisplayView(category: largestIncomeCategory, iconWidth: 20, iconHeight: 20)
+                            Text("\(largestIncomeCategory.name ?? ""): \(largestIncomeTransaction!.date!.dateTimeFormat())").font(.footnote)
+                        }
+                        if largestWeeklyExpenseTuple == largestMonthlyExpenseTuple {
+                            Text("While the largest expense of this month is the same largest expense of this week").fixedSize(horizontal: false, vertical: true).padding(.bottom, .tiny)
+                                .font(.footnote)
+                        }
+                        else {
+                            Text("While largest expense amount is \(largestMonthlyExpenseTuple.0) from")
+                                .font(.footnote)
+                            let transaction = largestMonthlyExpenseTuple.1
+                            let category = transaction!.category!
+                            HStack {
+                                CategoryIconDisplayView(category: category, iconWidth: 20, iconHeight: 20)
+                                Text("\(category.name ?? ""): \(transaction!.date!.dateTimeFormat())").font(.footnote)
+                            }
+                        }
                     }
                 }
             }.padding()

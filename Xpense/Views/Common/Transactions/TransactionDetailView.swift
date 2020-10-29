@@ -85,7 +85,7 @@ struct TransactionDetailView: View {
                     Spacer()
                 }.navigationTitle("Transaction Detail")
                 .navigationBarItems(trailing: Button(action: {
-                    editTransaction.toggle()
+                    editTransaction = true
                 }, label: {
                     Text("Edit")
                 }))

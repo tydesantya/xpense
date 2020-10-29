@@ -10,6 +10,7 @@
 		C30958CD2541BCD6006C0CB5 /* NewCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30958CC2541BCD6006C0CB5 /* NewCategoryView.swift */; };
 		C30958D02541C528006C0CB5 /* NewCategoryStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30958CF2541C528006C0CB5 /* NewCategoryStyleView.swift */; };
 		C30958D32541CC82006C0CB5 /* EmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30958D22541CC82006C0CB5 /* EmojiTextField.swift */; };
+		C31AE93F254B4017002B5A2F /* MonthlyExpenseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C31AE93E254B4017002B5A2F /* MonthlyExpenseChartView.swift */; };
 		C328825A2464894100F846DC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32882592464894100F846DC /* AppDelegate.swift */; };
 		C328825C2464894100F846DC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328825B2464894100F846DC /* SceneDelegate.swift */; };
 		C328825E2464894100F846DC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328825D2464894100F846DC /* ContentView.swift */; };
@@ -65,6 +66,7 @@
 		C30958CC2541BCD6006C0CB5 /* NewCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCategoryView.swift; sourceTree = "<group>"; };
 		C30958CF2541C528006C0CB5 /* NewCategoryStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCategoryStyleView.swift; sourceTree = "<group>"; };
 		C30958D22541CC82006C0CB5 /* EmojiTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiTextField.swift; sourceTree = "<group>"; };
+		C31AE93E254B4017002B5A2F /* MonthlyExpenseChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyExpenseChartView.swift; sourceTree = "<group>"; };
 		C32882562464894100F846DC /* Xpense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Xpense.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C32882592464894100F846DC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C328825B2464894100F846DC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -293,6 +295,7 @@
 				C381C4CC254895C0002DB1D7 /* ChartsHomePieView.swift */,
 				C381C4D82549C973002DB1D7 /* ReportsView.swift */,
 				C3CCD16C2549E5F200578B52 /* WeeklyExpenseChartView.swift */,
+				C31AE93E254B4017002B5A2F /* MonthlyExpenseChartView.swift */,
 			);
 			path = Reports;
 			sourceTree = "<group>";
@@ -434,6 +437,7 @@
 				C381C4D92549C973002DB1D7 /* ReportsView.swift in Sources */,
 				C381C4CD254895C0002DB1D7 /* ChartsHomePieView.swift in Sources */,
 				C30958CD2541BCD6006C0CB5 /* NewCategoryView.swift in Sources */,
+				C31AE93F254B4017002B5A2F /* MonthlyExpenseChartView.swift in Sources */,
 				C3CCD16A2549E2C500578B52 /* CategoryIconDisplayView.swift in Sources */,
 				C3CCD16D2549E5F200578B52 /* WeeklyExpenseChartView.swift in Sources */,
 				C328827C2469C3C400F846DC /* SwiftUIView.swift in Sources */,

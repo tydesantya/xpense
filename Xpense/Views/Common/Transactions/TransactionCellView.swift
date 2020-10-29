@@ -12,8 +12,8 @@ import SFSafeSymbols
 struct TransactionCellView: View {
     
     var transaction: TransactionModel
-    var category: CategoryModel {
-        transaction.category!
+    var category: CategoryModel? {
+        transaction.category
     }
     var paymentMethod: PaymentMethod {
         transaction.paymentMethod!
@@ -27,43 +27,45 @@ struct TransactionCellView: View {
             isActive: $navigationActive,
             label: {
                 HStack {
-                    HStack(spacing: .medium) {
-                        ZStack {
-                            let customTextIcon = category.text
-                            let symbolSelection:SFSymbol = SFSymbol(rawValue: category.symbolName ?? "") ?? .archiveboxFill
-                            Circle()
-                                .fill(
-                                    LinearGradient(gradient: .init(colors: [Color(UIColor.color(data: category.lighterColor!)!), Color(UIColor.color(data: category.color!)!)]), startPoint: .top, endPoint: .bottom)
-                                )
-                                .frame(width: 40, height: 40)
-                            if let text = customTextIcon {
-                                Text(text)
-                                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                                    .foregroundColor(.white)
+                    if let category = category {
+                        HStack(spacing: .medium) {
+                            ZStack {
+                                let customTextIcon = category.text
+                                let symbolSelection:SFSymbol = SFSymbol(rawValue: category.symbolName ?? "") ?? .archiveboxFill
+                                Circle()
+                                    .fill(
+                                        LinearGradient(gradient: .init(colors: [Color(UIColor.color(data: category.lighterColor!)!), Color(UIColor.color(data: category.color!)!)]), startPoint: .top, endPoint: .bottom)
+                                    )
+                                    .frame(width: 40, height: 40)
+                                if let text = customTextIcon {
+                                    Text(text)
+                                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                                        .foregroundColor(.white)
+                                }
+                                else {
+                                    Image(systemSymbol: symbolSelection)
+                                        .renderingMode(.template)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 20, height: 20)
+                                        .foregroundColor(.white)
+                                        .foregroundColor(.white)
+                                }
                             }
-                            else {
-                                Image(systemSymbol: symbolSelection)
-                                    .renderingMode(.template)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 20, height: 20)
-                                    .foregroundColor(.white)
-                                    .foregroundColor(.white)
-                            }
-                        }
-                        VStack(alignment: .leading) {
-                            Text(category.name ?? "")
-                                .foregroundColor(.init(.label))
-                                .bold()
-                            if category.type == CategoryType.income.rawValue {
-                                Text(getTransactionAmount())
-                                    .font(.header)
-                                    .foregroundColor(.init(.systemGreen))
-                            }
-                            else {
-                                Text("-\(getTransactionAmount())")
-                                    .font(.header)
-                                    .foregroundColor(.init(.systemRed))
+                            VStack(alignment: .leading) {
+                                Text(category.name ?? "")
+                                    .foregroundColor(.init(.label))
+                                    .bold()
+                                if category.type == CategoryType.income.rawValue {
+                                    Text(getTransactionAmount())
+                                        .font(.header)
+                                        .foregroundColor(.init(.systemGreen))
+                                }
+                                else {
+                                    Text("-\(getTransactionAmount())")
+                                        .font(.header)
+                                        .foregroundColor(.init(.systemRed))
+                                }
                             }
                         }
                     }

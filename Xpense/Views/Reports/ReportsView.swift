@@ -73,7 +73,7 @@ struct ReportsView: View {
                                 HStack {
                                     Image(systemName: "chart.pie.fill")
                                         .foregroundColor(Color(UIColor.systemGreen))
-                                    Text("Monthly Income")
+                                    Text("Income Report")
                                         .foregroundColor(Color(UIColor.systemGreen))
                                     Spacer()
                                     Text(getLatestIncomeTransactionDateTimeThisMonth())
@@ -102,7 +102,7 @@ struct ReportsView: View {
                                 HStack {
                                     Image(systemName: "chart.pie.fill")
                                         .foregroundColor(Color(UIColor.systemRed))
-                                    Text("Monthly Expense")
+                                    Text("Expense Report")
                                         .foregroundColor(Color(UIColor.systemRed))
                                     Spacer()
                                     Text(getLatestExpenseTransactionDateTimeThisMonth())
@@ -120,6 +120,9 @@ struct ReportsView: View {
                                 Text("Total Expense This Month").font(.footnote)
                                     .padding(.top, .tiny)
                             }.padding()
+                        }.onTapGesture {
+                            destinationView = AnyView(MonthlyExpenseChartView())
+                            navigate.toggle()
                         }
                     }
                     HStack {
@@ -426,7 +429,7 @@ private struct MonthlyHighlightReportView: View {
                         let expense = CurrencyHelper.getAmountFrom(formattedCurrencyString: totalMonthlyExpense, currency: "Rp ")
                         if let income = income, let expense = expense {
                             let net  = income - expense
-                            Text("You have a net balance of \(CurrencyHelper.string(from: net, currency: "Rp"))").font(.footnote)
+                            Text("You have a net balance of \(CurrencyHelper.string(from: net, currency: "Rp")) this month").font(.footnote)
                         }
                     }
                 }

@@ -38,11 +38,15 @@ struct AddExpenseView: View {
     @State var selectedCategory: CategoryModel? = nil
     @State var categorySelectNavigation = false
     
-    init(showSheetView:Binding<Bool>, refreshFlag:Binding<UUID>) {
+    var selectedTransaction: TransactionModel?
+    @State var populatedTransactionDetail = false
+    
+    init(showSheetView:Binding<Bool>, refreshFlag:Binding<UUID>, selectedTransaction: TransactionModel? = nil) {
         self._showSheetView = showSheetView
         _refreshFlag = refreshFlag
         let defaultCurrency = "IDR"
         _currency = .init(initialValue: CurrencyValue(amount: "0", currency: defaultCurrency))
+        self.selectedTransaction = selectedTransaction
         UITextView.appearance().backgroundColor = .clear
     }
     
@@ -224,11 +228,15 @@ struct AddExpenseView: View {
                 if amount == 0 {
                     showValidationAlert.toggle()
                 }
+                else if let transaction = selectedTransaction {
+                    editTransaction(transaction)
+                }
                 else {
                     createTransaction()
                 }
             }) {
-                Text("Add").bold()
+                let title = selectedTransaction != nil ? "Done" : "Add"
+                Text(title).bold()
             })
             .onAppear {
                 if selectedPaymentMethod == nil {
@@ -236,6 +244,12 @@ struct AddExpenseView: View {
                 }
                 if selectedCategory == nil {
                     selectedCategory = categories.first
+                }
+                if let transaction = selectedTransaction {
+                    if !populatedTransactionDetail {
+                        populatedTransactionDetail = true
+                        populateSelectedTransactionDetail(transaction)
+                    }
                 }
             }
         }.alert(isPresented: $showValidationAlert) {
@@ -250,6 +264,48 @@ struct AddExpenseView: View {
         do {
             try viewContext.save()
             categorySelectNavigation.toggle()
+        } catch let createError {
+            print("Failed to edit Category \(createError)")
+        }
+    }
+    
+    func populateSelectedTransactionDetail(_ transaction: TransactionModel) {
+        if let category = transaction.category {
+            category.lastUsed = Date()
+            selectedCategory = category
+            do {
+                try viewContext.save()
+            } catch let createError {
+                print("Failed to edit Category \(createError)")
+            }
+        }
+        if let paymentMethod = transaction.paymentMethod {
+            selectedPaymentMethod = paymentMethod
+        }
+        if let note = transaction.note {
+            notes = note
+        }
+        if let amount = transaction.amount?.currencyValue.amount {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.amount = Double(amount) ?? 0
+            }
+        }
+    }
+    
+    func editTransaction(_ transaction: TransactionModel) {
+        revertTransactionPaymentMethodAmount(transaction)
+        transaction.amount = getDisplayCurrencyValueFromAmount(amt: amount)
+        transaction.note = notes
+        transaction.category = selectedCategory
+        transaction.paymentMethod = selectedPaymentMethod
+        selectedCategory!.lastUsed = Date()
+        
+        deductSelectedPaymentMethodWithCurrentAmount()
+        do {
+            try viewContext.save()
+            refreshFlag = UUID()
+            SPAlert.present(title: "Edited Transaction", preset: .done)
+            self.showSheetView = false
         } catch let createError {
             print("Failed to edit Category \(createError)")
         }
@@ -283,6 +339,18 @@ struct AddExpenseView: View {
         
         let balance = getDisplayCurrencyValueFromAmount(amt: deductedCurrentAmount)
         selectedPaymentMethod?.balance = balance
+    }
+    
+    func revertTransactionPaymentMethodAmount(_ transaction: TransactionModel) {
+        let amountString = transaction.amount?.currencyValue.amount ?? ""
+        let amount = Double(amountString) ?? 0
+        let initialAmountString: String = transaction.amount?.currencyValue.amount ?? ""
+        let initialAmount = Double(initialAmountString) ?? 0
+        let categoryType = CategoryType(rawValue: transaction.category?.type ?? "") ?? .expense
+        let revertedAmount = categoryType == .expense ? initialAmount + amount : initialAmount - amount
+        
+        let balance = getDisplayCurrencyValueFromAmount(amt: revertedAmount)
+        transaction.paymentMethod?.balance = balance
     }
     
     func getDisplayCurrencyValueFromAmount(amt: Double) -> DisplayCurrencyValue {

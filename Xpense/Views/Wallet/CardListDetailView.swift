@@ -382,6 +382,7 @@ private struct PaymentMethodTransactionsView: View {
     private var data: FetchedResults<TransactionModel> {
         fetchRequest.wrappedValue
     }
+    @State var refreshFlag: UUID = UUID()
     
     var body: some View {
         ScrollView {
@@ -394,7 +395,7 @@ private struct PaymentMethodTransactionsView: View {
                 }
                 if (data.count > 0) {
                     ForEach(data) { trnsaction in
-                        TransactionCellView(transaction: trnsaction)
+                        TransactionCellView(transaction: trnsaction, refreshFlag: $refreshFlag)
                     }
                 }
                 else {
@@ -402,7 +403,7 @@ private struct PaymentMethodTransactionsView: View {
                         Text("No Transactions")
                     }.frame(minHeight: 200)
                 }
-            }
+            }.id(refreshFlag)
             .padding()
             .background(Color.init(.systemBackground))
         }

@@ -93,13 +93,16 @@ struct XpenseView: View {
                     .padding(.top, .small)
                     LazyVStack {
                         ForEach(0..<transactionLimit) { index in
-                            let transaction = transactions[index]
-                            TransactionCellView(transaction: transaction)
+                            if index < transactions.count {
+                                let transaction = transactions[index]
+                                TransactionCellView(transaction: transaction, refreshFlag: $refreshFlag)
+                            }
                         }
-                    }.id(refreshFlag)
+                    }
                     .padding(.horizontal)
                 }
-            }.edgesIgnoringSafeArea([.horizontal])
+            }
+            .id(refreshFlag)
             if (self.show) {
                 GeometryReader {
                     _ in
@@ -124,6 +127,7 @@ struct XpenseView: View {
             withAnimation {
                 self.progressValue = 0.5
             }
+            refreshFlag = UUID()
         })
     }
     

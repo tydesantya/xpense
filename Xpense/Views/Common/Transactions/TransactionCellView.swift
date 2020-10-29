@@ -18,10 +18,13 @@ struct TransactionCellView: View {
     var paymentMethod: PaymentMethod {
         transaction.paymentMethod!
     }
+    @State var navigationActive = false
+    @Binding var refreshFlag: UUID
     
     var body: some View {
         NavigationLink(
-            destination: TransactionDetailView(transaction: transaction),
+            destination: TransactionDetailView(navigationActive: $navigationActive, transaction: transaction, refreshFlag: $refreshFlag),
+            isActive: $navigationActive,
             label: {
                 HStack {
                     HStack(spacing: .medium) {

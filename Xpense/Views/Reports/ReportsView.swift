@@ -93,6 +93,7 @@ struct ReportsView: View {
                             }.padding()
                         }
                     }
+                    let totalExpenseThisMonth = getTotalExpenseThisMonth()
                     if monthlyExpenseTransactions.count > 0 {
                         ZStack {
                             RoundedRectangle(cornerRadius: .medium)
@@ -115,7 +116,7 @@ struct ReportsView: View {
                                         .foregroundColor(Color(UIColor.secondaryLabel))
                                 }
                                 Divider()
-                                Text(getTotalExpenseThisMonth()).font(.header)
+                                Text(totalExpenseThisMonth).font(.header)
                                 Text("Total Expense This Month").font(.footnote)
                                     .padding(.top, .tiny)
                             }.padding()
@@ -132,7 +133,7 @@ struct ReportsView: View {
                     }
                     let largestMonthlyExpenseTuple = getLargestMonthlyExpense()
                     if monthlyExpenseTransactions.count > 0 {
-                        MonthlyHighlightReportView(largestWeeklyExpenseTuple: largestWeeklyExpenseTuple, largestMonthlyExpenseTuple: largestMonthlyExpenseTuple, largestMonthlyIncomeTuple: getLargestMonthlyIncome(), totalMonthlyIncome: totalIncomeThisMonth)
+                        MonthlyHighlightReportView(largestWeeklyExpenseTuple: largestWeeklyExpenseTuple, largestMonthlyExpenseTuple: largestMonthlyExpenseTuple, largestMonthlyIncomeTuple: getLargestMonthlyIncome(), totalMonthlyIncome: totalIncomeThisMonth, totalMonthlyExpense: totalExpenseThisMonth)
                     }
                 }.padding()
                 NavigationLink(
@@ -382,6 +383,7 @@ private struct MonthlyHighlightReportView: View {
     var largestMonthlyExpenseTuple: (String, TransactionModel?)
     var largestMonthlyIncomeTuple: (String, TransactionModel?)
     var totalMonthlyIncome: String
+    var totalMonthlyExpense: String
     
     var body: some View {
         ZStack {
@@ -396,12 +398,12 @@ private struct MonthlyHighlightReportView: View {
                     Spacer()
                 }
                 Divider()
-                Text("You earned a total of \(totalMonthlyIncome) this month").fixedSize(horizontal: false, vertical: true).padding(.bottom, .tiny)
-                    .font(.footnote)
                 if let transaction = largestMonthlyIncomeTuple.1 {
                     if let largestIncomeCategory = transaction.category {
                         let largestIncomeTransaction = largestWeeklyExpenseTuple.1
-                        Text(largestMonthlyIncomeTuple.0 == totalMonthlyIncome ? "Purely from a single income of " : "Highlighting the largest income of the month of").fixedSize(horizontal: false, vertical: true).font(.footnote)
+                        Text("You earned a total of \(totalMonthlyIncome) this month").fixedSize(horizontal: false, vertical: true).padding(.bottom, .tiny)
+                            .font(.footnote)
+                        Text(largestMonthlyIncomeTuple.0 == totalMonthlyIncome ? "Purely from a single income from " : "Highlighting the largest income of the month from").fixedSize(horizontal: false, vertical: true).font(.footnote)
                         HStack {
                             CategoryIconDisplayView(category: largestIncomeCategory, iconWidth: 20, iconHeight: 20)
                             Text("\(largestIncomeCategory.name ?? ""): \(largestIncomeTransaction!.date!.dateTimeFormat())").font(.footnote)
@@ -419,6 +421,12 @@ private struct MonthlyHighlightReportView: View {
                                 CategoryIconDisplayView(category: category, iconWidth: 20, iconHeight: 20)
                                 Text("\(category.name ?? ""): \(transaction!.date!.dateTimeFormat())").font(.footnote)
                             }
+                        }
+                        let income = CurrencyHelper.getAmountFrom(formattedCurrencyString: totalMonthlyIncome, currency: "Rp ")
+                        let expense = CurrencyHelper.getAmountFrom(formattedCurrencyString: totalMonthlyExpense, currency: "Rp ")
+                        if let income = income, let expense = expense {
+                            let net  = income - expense
+                            Text("You have a net balance of \(CurrencyHelper.string(from: net, currency: "Rp"))").font(.footnote)
                         }
                     }
                 }

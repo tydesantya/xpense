@@ -7,30 +7,39 @@
 //
 
 import SwiftUI
+import SPAlert
 
 struct TransactionDetailView: View {
     
-    var transaction: TransactionModel
-    var category: CategoryModel {
-        transaction.category!
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    @Binding var navigationActive: Bool
+    @ObservedObject var transaction: TransactionModel
+    var category: CategoryModel? {
+        transaction.category
     }
+    @State var editTransaction = false
+    @State var confirmationAlertShown = false
+    @Binding var refreshFlag: UUID
     
     var body: some View {
         ScrollView {
             VStack {
                 VStack {
                     HStack {
-                        CategoryIconDisplayView(category: category, iconWidth: 100.0, iconHeight: 100.0)
-                        VStack(alignment: .leading) {
-                            Text(category.name!)
-                                .font(.title)
-                            let color = category.type == CategoryType.income.rawValue ? Color(UIColor.systemGreen) : Color(UIColor.systemRed)
-                            Text(transaction.amount!.toString())
-                                .font(.huge)
-                                .foregroundColor(color)
+                        if let category = category {
+                            CategoryIconDisplayView(category: category, iconWidth: 100.0, iconHeight: 100.0)
+                            VStack(alignment: .leading) {
+                                Text(category.name!)
+                                    .font(.title)
+                                let color = category.type == CategoryType.income.rawValue ? Color(UIColor.systemGreen) : Color(UIColor.systemRed)
+                                Text(transaction.amount!.toString())
+                                    .font(.huge)
+                                    .foregroundColor(color)
+                            }
+                            .padding(.leading, .medium)
+                            Spacer()
                         }
-                        .padding(.leading, .medium)
-                        Spacer()
                     }
                     Divider()
                         .padding(.bottom)
@@ -41,24 +50,28 @@ struct TransactionDetailView: View {
                             Text("Payment Method")
                         }
                         VStack(alignment: .leading, spacing: .small) {
-                            if transaction.note!.count > 0 {
+                            if transaction.note?.count ?? 0 > 0 {
                                 Text(transaction.note!)
                             }
                             else {
                                 Text("No Notes")
                                     .foregroundColor(Color(UIColor.secondaryLabel))
                             }
-                            Text(transaction.date!.dateTimeFormat())
-                            let width = CGFloat(150)
-                            let height = CGFloat(80)
-                            PaymentMethodCardView(paymentMethod: transaction.paymentMethod!, selectedPaymentMethod: .constant(nil))
-                                .frame(width: width, height: height)
+                            if let date = transaction.date {
+                                Text(date.dateTimeFormat())
+                            }
+                            if let paymentMethod = transaction.paymentMethod {
+                                let width = CGFloat(150)
+                                let height = CGFloat(80)
+                                PaymentMethodCardView(paymentMethod: paymentMethod, selectedPaymentMethod: .constant(nil))
+                                    .frame(width: width, height: height)
+                            }
                         }
                         Spacer()
-                    }
+                    }.id(refreshFlag)
                     Divider().padding(.vertical)
                     Button(action: {
-                        
+                        confirmationAlertShown.toggle()
                     }, label: {
                         ZStack {
                             Circle()
@@ -71,8 +84,56 @@ struct TransactionDetailView: View {
                     })
                     Spacer()
                 }.navigationTitle("Transaction Detail")
+                .navigationBarItems(trailing: Button(action: {
+                    editTransaction.toggle()
+                }, label: {
+                    Text("Edit")
+                }))
                 .padding(.large)
+                .sheet(isPresented: $editTransaction, content: {
+                    AddExpenseView(showSheetView: $editTransaction, refreshFlag: $refreshFlag, selectedTransaction: transaction)
+                        .environment(\.managedObjectContext, viewContext)
+                })
+                .alert(isPresented: $confirmationAlertShown, content: {
+                    Alert(title: Text("Warning"), message: Text("Are you sure you want to delete this transaction ?"), primaryButton: .destructive(Text("Delete")) {
+                        deleteSelectedTransaction()
+                    }, secondaryButton: .cancel())
+                })
             }
         }
+    }
+    
+    func deleteSelectedTransaction() {
+        revertTransactionPaymentMethodAmount(transaction)
+        navigationActive.toggle()
+        viewContext.delete(transaction)
+        do {
+            try viewContext.save()
+            SPAlert.present(title: "Deleted", preset: .done)
+        } catch let createError {
+            print("Failed to delete transaction \(createError)")
+        }
+    }
+    
+    func revertTransactionPaymentMethodAmount(_ transaction: TransactionModel) {
+        let amountString = transaction.amount?.currencyValue.amount ?? ""
+        let amount = Double(amountString) ?? 00
+        let initialAmountString: String = transaction.amount?.currencyValue.amount ?? ""
+        let initialAmount = Double(initialAmountString) ?? 0
+        let categoryType = CategoryType(rawValue: transaction.category?.type ?? "") ?? .expense
+        let revertedAmount = categoryType == .expense ? initialAmount + amount : initialAmount - amount
+        
+        let balance = getDisplayCurrencyValueFromAmount(amt: revertedAmount)
+        transaction.paymentMethod?.balance = balance
+    }
+    
+    func getDisplayCurrencyValueFromAmount(amt: Double) -> DisplayCurrencyValue {
+        let selectedPaymentMethod = transaction.paymentMethod
+        let numOfDecimalPoint = selectedPaymentMethod?.balance?.numOfDecimalPoint
+        let decimalSeparator = selectedPaymentMethod?.balance?.decimalSeparator
+        let groupingSeparator = selectedPaymentMethod?.balance?.groupingSeparator
+        let amountString = numOfDecimalPoint == 0 ? String(format: "%.0f", amt) : String(amt)
+        let currency = CurrencyValue(amount: amountString, currency: selectedPaymentMethod?.balance?.currencyValue.currency ?? "")
+        return DisplayCurrencyValue(currencyValue: currency, numOfDecimalPoint: numOfDecimalPoint ?? 0, decimalSeparator: decimalSeparator ?? ",", groupingSeparator: groupingSeparator ?? ".")
     }
 }

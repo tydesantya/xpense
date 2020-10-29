@@ -214,6 +214,7 @@ private struct CustomBarChartView: View {
 private struct WeeklyExpenseDetailView: View {
     
     var weekMapping: [Date: DailyTransaction]
+    @State var refreshFlag = UUID()
     
     var body: some View {
         LazyVStack {
@@ -275,10 +276,10 @@ private struct WeeklyExpenseDetailView: View {
                     .padding(.top)
                     ForEach(transactions) {
                         transaction in
-                        TransactionCellView(transaction: transaction)
+                        TransactionCellView(transaction: transaction, refreshFlag: $refreshFlag)
                     }
                 }
-            }
+            }.id(refreshFlag)
         }
         .padding()
     }

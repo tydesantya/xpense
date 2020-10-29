@@ -24,6 +24,7 @@ struct TransactionListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \TransactionModel.date, ascending: false)])
     private var transactions: FetchedResults<TransactionModel>
+    @State var refreshFlag = UUID()
     
     var body: some View {
         ScrollView {
@@ -47,11 +48,12 @@ struct TransactionListView: View {
                                 Spacer()
                             }.padding(.bottom, .small)
                             ForEach(section.transactions, id: \.self) { transaction in
-                                TransactionCellView(transaction: transaction)
+                                TransactionCellView(transaction: transaction, refreshFlag: $refreshFlag)
                             }
                         }.textCase(nil)
                     }
                 }.padding(.horizontal)
+                .id(refreshFlag)
             }.navigationTitle("Transactions")
         }
     }

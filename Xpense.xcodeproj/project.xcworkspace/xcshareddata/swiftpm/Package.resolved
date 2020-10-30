@@ -20,6 +20,15 @@
         }
       },
       {
+        "package": "PartialSheet",
+        "repositoryURL": "https://github.com/AndreaMiotto/PartialSheet.git",
+        "state": {
+          "branch": null,
+          "revision": "936465232b6399e402e79d5b031622af9a5e9960",
+          "version": "2.1.11"
+        }
+      },
+      {
         "package": "SFSafeSymbols",
         "repositoryURL": "https://github.com/piknotech/SFSafeSymbols.git",
         "state": {
@@ -35,15 +44,6 @@
           "branch": null,
           "revision": "18862409586ac547bcdf8957cd96beb872fbc729",
           "version": "2.1.4"
-        }
-      },
-      {
-        "package": "SunburstDiagram",
-        "repositoryURL": "https://github.com/lludo/SwiftSunburstDiagram.git",
-        "state": {
-          "branch": null,
-          "revision": "23ac804b97642ca288d5cdd0c0cc339e2d9353ec",
-          "version": "1.1.0"
         }
       },
       {

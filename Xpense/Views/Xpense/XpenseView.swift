@@ -14,7 +14,6 @@ struct XpenseView: View {
     @Environment(\.managedObjectContext) private var viewContext
     var fetchRequest: FetchRequest<TransactionModel>
     var transactions : FetchedResults<TransactionModel>{fetchRequest.wrappedValue}
-    @State var show = false
     @State var progressValue: Float = 1.0
     @State var showAddExpense: Bool = false
     @Binding var refreshFlag: UUID
@@ -103,26 +102,6 @@ struct XpenseView: View {
                 }
             }
             .id(refreshFlag)
-            if (self.show) {
-                GeometryReader {
-                    _ in
-                    MonthPicker(completion: {
-                        month, year in
-                        withAnimation {
-                            self.show.toggle()
-                        }
-                        print (month, year)
-                    })
-                }.background(
-                    Blur(style: .systemUltraThinMaterial)
-                    .edgesIgnoringSafeArea(.all)
-                    .onTapGesture {
-                        withAnimation {
-                            self.show.toggle()
-                        }
-                    }
-                )
-            }
         }.onAppear(perform: {
             withAnimation {
                 self.progressValue = 0.5

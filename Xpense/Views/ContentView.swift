@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import PartialSheet
 
 struct ContentView: View {
     
@@ -78,6 +79,7 @@ struct ContentView: View {
                 .accentColor(.theme)
                 .environment(\.managedObjectContext, self.viewContext)
         })
+        .addPartialSheet()
         .accentColor(.theme)
     }
     

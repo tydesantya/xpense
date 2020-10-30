@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftUI
+import PartialSheet
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -22,8 +23,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Create the SwiftUI view that provides the window contents.
         persistenceController.validateCategoriesSeed()
+        let sheetManager: PartialSheetManager = PartialSheetManager()
         let contentView = ContentView()
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            .environmentObject(sheetManager)
 
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {

@@ -48,21 +48,59 @@ extension Date {
     func byAdding(component: Calendar.Component, value: Int, wrappingComponents: Bool = false, using calendar: Calendar = .current) -> Date? {
         calendar.date(byAdding: component, value: value, to: self, wrappingComponents: wrappingComponents)
     }
-    func dateComponents(_ components: Set<Calendar.Component>, using calendar: Calendar = .current) -> DateComponents {
+    func dateComponents(_ components: Set<Calendar.Component>, using calendar: Calendar = .iso8601) -> DateComponents {
         calendar.dateComponents(components, from: self)
     }
-    func startOfWeek(using calendar: Calendar = .current) -> Date {
+    func startOfWeek(using calendar: Calendar = .iso8601) -> Date {
         calendar.date(from: dateComponents([.yearForWeekOfYear, .weekOfYear], using: calendar))!
     }
-    func startOfMonth(using calendar: Calendar = .current) -> Date {
+    func startOfMonth(using calendar: Calendar = .iso8601) -> Date {
         calendar.date(from: dateComponents([.year, .month], using: calendar))!
     }
-    var noon: Date {
-        Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: self)!
+    func startOfYear(using calendar: Calendar = .iso8601) -> Date {
+        calendar.date(from: dateComponents([.year], using: calendar))!
     }
-    func daysOfWeek(using calendar: Calendar = .current) -> [Date] {
+    var noon: Date {
+        Calendar.iso8601.date(bySettingHour: 12, minute: 0, second: 0, of: self)!
+    }
+    var startOfDay: Date {
+        return Calendar.iso8601.startOfDay(for: self)
+    }
+    var endOfDay: Date {
+        var components = DateComponents()
+        components.day = 1
+        components.second = -1
+        return Calendar.iso8601.date(byAdding: components, to: startOfDay)!
+    }
+    var endOfMonth: Date {
+        var components = DateComponents()
+        components.month = 1
+        components.second = -1
+        return Calendar.iso8601.date(byAdding: components, to: startOfMonth())!
+    }
+    var endOfYear: Date {
+        var components = DateComponents()
+        components.year = 1
+        components.second = -1
+        return Calendar.iso8601.date(byAdding: components, to: startOfYear())!
+    }
+    func daysOfWeek(using calendar: Calendar = .iso8601) -> [Date] {
         let startOfWeek = self.startOfWeek(using: calendar).noon
         return (0...6).map { startOfWeek.byAdding(component: .day, value: $0, using: calendar)! }
+    }
+    
+    func numberOfDaysInYear() -> Int {
+        let calendar = Calendar.iso8601
+        let interval = calendar.dateInterval(of: .year, for: self)!
+        let days = calendar.dateComponents([.day], from: interval.start, to: interval.end).day!
+        return days
+    }
+    
+    func numberOfDaysInMonth() -> Int {
+        let calendar = Calendar.iso8601
+        let interval = calendar.dateInterval(of: .month, for: self)!
+        let days = calendar.dateComponents([.day], from: interval.start, to: interval.end).day!
+        return days
     }
     
     var ddMMyyyy: String { Formatter.ddMMyyyy.string(from: self) }

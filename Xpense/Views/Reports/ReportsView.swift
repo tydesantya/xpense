@@ -91,6 +91,9 @@ struct ReportsView: View {
                                 Text("Total Income This Month").font(.footnote)
                                     .padding(.top, .tiny)
                             }.padding()
+                        }.onTapGesture {
+                            destinationView = AnyView(PieReportChartView(reportType: .income))
+                            navigate.toggle()
                         }
                     }
                     let totalExpenseThisMonth = getTotalExpenseThisMonth()
@@ -121,7 +124,7 @@ struct ReportsView: View {
                                     .padding(.top, .tiny)
                             }.padding()
                         }.onTapGesture {
-                            destinationView = AnyView(MonthlyExpenseChartView())
+                            destinationView = AnyView(PieReportChartView(reportType: .expense))
                             navigate.toggle()
                         }
                     }
@@ -310,16 +313,16 @@ struct ReportsView: View {
         weeklyExpenseFetchRequest = FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
         
         
-        let startOfMonth = Date().startOfMonth()
+        let startOfMonth = Date().startOfMonth(using: .iso8601)
         components.year = 0
         components.month = 1
-        components.day = -1
+        components.day = 0
         let endOfMonth = Calendar.iso8601.date(byAdding: components, to: startOfMonth)
         let incomeType = CategoryType.income.rawValue
-        let monthlyIncomePredicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfMonth as NSDate , endOfMonth! as NSDate, incomeType)
+        let monthlyIncomePredicate = NSPredicate(format: "date >= %@ && date < %@ && category.type == %@", startOfMonth as NSDate , endOfMonth! as NSDate, incomeType)
         monthlyIncomeFetchRequest = FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: monthlyIncomePredicate, animation: .spring())
         
-        let monthlyExpensePredicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfMonth as NSDate , endOfMonth! as NSDate, expenseType)
+        let monthlyExpensePredicate = NSPredicate(format: "date >= %@ && date < %@ && category.type == %@", startOfMonth as NSDate , endOfMonth! as NSDate, expenseType)
         monthlyExpenseFetchRequest = FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: monthlyExpensePredicate, animation: .spring())
     }
 }

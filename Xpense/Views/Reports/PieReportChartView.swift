@@ -56,10 +56,7 @@ struct PieReportChartView: View {
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding()
-                .onChange(of: self.segmentIndex, perform: { value in
-                    self.segmentChanged(value)
-                })
-                ReportPieChartDetailView(fetchRequest: getFetchRequest(), elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: getElapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod(), reportType: reportType, amountColor: amountColor, groupingType: groupingType)
+                ReportPieChartDetailView(fetchRequest: getFetchRequest(), elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: getElapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod(), reportType: reportType, amountColor: amountColor, groupingType: groupingType, calculateNetBalance: reportType == .income, expenseFetchRequestForNetCalculation: getOppositeFetchRequest())
             }
         }.navigationTitle(dateFormatter.string(from: selectedDate))
         .onAppear {
@@ -130,6 +127,18 @@ struct PieReportChartView: View {
         }
     }
     
+    func getOppositeFetchRequest() -> FetchRequest<TransactionModel> {
+        let dateType = segments[segmentIndex]
+        switch dateType {
+        case .day:
+            return makeOppositeDailyTransactionAmountFetchRequest()
+        case .month:
+            return makeOppositeMonthlyTransactionAmountFetchRequest()
+        default:
+            return makeOppositeYearlyTransactionAmountFetchRequest()
+        }
+    }
+    
     func makeDailyTransactionAmountFetchRequest() -> FetchRequest<TransactionModel> {
         let startOfDay = selectedDate.startOfDay
         let endOfDay = selectedDate.endOfDay
@@ -158,6 +167,34 @@ struct PieReportChartView: View {
         return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
     }
     
+    func makeOppositeDailyTransactionAmountFetchRequest() -> FetchRequest<TransactionModel> {
+        let categoryType = reportType.rawValue
+        let startOfDay = selectedDate.startOfDay
+        let endOfDay = selectedDate.endOfDay
+        let sort = NSSortDescriptor(key: "date", ascending: true)
+        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type != %@", startOfDay as NSDate, endOfDay as NSDate, categoryType)
+        return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
+    }
+    
+    func makeOppositeMonthlyTransactionAmountFetchRequest() -> FetchRequest<TransactionModel> {
+        let startOfMonth = selectedDate.startOfMonth()
+        let endOfMonth = selectedDate.endOfMonth
+        let sort = NSSortDescriptor(key: "date", ascending: true)
+        let categoryType = reportType.rawValue
+        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type != %@", startOfMonth as NSDate , endOfMonth as NSDate, categoryType)
+        return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
+    }
+    
+    func makeOppositeYearlyTransactionAmountFetchRequest() -> FetchRequest<TransactionModel> {
+        let startOfYear = selectedDate.startOfYear()
+        let endOfYear = selectedDate.endOfYear
+        
+        let sort = NSSortDescriptor(key: "date", ascending: true)
+        let categoryType = reportType.rawValue
+        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type != %@", startOfYear as NSDate, endOfYear as NSDate, categoryType)
+        return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
+    }
+    
     func getElapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod() -> (Int, Bool, Int)? {
         let dateType = segments[segmentIndex]
         switch dateType {
@@ -175,9 +212,8 @@ struct PieReportChartView: View {
             return (components.day ?? 0, currentPeriodStartOfYear == startOfYear, selectedDate.numberOfDaysInYear())
         }
     }
-    func segmentChanged(_ segment: Int) {
-        
-    }
+    
+    
 }
 
 struct MonthlyTransactionAmountChartView_Previews: PreviewProvider {
@@ -198,6 +234,12 @@ private struct ReportPieChartDetailView: View {
     var amountColor: Color
     var groupingType: ReportGroupingType
     
+    var calculateNetBalance: Bool
+    var expenseFetchRequestForNetCalculation: FetchRequest<TransactionModel>
+    private var expenseDataForNetCalculation: FetchedResults<TransactionModel> {
+        expenseFetchRequestForNetCalculation.wrappedValue
+    }
+    
     var body: some View {
         let dataAndStyle = mapFetchResultIntoChartDataAndStyle(data)
         let listData = dataAndStyle.1
@@ -214,7 +256,7 @@ private struct ReportPieChartDetailView: View {
                     .chartStyle(dataAndStyle.0)
                     .padding()
                     .aspectRatio(CGSize(width: 1, height: 0.7), contentMode: .fit)
-                ReportDetailListView(chartData: listData.0, totalAmount: listData.1, elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod, reportType: reportType, amountColor: amountColor, groupingType: groupingType).padding(.top)
+                ReportDetailListView(chartData: listData.0, totalAmount: listData.1, elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod, reportType: reportType, amountColor: amountColor, groupingType: groupingType, oppositeTotalAmount: getTotalOppositeAmount(expenseDataForNetCalculation), calculateNetBalance: calculateNetBalance).padding(.top)
             }.id(listData.0.count)
         }
         else {
@@ -222,6 +264,19 @@ private struct ReportPieChartDetailView: View {
                 Text("No Data")
             }.frame(minHeight: 300)
         }
+    }
+    
+    func getTotalOppositeAmount(_ result : FetchedResults<TransactionModel>) -> Double {
+        if !calculateNetBalance {
+            return 0.0
+        }
+        var total: Double = 0.0
+        for transaction in result {
+            let amountString = transaction.amount?.currencyValue.amount ?? "0"
+            let amount = Double(amountString) ?? 0
+            total += amount
+        }
+        return total
     }
     
     func mapFetchResultIntoChartDataAndStyle(_ result : FetchedResults<TransactionModel>)-> (ChartStyle, ([ChartModel], Double)) {
@@ -283,45 +338,26 @@ struct ReportDetailListView: View {
     var reportType: CategoryType
     var amountColor: Color
     var groupingType: ReportGroupingType
+    var oppositeTotalAmount: Double
+    var calculateNetBalance: Bool
     
     var body: some View {
         VStack {
             let averages = getOverallAverageAndPerDayAndTotal()
-            let averageTransaction = averages.2
             let averageDailyTransaction = averages.3
-            HStack(alignment: .bottom, spacing: .medium) {
-                VStack(alignment: .leading, spacing: .tiny) {
-                    Text("")
-                        .font(.footnote)
-                    Text("Divided by")
-                        .font(.footnote)
-                    Text("Average")
-                        .font(.footnote)
-                }
-                if averageTransaction > 0 {
-                    VStack(alignment: .leading, spacing: .tiny) {
-                        Text("Overall \(reportType.rawValue)")
-                            .font(.footnote)
-                        Text("\(averageTransaction) transaction(s)")
-                            .font(.footnote)
-                        Text(averages.0)
-                            .font(.footnote).bold()
-                            .foregroundColor(amountColor)
-                    }
-                }
-                if averageDailyTransaction > 0 {
-                    VStack(alignment: .leading, spacing: .tiny) {
-                        Text("Daily \(reportType.rawValue)")
-                            .font(.footnote)
-                        Text("\(averageDailyTransaction) day(s)")
-                            .font(.footnote)
-                        Text(averages.1)
-                            .font(.footnote).bold()
-                            .foregroundColor(amountColor)
-                    }
-                }
-                Spacer()
-            }.padding()
+            let averagesDailyTransactionAmount = averages.1
+            if reportType == .expense {
+                let averageTransaction = averages.2
+                let averageTransactionAmount = averages.0
+                ExpenseSummaryView(averageTransactionCount: averageTransaction, averageTransactionAmount: averageTransactionAmount, transactionDays: averageDailyTransaction, dailyTransactionAmount: averagesDailyTransactionAmount, amountColor: amountColor, reportType: reportType)
+            }
+            else if calculateNetBalance {
+                let currency = chartData.first?.transactions.first?.amount?.currencyValue.currency ?? ""
+                let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency) ?? ""
+                let oppositeAmount = oppositeTotalAmount
+                let netAmount = totalAmount - oppositeAmount
+                IncomeSummaryView(netAmount: netAmount, oppositeAmount: oppositeAmount, currencySign: currencySign, amountColor: amountColor, transactionDays: averageDailyTransaction, averageTransactionAmount: averagesDailyTransactionAmount)
+            }
             LazyVStack {
                 ForEach(chartData, id: \.self) {
                     chartModel in
@@ -368,6 +404,105 @@ struct ReportDetailListView: View {
         let averageAmountPerDayString = CurrencyHelper.string(from: averageAmountPerDay, currency: currency)
         let totalAmountString = CurrencyHelper.string(from: totalAmount, currency: currency)
         return (averageAmountOfTheWeekString, averageAmountPerDayString, transactionsCount, totalDays ?? 0, totalAmountString)
+    }
+}
+
+struct IncomeSummaryView: View {
+    var netAmount: Double
+    var oppositeAmount: Double
+    var currencySign: String
+    var amountColor: Color
+    var transactionDays: Int
+    var averageTransactionAmount: String
+    
+    var body: some View {
+        HStack(alignment: .bottom, spacing: .small) {
+            VStack(alignment: .leading) {
+                Text("Total")
+                    .font(.footnote)
+                    .hidden()
+                Text("Substract with")
+                    .font(.footnote)
+                    .padding(.bottom)
+                Text("Total")
+                    .font(.footnote)
+                    .hidden()
+                Text("Divided by")
+                    .font(.footnote)
+            }
+            VStack(alignment: .leading) {
+                Text("Total Expense")
+                    .font(.footnote)
+                Text(CurrencyHelper.string(from: oppositeAmount, currency: currencySign))
+                    .foregroundColor(Color(UIColor.systemRed))
+                    .font(.footnote).bold()
+                    .padding(.bottom)
+                Text("Total Transactions")
+                    .font(.footnote)
+                Text("\(transactionDays) day(s)")
+                    .font(.footnote).bold()
+            }
+            Divider()
+            VStack(alignment: .leading) {
+                Text("Net Income")
+                    .font(.footnote)
+                Text(CurrencyHelper.string(from: netAmount, currency: currencySign))
+                    .foregroundColor(amountColor)
+                    .font(.footnote).bold()
+                    .padding(.bottom)
+                Text("Daily Income")
+                    .font(.footnote)
+                Text(averageTransactionAmount)
+                    .foregroundColor(amountColor)
+                    .font(.footnote).bold()
+            }
+            Spacer()
+        }.padding()
+    }
+}
+
+struct ExpenseSummaryView: View {
+    let averageTransactionCount: Int
+    let averageTransactionAmount: String
+    let transactionDays: Int
+    let dailyTransactionAmount: String
+    let amountColor: Color
+    let reportType: CategoryType
+    
+    var body: some View {
+        HStack(alignment: .bottom, spacing: .medium) {
+            VStack(alignment: .leading, spacing: .tiny) {
+                Text("")
+                    .font(.footnote)
+                Text("Divided by")
+                    .font(.footnote)
+                Text("Average")
+                    .font(.footnote)
+            }
+            if averageTransactionCount > 0 {
+                VStack(alignment: .leading, spacing: .tiny) {
+                    Text("Overall \(reportType.rawValue)")
+                        .font(.footnote)
+                    Text("\(averageTransactionCount) transaction(s)")
+                        .font(.footnote)
+                    Text(averageTransactionAmount)
+                        .font(.footnote).bold()
+                        .foregroundColor(amountColor)
+                }
+            }
+            if transactionDays > 0 {
+                VStack(alignment: .leading, spacing: .tiny) {
+                    Text("Daily \(reportType.rawValue)")
+                        .font(.footnote)
+                    Text("\(transactionDays) day(s)")
+                        .font(.footnote)
+                    Text(dailyTransactionAmount)
+                        .font(.footnote).bold()
+                        .foregroundColor(amountColor)
+                }
+            }
+            Spacer()
+        }.padding()
     }
 }
 

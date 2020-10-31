@@ -11,14 +11,21 @@ import SwiftUICharts
 import PartialSheet
 
 struct ChartModel: Hashable {
-    var category: CategoryModel
+    var category: CategoryModel?
+    var paymentMethod: PaymentMethod?
     var amount: Double
     var color: ColorGradient
     var transactions: [TransactionModel]
+    var groupingType: ReportGroupingType
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(category)
     }
+}
+
+enum ReportGroupingType {
+    case categories
+    case paymentMethods
 }
 
 struct PieReportChartView: View {
@@ -30,6 +37,8 @@ struct PieReportChartView: View {
     @EnvironmentObject var partialSheetManager: PartialSheetManager
     @State var selectedDate = Date()
     @State var segmentIndex = 1
+    @State var groupingType: ReportGroupingType = .categories
+    
     var segments = ReportDatePickerType.allCases
     var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
@@ -50,7 +59,7 @@ struct PieReportChartView: View {
                 .onChange(of: self.segmentIndex, perform: { value in
                     self.segmentChanged(value)
                 })
-                ReportPieChartDetailView(fetchRequest: getFetchRequest(), elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: getElapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod(), reportType: reportType, amountColor: amountColor)
+                ReportPieChartDetailView(fetchRequest: getFetchRequest(), elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: getElapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod(), reportType: reportType, amountColor: amountColor, groupingType: groupingType)
             }
         }.navigationTitle(dateFormatter.string(from: selectedDate))
         .onAppear {
@@ -74,6 +83,7 @@ struct PieReportChartView: View {
                 Section {
                     Button(action: {
                         // Show By Category
+                        groupingType = .categories
                     }) {
                         Label {
                             Text("Show By Categories")
@@ -83,6 +93,7 @@ struct PieReportChartView: View {
                     }
                     Button(action: {
                         // Show By Payment Methods
+                        groupingType = .paymentMethods
                     }) {
                         Label {
                             Text("Show By Payment Methods")
@@ -185,6 +196,7 @@ private struct ReportPieChartDetailView: View {
     var elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: (Int, Bool, Int)?
     var reportType: CategoryType
     var amountColor: Color
+    var groupingType: ReportGroupingType
     
     var body: some View {
         let dataAndStyle = mapFetchResultIntoChartDataAndStyle(data)
@@ -202,7 +214,7 @@ private struct ReportPieChartDetailView: View {
                     .chartStyle(dataAndStyle.0)
                     .padding()
                     .aspectRatio(CGSize(width: 1, height: 0.7), contentMode: .fit)
-                ReportDetailListView(chartData: listData.0, totalAmount: listData.1, elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod, reportType: reportType, amountColor: amountColor).padding(.top)
+                ReportDetailListView(chartData: listData.0, totalAmount: listData.1, elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod, reportType: reportType, amountColor: amountColor, groupingType: groupingType).padding(.top)
             }.id(listData.0.count)
         }
         else {
@@ -214,26 +226,49 @@ private struct ReportPieChartDetailView: View {
     
     func mapFetchResultIntoChartDataAndStyle(_ result : FetchedResults<TransactionModel>)-> (ChartStyle, ([ChartModel], Double)) {
         var total: Double = 0.0
-        let data = Dictionary(grouping: result){ (transaction : TransactionModel) -> CategoryModel in
-            // group by category
-            return transaction.category!
-        }.values.map { (transactionByGroup) -> (ChartModel) in
-            var totalTransactionAmountForGroup: Double = 0.0
-            for transaction in transactionByGroup {
-                let amountString: String = transaction.amount?.currencyValue.amount ?? "0"
-                let amount: Double = Double(amountString)!
-                totalTransactionAmountForGroup += amount
+        var data: [ChartModel] = []
+        if groupingType == .paymentMethods {
+            data = Dictionary(grouping: result) { (transaction: TransactionModel) -> PaymentMethod in
+                // group by payment method
+                return transaction.paymentMethod!
+            }.values.map { (transactionByPaymentMethod) -> ChartModel in
+                var totalTransactionAmountForPaymentMethod: Double = 0.0
+                for transaction in transactionByPaymentMethod {
+                    let amountString: String = transaction.amount?.currencyValue.amount ?? "0"
+                    let amount: Double = Double(amountString)!
+                    totalTransactionAmountForPaymentMethod += amount
+                }
+                let paymentMethod = transactionByPaymentMethod[0].paymentMethod!
+                let paymentMethodColorData = paymentMethod.color
+                let paymentMethodUIColor = UIColor.color(data: paymentMethodColorData!)
+                let colorGradient = ColorGradient(Color(paymentMethodUIColor!))
+                total += totalTransactionAmountForPaymentMethod
+                return ChartModel(paymentMethod: paymentMethod, amount: totalTransactionAmountForPaymentMethod, color: colorGradient, transactions: transactionByPaymentMethod, groupingType: groupingType)
             }
-            let category = transactionByGroup[0].category!
-            let categoryColorData = category.color
-            let categoryUIColor = UIColor.color(data: categoryColorData!)
-            let colorGradient = ColorGradient(Color(categoryUIColor!))
-            total += totalTransactionAmountForGroup
-            return ChartModel(category: category, amount: totalTransactionAmountForGroup, color: colorGradient, transactions: transactionByGroup)
-        }.sorted { (first, second) -> Bool in
-            return first.amount > second.amount
+        }
+        else {
+            data = Dictionary(grouping: result){ (transaction : TransactionModel) -> CategoryModel in
+                // group by category
+                return transaction.category!
+            }.values.map { (transactionByCategory) -> ChartModel in
+                var totalTransactionAmountForCategory: Double = 0.0
+                for transaction in transactionByCategory {
+                    let amountString: String = transaction.amount?.currencyValue.amount ?? "0"
+                    let amount: Double = Double(amountString)!
+                    totalTransactionAmountForCategory += amount
+                }
+                let category = transactionByCategory[0].category!
+                let categoryColorData = category.color
+                let categoryUIColor = UIColor.color(data: categoryColorData!)
+                let colorGradient = ColorGradient(Color(categoryUIColor!))
+                total += totalTransactionAmountForCategory
+                return ChartModel(category: category, amount: totalTransactionAmountForCategory, color: colorGradient, transactions: transactionByCategory, groupingType: groupingType)
+            }
         }
         
+        data = data.sorted { (first, second) -> Bool in
+            return first.amount > second.amount
+        }
         let chartStyle = ChartStyle(backgroundColor: Color(UIColor.clear), foregroundColor: data.map{$0.color})
         return (chartStyle, (data, total))
     }
@@ -247,6 +282,7 @@ struct ReportDetailListView: View {
     var elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: (Int, Bool, Int)?
     var reportType: CategoryType
     var amountColor: Color
+    var groupingType: ReportGroupingType
     
     var body: some View {
         VStack {
@@ -290,46 +326,11 @@ struct ReportDetailListView: View {
                 ForEach(chartData, id: \.self) {
                     chartModel in
                     if let firstData = chartData.first {
-                        let largestAmount = firstData.amount
-                        let category = chartModel.category
-                        let color = chartModel.color.startColor
-                        let amount = chartModel.amount
-                        let percentage = amount / totalAmount * 100
-                        let decimals = percentage.truncatingRemainder(dividingBy: 1.0) == 0 ? 0 : 2
-                        let percentageFormat = String(format: "%.\(decimals)f", percentage)
-                        let percentageToShow = percentage < 1 ? "< 0" : percentageFormat
-                        let transaction = firstData.transactions.first
-                        let currency = transaction?.amount?.currencyValue.currency ?? ""
-                        let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency) ?? ""
-                        VStack {
-                            HStack(alignment: .top) {
-                                CategoryIconDisplayView(category: category, iconWidth: 50.0, iconHeight: 50.0)
-                                    .padding()
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 0) {
-                                        Spacer()
-                                        Text(category.name ?? "").font(.footnote)
-                                        HStack(alignment: .bottom) {
-                                            Text(CurrencyHelper.string(from: amount, currency: currencySign))
-                                                .font(.header)
-                                                .foregroundColor(amountColor)
-                                            Spacer()
-                                        }
-                                        HStack {
-                                            ProgressView(value: amount, total: largestAmount)
-                                                .accentColor(color)
-                                            Text("\(percentageToShow)%").font(.footnote)
-                                                .foregroundColor(Color(UIColor.secondaryLabel))
-                                                .frame(minWidth: 50, alignment: .trailing)
-                                        }
-                                        .padding(.trailing, .extraLarge)
-                                        Spacer()
-                                    }
-                                    Image(systemSymbol: .chevronRight)
-                                        .padding(.trailing)
-                                }
-                            }
-                            Divider()
+                        if chartModel.groupingType == .categories {
+                            CategoryReportCellView(chartModel: chartModel, firstData: firstData, totalAmount: totalAmount, amountColor: amountColor)
+                        }
+                        else {
+                            PaymentMethodReportCellView(chartModel: chartModel, firstData: firstData, totalAmount: totalAmount, amountColor: amountColor)
                         }
                     }
                 }
@@ -369,3 +370,113 @@ struct ReportDetailListView: View {
         return (averageAmountOfTheWeekString, averageAmountPerDayString, transactionsCount, totalDays ?? 0, totalAmountString)
     }
 }
+
+struct CategoryReportCellView: View {
+    
+    var chartModel: ChartModel
+    var firstData: ChartModel
+    var totalAmount: Double
+    var amountColor: Color
+    
+    var body: some View {
+        if let category = chartModel.category {
+            let largestAmount = firstData.amount
+            let color = chartModel.color.startColor
+            let amount = chartModel.amount
+            let percentage = amount / totalAmount * 100
+            let decimals = percentage.truncatingRemainder(dividingBy: 1.0) == 0 ? 0 : 2
+            let percentageFormat = String(format: "%.\(decimals)f", percentage)
+            let percentageToShow = percentage < 1 ? "< 0" : percentageFormat
+            let transaction = firstData.transactions.first
+            let currency = transaction?.amount?.currencyValue.currency ?? ""
+            let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency) ?? ""
+            VStack {
+                HStack(alignment: .top) {
+                    CategoryIconDisplayView(category: category, iconWidth: 50.0, iconHeight: 50.0)
+                        .padding()
+                    HStack {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Spacer()
+                            Text(category.name ?? "").font(.footnote)
+                            HStack(alignment: .bottom) {
+                                Text(CurrencyHelper.string(from: amount, currency: currencySign))
+                                    .font(.header)
+                                    .foregroundColor(amountColor)
+                                Spacer()
+                            }
+                            HStack {
+                                ProgressView(value: amount, total: largestAmount)
+                                    .accentColor(color)
+                                Text("\(percentageToShow)%").font(.footnote)
+                                    .foregroundColor(Color(UIColor.secondaryLabel))
+                                    .frame(minWidth: 50, alignment: .trailing)
+                            }
+                            .padding(.trailing, .extraLarge)
+                            Spacer()
+                        }
+                        Image(systemSymbol: .chevronRight)
+                            .padding(.trailing)
+                    }
+                }
+                Divider()
+            }
+        }
+    }
+}
+
+struct PaymentMethodReportCellView: View {
+    
+    var chartModel: ChartModel
+    var firstData: ChartModel
+    var totalAmount: Double
+    var amountColor: Color
+    
+    var body: some View {
+        if let paymentMethod = chartModel.paymentMethod {
+            let largestAmount = firstData.amount
+            let color = chartModel.color.startColor
+            let amount = chartModel.amount
+            let percentage = amount / totalAmount * 100
+            let decimals = percentage.truncatingRemainder(dividingBy: 1.0) == 0 ? 0 : 2
+            let percentageFormat = String(format: "%.\(decimals)f", percentage)
+            let percentageToShow = percentage < 1 ? "< 0" : percentageFormat
+            let transaction = firstData.transactions.first
+            let currency = transaction?.amount?.currencyValue.currency ?? ""
+            let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency) ?? ""
+            let cardWidth:CGFloat = 105.0
+            let cardHeight:CGFloat = 56.0
+            VStack {
+                HStack(alignment: .top) {
+                    PaymentMethodCardView(paymentMethod: paymentMethod, selectedPaymentMethod: .constant(nil), showLabel: false)
+                        .frame(width: cardWidth, height: cardHeight)
+                        .padding()
+                    HStack {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Spacer()
+                            Text(paymentMethod.name ?? "").font(.footnote)
+                            HStack(alignment: .bottom) {
+                                Text(CurrencyHelper.string(from: amount, currency: currencySign))
+                                    .font(.header)
+                                    .foregroundColor(amountColor)
+                                Spacer()
+                            }
+                            HStack {
+                                ProgressView(value: amount, total: largestAmount)
+                                    .accentColor(color)
+                                Text("\(percentageToShow)%").font(.footnote)
+                                    .foregroundColor(Color(UIColor.secondaryLabel))
+                                    .frame(minWidth: 50, alignment: .trailing)
+                            }
+                            .padding(.trailing, .extraLarge)
+                            Spacer()
+                        }
+                        Image(systemSymbol: .chevronRight)
+                            .padding(.trailing)
+                    }
+                }
+                Divider()
+            }
+        }
+    }
+}
+

@@ -367,6 +367,7 @@ struct PaymentMethodCardView: View {
     
     var paymentMethod: PaymentMethod
     @Binding var selectedPaymentMethod: PaymentMethod?
+    var showLabel: Bool = true
     
     var body: some View {
         Button(action: {
@@ -390,12 +391,14 @@ struct PaymentMethodCardView: View {
                                 .foregroundColor(.white)
                         }
                     }
-                    HStack {
-                        Spacer()
-                        Text(paymentMethod.name ?? "")
-                            .font(.callout)
-                            .bold()
-                            .foregroundColor(.white)
+                    if showLabel {
+                        HStack {
+                            Spacer()
+                            Text(paymentMethod.name ?? "")
+                                .font(.callout)
+                                .bold()
+                                .foregroundColor(.white)
+                        }
                     }
                 }.padding(.horizontal, .normal)
             }

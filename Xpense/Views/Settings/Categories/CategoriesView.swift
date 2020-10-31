@@ -18,20 +18,26 @@ struct CategoriesView: View {
     @State var selectedCategory: CategoryModel? = nil
     @State private var refreshID = UUID()
     var selectionAction:((CategoryModel) -> Void)? = nil
+    var migrationSelection: CategoryModel?
     
     var body: some View {
         VStack {
+            if let migration = migrationSelection {
+                HStack {
+                    Text("To receive transaction migration from \(migration.name ?? "")")
+                        .fixedSize(horizontal: false, vertical: true)
+                        .font(.footnote)
+                    Spacer()
+                }.padding(.horizontal)
+            }
             Picker(selection: self.$segmentIndex, label: Text("")) {
                 ForEach(0..<self.segments.count) { index in
                     Text(self.segments[index].rawValue)
                 }
             }
             .padding()
-            .onChange(of: self.segmentIndex, perform: { value in
-                self.segmentChanged(value)
-            })
             .pickerStyle(SegmentedPickerStyle())
-            CategoriesGrid(fetchRequest: makeFetchRequest(), categoryTapAction: onCategoryTapped(category:))
+            CategoriesGrid(fetchRequest: makeFetchRequest(), categoryTapAction: onCategoryTapped(category:), refreshFlag: $refreshID)
                 .id(refreshID)
         }
         .sheet(isPresented: $addCategoryFlag, content: {
@@ -39,37 +45,39 @@ struct CategoriesView: View {
                 NewCategoryView(showSheetView: $addCategoryFlag, existingCategory: $selectedCategory, categoryType: newCategoryType, refreshFlagUUID: $refreshID).environment(\.managedObjectContext, self.viewContext)
             }.accentColor(.theme)
         })
-        .navigationTitle("Categories")
+        .navigationTitle(migrationSelection != nil ? "Select Category" : "Categories")
         .toolbar(content: {
             ToolbarItem(placement: .primaryAction) {
-                Menu {
-                    Section {
-                        Button(action: {
-                            selectedCategory = nil
-                            newCategoryType = .income
-                            addCategoryFlag.toggle()
-                        }) {
-                            Label {
-                                Text("New Income Category")
-                            } icon: {
-                                Image(systemSymbol: .arrowDownCircleFill)
+                if migrationSelection == nil {
+                    Menu {
+                        Section {
+                            Button(action: {
+                                selectedCategory = nil
+                                newCategoryType = .income
+                                addCategoryFlag.toggle()
+                            }) {
+                                Label {
+                                    Text("New Income Category")
+                                } icon: {
+                                    Image(systemSymbol: .plusCircle)
+                                }
                             }
-                        }
-                        Button(action: {
-                            selectedCategory = nil
-                            newCategoryType = .expense
-                            addCategoryFlag.toggle()
-                        }) {
-                            Label {
-                                Text("New Expense Category")
-                            } icon: {
-                                Image(systemSymbol: .arrowUpCircleFill)
+                            Button(action: {
+                                selectedCategory = nil
+                                newCategoryType = .expense
+                                addCategoryFlag.toggle()
+                            }) {
+                                Label {
+                                    Text("New Expense Category")
+                                } icon: {
+                                    Image(systemSymbol: .minusCircle)
+                                }
                             }
                         }
                     }
-                }
-                label: {
-                    Label("Add", systemImage: "rectangle.stack.fill.badge.plus")
+                    label: {
+                        Label("Add", systemImage: "rectangle.stack.fill.badge.plus")
+                    }
                 }
             }
         })
@@ -77,7 +85,10 @@ struct CategoriesView: View {
     
     func makeFetchRequest() -> FetchRequest<CategoryModel> {
         let type = CategoryType.allCases[self.segmentIndex].rawValue
-        let predicate = NSPredicate(format: "type == %@", type)
+        var predicate = NSPredicate(format: "type == %@", type)
+        if let migration = migrationSelection {
+            predicate = NSPredicate(format: "type == %@ && SELF != %@", type, migration)
+        }
         let sort = NSSortDescriptor(key: "timeStamp", ascending: true)
         return FetchRequest<CategoryModel>(entity: CategoryModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
     }
@@ -97,10 +108,6 @@ struct CategoriesView: View {
                 addCategoryFlag.toggle()
             }
         }
-    }
-    
-    func segmentChanged(_ index: Int) {
-        
     }
 }
 

@@ -113,6 +113,10 @@ struct XpenseView: View {
                 AddBudgetView(showSheetView: $showAddBudget)
                     .environment(\.managedObjectContext, self.viewContext)
             }.accentColor(.theme)
+            .presentation(isModal: .constant(true)) {
+                print("Attempted to dismiss")
+            }
+            .edgesIgnoringSafeArea(.bottom)
         })
     }
     

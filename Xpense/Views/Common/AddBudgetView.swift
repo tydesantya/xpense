@@ -15,7 +15,7 @@ struct AddBudgetView: View {
         sortDescriptors: [
         ]
     ) var budgets: FetchedResults<Budget>
-    @State var selectedCategories: [CategoryModel] = []
+    @State var budgetInputModels: [InputModel] = []
     @State private var refreshID = UUID()
     @Binding var showSheetView: Bool
     
@@ -30,14 +30,15 @@ struct AddBudgetView: View {
                 }.padding(.horizontal)
                 HStack {
                     Spacer()
-                    ForEach(selectedCategories, id: \.self) {
-                        category in
+                    ForEach(budgetInputModels, id: \.self) {
+                        inputModel in
+                        let category = inputModel.category
                         let width:CGFloat = 50.0
                         let height:CGFloat = 50.0
                         ZStack(alignment: .topTrailing) {
                             CategoryIconDisplayView(category: category, iconWidth: width, iconHeight: height)
                                 .onTapGesture {
-                                    selectedCategories.remove(at: selectedCategories.firstIndex(of: category)!)
+                                    budgetInputModels.remove(at: budgetInputModels.firstIndex(of: inputModel)!)
                                 }
                             ZStack(alignment: .center) {
                                 Circle()
@@ -68,19 +69,11 @@ struct AddBudgetView: View {
             self.showSheetView = false
         }) {
             Text("Cancel").bold()
-        }, trailing: Button(action: {
-//            if amount == 0 {
-//                showValidationAlert.toggle()
-//            }
-//            else if let transaction = selectedTransaction {
-//                editTransaction(transaction)
-//            }
-//            else {
-//                createTransaction()
-//            }
-        }) {
-            Text("Next").bold()
-        }.disabled(selectedCategories.count == 0))
+        }, trailing: NavigationLink(
+            destination: ConfigureBudgetView(inputModels: $budgetInputModels, showSheetView: $showSheetView).environment(\.editMode, Binding.constant(EditMode.active)),
+            label: {
+                Text("Next").bold()
+            }).disabled(budgetInputModels.count == 0))
         .onAppear {
             print("budget count \(budgets.count)")
             for budget in budgets {
@@ -96,7 +89,8 @@ struct AddBudgetView: View {
         let type = CategoryType.expense.rawValue
         var predicateString = "type == %@"
         var argumentArray: [Any] = [type]
-        for category in selectedCategories {
+        for inputModel in budgetInputModels {
+            let category = inputModel.category
             predicateString.append(" && SELF != %@")
             argumentArray.append(category)
         }
@@ -106,8 +100,9 @@ struct AddBudgetView: View {
     }
     
     func onCategoryTapped(category: CategoryModel) {
-        if selectedCategories.count < 3 {
-            selectedCategories.append(category)
+        if budgetInputModels.count < 3 {
+            let inputModel = InputModel(category: category, amount: 0, currencyValue: CurrencyValue(amount: "0", currency: "IDR"))
+            budgetInputModels.append(inputModel)
         }
     }
 }

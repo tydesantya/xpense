@@ -37,13 +37,16 @@ struct ConfigureBudgetView: View {
     var body: some View {
         ScrollView {
             VStack {
+                Text("Budget Period")
+                    .font(.footnote)
+                    .padding(.top)
                 Picker(selection: self.$segmentIndex, label: Text("")) {
                     ForEach(0..<self.segments.count) { index in
                         Text(self.segments[index].rawValue)
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
-                .padding()
+                .padding([.horizontal, .bottom])
                 let initialSize:CGFloat = 60.0
                 ZStack {
                     ForEach(inputModels, id: \.self) {

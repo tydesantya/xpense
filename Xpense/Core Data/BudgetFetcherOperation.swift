@@ -30,10 +30,9 @@ class BudgetFetcherOperation: Operation {
             let budget = try context.fetch(fetchRequest)
             if budget.count == 0 {
                 let newBudget = Budget(context: context)
-                newBudget.category = category.first!
                 newBudget.amount = DisplayCurrencyValue(currencyValue: CurrencyValue(amount: "100000", currency: "IDR"), numOfDecimalPoint: 0, decimalSeparator: ",", groupingSeparator: ".")
                 newBudget.period = "Daily"
-                
+                category.first!.addToBudget(newBudget)
                 try context.save()
             }
         } catch let fetchError {

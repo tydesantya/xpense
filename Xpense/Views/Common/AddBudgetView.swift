@@ -78,7 +78,6 @@ struct AddBudgetView: View {
             print("budget count \(budgets.count)")
             for budget in budgets {
                 print("check budget \(budget.period)")
-                print("check budget \(budget.category)")
                 print("check budget \(budget.amount)")
             }
         }

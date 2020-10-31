@@ -4,7 +4,7 @@
         <attribute name="amount" optional="YES" attributeType="Transformable" valueTransformerName="DisplayCurrencyTransformer" customClassName="DisplayCurrencyValue"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="period" optional="YES" attributeType="String"/>
-        <relationship name="categories" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Category" inverseName="budget" inverseEntity="Category"/>
+        <relationship name="categories" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="budget" inverseEntity="Category"/>
     </entity>
     <entity name="Category" representedClassName="CategoryModel" syncable="YES" codeGenerationType="class">
         <attribute name="color" optional="YES" attributeType="Binary"/>

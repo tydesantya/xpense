@@ -20,6 +20,7 @@ struct TransactionCellView: View {
     }
     @State var navigationActive = false
     @Binding var refreshFlag: UUID
+    var editable: Bool = true
     
     var body: some View {
         NavigationLink(
@@ -81,7 +82,9 @@ struct TransactionCellView: View {
                         Spacer()
                         HStack {
                             Text(transaction.date?.todayShortFormat() ?? "")
-                            Image(systemSymbol: .chevronRight)
+                            if editable {
+                                Image(systemSymbol: .chevronRight)
+                            }
                         }.padding(.top, .tiny)
                     }
                     .foregroundColor(.init(.secondaryLabel))
@@ -92,7 +95,8 @@ struct TransactionCellView: View {
                     Color.init(.secondarySystemBackground)
                         .cornerRadius(16)
                 )
-            })
+            }
+        ).allowsHitTesting(editable)
     }
     
     

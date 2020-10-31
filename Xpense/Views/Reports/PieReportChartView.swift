@@ -17,6 +17,7 @@ struct ChartModel: Hashable {
     var color: ColorGradient
     var transactions: [TransactionModel]
     var groupingType: ReportGroupingType
+    var periodString: String
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(category)
@@ -38,6 +39,7 @@ struct PieReportChartView: View {
     @State var selectedDate = Date()
     @State var segmentIndex = 1
     @State var groupingType: ReportGroupingType = .categories
+    @State var refreshFlag: UUID = UUID()
     
     var segments = ReportDatePickerType.allCases
     var dateFormatter: DateFormatter {
@@ -45,6 +47,7 @@ struct PieReportChartView: View {
         formatter.dateFormat = segmentIndex == 0 ? "dd MMMM yyyy" : segmentIndex == 1 ? "MMMM yyyy" : "yyyy"
         return formatter
     }
+    
     
     var body: some View {
         ScrollView {
@@ -56,8 +59,8 @@ struct PieReportChartView: View {
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding()
-                ReportPieChartDetailView(fetchRequest: getFetchRequest(), elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: getElapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod(), reportType: reportType, amountColor: amountColor, groupingType: groupingType, calculateNetBalance: reportType == .income, expenseFetchRequestForNetCalculation: getOppositeFetchRequest())
-            }
+                ReportPieChartDetailView(fetchRequest: getFetchRequest(), elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: getElapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod(), reportType: reportType, amountColor: amountColor, groupingType: groupingType, calculateNetBalance: reportType == .income, expenseFetchRequestForNetCalculation: getOppositeFetchRequest(), periodString: dateFormatter.string(from: selectedDate), refreshFlag: $refreshFlag)
+            }.id(refreshFlag)
         }.navigationTitle(dateFormatter.string(from: selectedDate))
         .onAppear {
             setupCurrentMonth()
@@ -239,6 +242,8 @@ private struct ReportPieChartDetailView: View {
     private var expenseDataForNetCalculation: FetchedResults<TransactionModel> {
         expenseFetchRequestForNetCalculation.wrappedValue
     }
+    var periodString: String
+    @Binding var refreshFlag: UUID
     
     var body: some View {
         let dataAndStyle = mapFetchResultIntoChartDataAndStyle(data)
@@ -256,7 +261,7 @@ private struct ReportPieChartDetailView: View {
                     .chartStyle(dataAndStyle.0)
                     .padding()
                     .aspectRatio(CGSize(width: 1, height: 0.7), contentMode: .fit)
-                ReportDetailListView(chartData: listData.0, totalAmount: listData.1, elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod, reportType: reportType, amountColor: amountColor, groupingType: groupingType, oppositeTotalAmount: getTotalOppositeAmount(expenseDataForNetCalculation), calculateNetBalance: calculateNetBalance).padding(.top)
+                ReportDetailListView(chartData: listData.0, totalAmount: listData.1, elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod, reportType: reportType, amountColor: amountColor, groupingType: groupingType, oppositeTotalAmount: getTotalOppositeAmount(expenseDataForNetCalculation), calculateNetBalance: calculateNetBalance, refreshFlag: $refreshFlag).padding(.top)
             }.id(listData.0.count)
         }
         else {
@@ -298,7 +303,7 @@ private struct ReportPieChartDetailView: View {
                 let paymentMethodUIColor = UIColor.color(data: paymentMethodColorData!)
                 let colorGradient = ColorGradient(Color(paymentMethodUIColor!))
                 total += totalTransactionAmountForPaymentMethod
-                return ChartModel(paymentMethod: paymentMethod, amount: totalTransactionAmountForPaymentMethod, color: colorGradient, transactions: transactionByPaymentMethod, groupingType: groupingType)
+                return ChartModel(paymentMethod: paymentMethod, amount: totalTransactionAmountForPaymentMethod, color: colorGradient, transactions: transactionByPaymentMethod, groupingType: groupingType, periodString: periodString)
             }
         }
         else {
@@ -317,7 +322,7 @@ private struct ReportPieChartDetailView: View {
                 let categoryUIColor = UIColor.color(data: categoryColorData!)
                 let colorGradient = ColorGradient(Color(categoryUIColor!))
                 total += totalTransactionAmountForCategory
-                return ChartModel(category: category, amount: totalTransactionAmountForCategory, color: colorGradient, transactions: transactionByCategory, groupingType: groupingType)
+                return ChartModel(category: category, amount: totalTransactionAmountForCategory, color: colorGradient, transactions: transactionByCategory, groupingType: groupingType, periodString: periodString)
             }
         }
         
@@ -340,6 +345,7 @@ struct ReportDetailListView: View {
     var groupingType: ReportGroupingType
     var oppositeTotalAmount: Double
     var calculateNetBalance: Bool
+    @Binding var refreshFlag: UUID
     
     var body: some View {
         VStack {
@@ -363,10 +369,10 @@ struct ReportDetailListView: View {
                     chartModel in
                     if let firstData = chartData.first {
                         if chartModel.groupingType == .categories {
-                            CategoryReportCellView(chartModel: chartModel, firstData: firstData, totalAmount: totalAmount, amountColor: amountColor)
+                            CategoryReportCellView(chartModel: chartModel, firstData: firstData, totalAmount: totalAmount, amountColor: amountColor, refreshFlag: $refreshFlag)
                         }
                         else {
-                            PaymentMethodReportCellView(chartModel: chartModel, firstData: firstData, totalAmount: totalAmount, amountColor: amountColor)
+                            PaymentMethodReportCellView(chartModel: chartModel, firstData: firstData, totalAmount: totalAmount, amountColor: amountColor, refreshFlag: $refreshFlag)
                         }
                     }
                 }
@@ -512,6 +518,8 @@ struct CategoryReportCellView: View {
     var firstData: ChartModel
     var totalAmount: Double
     var amountColor: Color
+    @Binding var refreshFlag: UUID
+    var paymentMethodName: String?
     
     var body: some View {
         if let category = chartModel.category {
@@ -525,36 +533,44 @@ struct CategoryReportCellView: View {
             let transaction = firstData.transactions.first
             let currency = transaction?.amount?.currencyValue.currency ?? ""
             let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency) ?? ""
-            VStack {
-                HStack(alignment: .top) {
-                    CategoryIconDisplayView(category: category, iconWidth: 50.0, iconHeight: 50.0)
-                        .padding()
-                    HStack {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Spacer()
-                            Text(category.name ?? "").font(.footnote)
-                            HStack(alignment: .bottom) {
-                                Text(CurrencyHelper.string(from: amount, currency: currencySign))
-                                    .font(.header)
-                                    .foregroundColor(amountColor)
-                                Spacer()
-                            }
+            NavigationLink(
+                destination: ReportCategoryGroupingDetailView(refreshFlag: $refreshFlag, chartModel: chartModel, paymentMethodName: paymentMethodName),
+                label: {
+                    VStack {
+                        HStack(alignment: .top) {
+                            CategoryIconDisplayView(category: category, iconWidth: 50.0, iconHeight: 50.0)
+                                .padding()
                             HStack {
-                                ProgressView(value: amount, total: largestAmount)
-                                    .accentColor(color)
-                                Text("\(percentageToShow)%").font(.footnote)
-                                    .foregroundColor(Color(UIColor.secondaryLabel))
-                                    .frame(minWidth: 50, alignment: .trailing)
+                                VStack(alignment: .leading, spacing: 0) {
+                                    Spacer()
+                                    Text(category.name ?? "")
+                                        .font(.footnote)
+                                        .foregroundColor(Color(UIColor.label))
+                                    HStack(alignment: .bottom) {
+                                        Text(CurrencyHelper.string(from: amount, currency: currencySign))
+                                            .font(.header)
+                                            .foregroundColor(amountColor)
+                                        Spacer()
+                                    }
+                                    HStack {
+                                        ProgressView(value: amount, total: largestAmount)
+                                            .accentColor(color)
+                                        Text("\(percentageToShow)%").font(.footnote)
+                                            .foregroundColor(Color(UIColor.secondaryLabel))
+                                            .frame(minWidth: 50, alignment: .trailing)
+                                    }
+                                    .padding(.trailing, .extraLarge)
+                                    Spacer()
+                                }
+                                Image(systemSymbol: .chevronRight)
+                                    .padding(.trailing)
+                                    .foregroundColor(Color(UIColor.label))
                             }
-                            .padding(.trailing, .extraLarge)
-                            Spacer()
                         }
-                        Image(systemSymbol: .chevronRight)
-                            .padding(.trailing)
+                        Divider()
                     }
                 }
-                Divider()
-            }
+            )
         }
     }
 }
@@ -565,6 +581,7 @@ struct PaymentMethodReportCellView: View {
     var firstData: ChartModel
     var totalAmount: Double
     var amountColor: Color
+    @Binding var refreshFlag: UUID
     
     var body: some View {
         if let paymentMethod = chartModel.paymentMethod {
@@ -580,37 +597,45 @@ struct PaymentMethodReportCellView: View {
             let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency) ?? ""
             let cardWidth:CGFloat = 105.0
             let cardHeight:CGFloat = 56.0
-            VStack {
-                HStack(alignment: .top) {
-                    PaymentMethodCardView(paymentMethod: paymentMethod, selectedPaymentMethod: .constant(nil), showLabel: false)
-                        .frame(width: cardWidth, height: cardHeight)
-                        .padding()
-                    HStack {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Spacer()
-                            Text(paymentMethod.name ?? "").font(.footnote)
-                            HStack(alignment: .bottom) {
-                                Text(CurrencyHelper.string(from: amount, currency: currencySign))
-                                    .font(.header)
-                                    .foregroundColor(amountColor)
-                                Spacer()
-                            }
+            NavigationLink(
+                destination: ReportPaymentMethodGroupingDetailView(refreshFlag: $refreshFlag, chartModel: chartModel, reportType: CategoryType(rawValue: transaction?.category?.type ?? "") ?? .expense),
+                label: {
+                    VStack {
+                        HStack(alignment: .top) {
+                            PaymentMethodCardView(paymentMethod: paymentMethod, selectedPaymentMethod: .constant(nil), showLabel: false)
+                                .frame(width: cardWidth, height: cardHeight)
+                                .padding()
                             HStack {
-                                ProgressView(value: amount, total: largestAmount)
-                                    .accentColor(color)
-                                Text("\(percentageToShow)%").font(.footnote)
-                                    .foregroundColor(Color(UIColor.secondaryLabel))
-                                    .frame(minWidth: 50, alignment: .trailing)
+                                VStack(alignment: .leading, spacing: 0) {
+                                    Spacer()
+                                    Text(paymentMethod.name ?? "")
+                                        .foregroundColor(Color(UIColor.label))
+                                        .font(.footnote)
+                                    HStack(alignment: .bottom) {
+                                        Text(CurrencyHelper.string(from: amount, currency: currencySign))
+                                            .font(.header)
+                                            .foregroundColor(amountColor)
+                                        Spacer()
+                                    }
+                                    HStack {
+                                        ProgressView(value: amount, total: largestAmount)
+                                            .accentColor(color)
+                                        Text("\(percentageToShow)%").font(.footnote)
+                                            .foregroundColor(Color(UIColor.secondaryLabel))
+                                            .frame(minWidth: 50, alignment: .trailing)
+                                    }
+                                    .padding(.trailing, .extraLarge)
+                                    Spacer()
+                                }
+                                Image(systemSymbol: .chevronRight)
+                                    .padding(.trailing)
+                                    .foregroundColor(Color(UIColor.label))
                             }
-                            .padding(.trailing, .extraLarge)
-                            Spacer()
                         }
-                        Image(systemSymbol: .chevronRight)
-                            .padding(.trailing)
+                        Divider()
                     }
                 }
-                Divider()
-            }
+            )
         }
     }
 }

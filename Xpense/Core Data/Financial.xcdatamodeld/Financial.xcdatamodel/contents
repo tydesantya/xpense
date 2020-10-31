@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="19G2021" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Budget" representedClassName="Budget" syncable="YES" codeGenerationType="class">
+        <attribute name="amount" optional="YES" attributeType="Transformable" valueTransformerName="DisplayCurrencyTransformer" customClassName="DisplayCurrencyValue"/>
+        <attribute name="period" optional="YES" attributeType="String"/>
+        <relationship name="category" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="budget" inverseEntity="Category"/>
+    </entity>
     <entity name="Category" representedClassName="CategoryModel" syncable="YES" codeGenerationType="class">
         <attribute name="color" optional="YES" attributeType="Binary"/>
         <attribute name="lastUsed" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -9,6 +14,7 @@
         <attribute name="text" optional="YES" attributeType="String"/>
         <attribute name="timeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="type" optional="YES" attributeType="String"/>
+        <relationship name="budget" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Budget" inverseName="category" inverseEntity="Budget"/>
         <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Transaction" inverseName="category" inverseEntity="Transaction"/>
     </entity>
     <entity name="PaymentMethod" representedClassName="PaymentMethod" syncable="YES" codeGenerationType="class">
@@ -27,8 +33,9 @@
         <relationship name="paymentMethod" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PaymentMethod" inverseName="transactions" inverseEntity="PaymentMethod"/>
     </entity>
     <elements>
-        <element name="Category" positionX="-54" positionY="27" width="128" height="178"/>
+        <element name="Category" positionX="-54" positionY="27" width="128" height="193"/>
         <element name="PaymentMethod" positionX="-54" positionY="-9" width="128" height="133"/>
         <element name="Transaction" positionX="-54" positionY="72" width="128" height="118"/>
+        <element name="Budget" positionX="-45" positionY="81" width="128" height="88"/>
     </elements>
 </model>

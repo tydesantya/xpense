@@ -15,7 +15,7 @@ struct XpenseView: View {
     var fetchRequest: FetchRequest<TransactionModel>
     var transactions : FetchedResults<TransactionModel>{fetchRequest.wrappedValue}
     @State var progressValue: Float = 1.0
-    @State var showAddExpense: Bool = false
+    @State var showAddBudget: Bool = false
     @Binding var refreshFlag: UUID
     var transactionLimit: Int {
         transactions.count > 3 ? 3 : transactions.count
@@ -76,7 +76,7 @@ struct XpenseView: View {
                         .background(Color.init(.secondarySystemBackground))
                         .cornerRadius(16)
                         .onTapGesture {
-                            
+                            showAddBudget.toggle()
                         }
                     }
                     .padding([.horizontal, .bottom])
@@ -107,6 +107,12 @@ struct XpenseView: View {
                 self.progressValue = 0.5
             }
             refreshFlag = UUID()
+        })
+        .sheet(isPresented: $showAddBudget, content: {
+            NavigationView {
+                AddBudgetView(showSheetView: $showAddBudget)
+                    .environment(\.managedObjectContext, self.viewContext)
+            }.accentColor(.theme)
         })
     }
     

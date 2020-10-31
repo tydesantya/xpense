@@ -25,7 +25,11 @@ struct ContentView: View {
         NavigationView {
             TabView(selection: $selection) {
                 XpenseView(uuid: $addTransactionRefreshFlag).tabItem {
-                    Image(systemName: "x.circle")
+                    Image("xpense")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 15, height: 15)
                     Text("Xpense")
                 }.tag(1)
                 WalletView().tabItem {

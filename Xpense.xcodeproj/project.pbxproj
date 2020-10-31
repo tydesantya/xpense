@@ -13,6 +13,9 @@
 		C31AE93F254B4017002B5A2F /* PieReportChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C31AE93E254B4017002B5A2F /* PieReportChartView.swift */; };
 		C326DF74254D8A1C006B50D0 /* ReportPaymentMethodGroupingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C326DF73254D8A1C006B50D0 /* ReportPaymentMethodGroupingDetailView.swift */; };
 		C326DF77254D91BF006B50D0 /* ReportCategoryGroupingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C326DF76254D91BF006B50D0 /* ReportCategoryGroupingDetailView.swift */; };
+		C326DF7A254DB8D7006B50D0 /* AddBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C326DF79254DB8D7006B50D0 /* AddBudgetView.swift */; };
+		C326DF7D254DC224006B50D0 /* ConfigureBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C326DF7C254DC224006B50D0 /* ConfigureBudgetView.swift */; };
+		C326DF80254DCEDC006B50D0 /* BudgetFetcherOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C326DF7F254DCEDC006B50D0 /* BudgetFetcherOperation.swift */; };
 		C328825A2464894100F846DC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32882592464894100F846DC /* AppDelegate.swift */; };
 		C328825C2464894100F846DC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328825B2464894100F846DC /* SceneDelegate.swift */; };
 		C328825E2464894100F846DC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328825D2464894100F846DC /* ContentView.swift */; };
@@ -71,6 +74,9 @@
 		C31AE93E254B4017002B5A2F /* PieReportChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieReportChartView.swift; sourceTree = "<group>"; };
 		C326DF73254D8A1C006B50D0 /* ReportPaymentMethodGroupingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportPaymentMethodGroupingDetailView.swift; sourceTree = "<group>"; };
 		C326DF76254D91BF006B50D0 /* ReportCategoryGroupingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportCategoryGroupingDetailView.swift; sourceTree = "<group>"; };
+		C326DF79254DB8D7006B50D0 /* AddBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBudgetView.swift; sourceTree = "<group>"; };
+		C326DF7C254DC224006B50D0 /* ConfigureBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigureBudgetView.swift; sourceTree = "<group>"; };
+		C326DF7F254DCEDC006B50D0 /* BudgetFetcherOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetFetcherOperation.swift; sourceTree = "<group>"; };
 		C32882562464894100F846DC /* Xpense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Xpense.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C32882592464894100F846DC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C328825B2464894100F846DC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -224,6 +230,7 @@
 				C3369D9C253212DF00CA5647 /* Financial.xcdatamodeld */,
 				C3369DA42532152500CA5647 /* CoreDataManager.swift */,
 				C380513025436E6000580A1E /* Persistence+CategorySeed.swift */,
+				C326DF7F254DCEDC006B50D0 /* BudgetFetcherOperation.swift */,
 			);
 			path = "Core Data";
 			sourceTree = "<group>";
@@ -324,6 +331,8 @@
 				C3F77DC6251E870600CA68BB /* Buttons.swift */,
 				C3369DAD2532244F00CA5647 /* CreatePaymentMethodView.swift */,
 				C3CCD1692549E2C500578B52 /* CategoryIconDisplayView.swift */,
+				C326DF79254DB8D7006B50D0 /* AddBudgetView.swift */,
+				C326DF7C254DC224006B50D0 /* ConfigureBudgetView.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -417,6 +426,7 @@
 			files = (
 				C3369D8B2532063100CA5647 /* CurrencyValue.swift in Sources */,
 				C3F77DC7251E870600CA68BB /* Buttons.swift in Sources */,
+				C326DF80254DCEDC006B50D0 /* BudgetFetcherOperation.swift in Sources */,
 				C3288277246489FD00F846DC /* URLImage.swift in Sources */,
 				C3F77DC2251E733100CA68BB /* ProgressBar.swift in Sources */,
 				C381C4B32544A557002DB1D7 /* DateFormat.swift in Sources */,
@@ -434,6 +444,7 @@
 				C326DF74254D8A1C006B50D0 /* ReportPaymentMethodGroupingDetailView.swift in Sources */,
 				C381C4B62545D0B4002DB1D7 /* TransactionListView.swift in Sources */,
 				C35D41A0251FA96600B45BD7 /* CategoriesView.swift in Sources */,
+				C326DF7A254DB8D7006B50D0 /* AddBudgetView.swift in Sources */,
 				C3CCD171254A02E300578B52 /* TransactionDetailView.swift in Sources */,
 				C3369D8F2532069000CA5647 /* DisplayCurrencyValue.swift in Sources */,
 				C3369DAE2532244F00CA5647 /* CreatePaymentMethodView.swift in Sources */,
@@ -442,6 +453,7 @@
 				C35D41B12520F07F00B45BD7 /* AddExpenseView.swift in Sources */,
 				C35D41BC2531D60900B45BD7 /* TransactionCellView.swift in Sources */,
 				C3369DA1253213EF00CA5647 /* PaymentMethodTypes.swift in Sources */,
+				C326DF7D254DC224006B50D0 /* ConfigureBudgetView.swift in Sources */,
 				C381C4D92549C973002DB1D7 /* ReportsView.swift in Sources */,
 				C381C4CD254895C0002DB1D7 /* ChartsHomePieView.swift in Sources */,
 				C30958CD2541BCD6006C0CB5 /* NewCategoryView.swift in Sources */,

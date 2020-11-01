@@ -33,7 +33,7 @@ struct WalletView: View {
                 VStack {
                     HStack {
                         Text("Overview")
-                            .font(Font.getFontFromDesign(design: .sectionTitle))
+                            .font(.sectionTitle)
                         Spacer()
                     }.padding([.top, .horizontal])
                     VStack(alignment: .leading, spacing: .small) {
@@ -54,20 +54,34 @@ struct WalletView: View {
                             .cornerRadius(.medium)
                     )
                     .padding(.horizontal)
-                    CashWalletView(parentWidth: reader.size.width, cashTapAction: showCashDetail)
-                    DebitCardWalletView(parentWidth: reader.size.width, addDebitAction: showAddDebitCard, debitDetailAction: showDebitCardList)
-                    CreditCardWalletView(parentWidth: reader.size.width, showSheetAction: showAddCreditCard)
                     HStack {
-                        Text("E-Wallet")
-                            .font(Font.getFontFromDesign(design: .sectionTitle))
-                            .padding(.horizontal)
-                            .padding(.top, .medium)
+                        Text("Payment Methods")
+                            .font(.sectionTitle)
                         Spacer()
-                    }
-                    .padding(.top, .normal)
-                    AddCardPlaceholder(text: "Add E-Wallet")
-                        .frame(width: abs(reader.size.width - 100), height: 150)
-                        .padding(.bottom, .large)
+                    }.padding([.top, .horizontal])
+                    VStack {
+                        VStack {
+                            CashWalletView(parentWidth: reader.size.width, cashTapAction: showCashDetail)
+                            DebitCardWalletView(parentWidth: reader.size.width, addDebitAction: showAddDebitCard, debitDetailAction: showDebitCardList)
+                            CreditCardWalletView(parentWidth: reader.size.width, showSheetAction: showAddCreditCard)
+                            
+                            HStack {
+                                Text("E-Wallet")
+                                    .font(Font.getFontFromDesign(design: .sectionTitle))
+                                    .padding(.horizontal)
+                                    .padding(.top, .medium)
+                                Spacer()
+                            }
+                            .padding(.top, .normal)
+                            AddCardPlaceholder(text: "Add E-Wallet")
+                                .frame(width: abs(reader.size.width - 100), height: 150)
+                                .padding(.bottom, .large)
+                        }.padding(.horizontal)
+                        .background(
+                            Color.init(.secondarySystemBackground)
+                                .cornerRadius(.medium)
+                        )
+                    }.padding([.horizontal, .bottom])
                 }
             }
         }
@@ -226,7 +240,6 @@ struct DebitCardWalletView: View {
             VStack {
                 HStack {
                     Text("Debit Cards")
-                        .font(Font.getFontFromDesign(design: .sectionTitle))
                         .padding(.horizontal)
                         .padding(.top, .large)
                     Spacer()
@@ -245,7 +258,6 @@ struct DebitCardWalletView: View {
             VStack {
                 HStack {
                     Text("Debit Cards")
-                        .font(Font.getFontFromDesign(design: .sectionTitle))
                         .padding(.horizontal)
                         .padding(.top, .medium)
                     Spacer()
@@ -323,7 +335,6 @@ struct CreditCardWalletView: View {
             VStack {
                 HStack {
                     Text("Credit Cards")
-                        .font(Font.getFontFromDesign(design: .sectionTitle))
                         .padding(.horizontal)
                         .padding(.top, .small)
                     Spacer()
@@ -358,7 +369,6 @@ struct CashWalletView: View {
             VStack {
                 HStack {
                     Text(cashMethod?.name ?? "")
-                        .font(Font.getFontFromDesign(design: .sectionTitle))
                         .padding(.horizontal)
                         .padding(.top, .large)
                     Spacer()

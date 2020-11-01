@@ -21,6 +21,13 @@ struct XpenseView: View {
         transactions.count > 3 ? 3 : transactions.count
     }
     
+    @FetchRequest(
+        entity: PeriodicBudget.entity(),
+        sortDescriptors: [
+        ],
+        predicate: NSPredicate(format: "startDate <= %@ && endDate >= %@", Date() as NSDate, Date() as NSDate)
+    ) var periodicBudgets: FetchedResults<PeriodicBudget>
+    
     var body: some View {
         ZStack {
             ScrollView {
@@ -28,58 +35,11 @@ struct XpenseView: View {
                     Text("Daily Budget")
                         .font(Font.getFontFromDesign(design: .sectionTitle))
                         .padding([.top, .horizontal])
-                    HStack {
-                        VStack(alignment: .leading) {
-                            HStack(alignment: .center) {
-                                ZStack {
-                                    ProgressBar(progress: self.$progressValue, color: UIColor.systemBlue)
-                                    .frame(width: 40.0, height: 40.0)
-                                        .padding(.vertical)
-                                    ProgressBar(progress: self.$progressValue, color: UIColor.systemRed)
-                                    .frame(width: 70.0, height: 70.0)
-                                        .padding(.vertical)
-                                    ProgressBar(progress: self.$progressValue, color: UIColor.purple)
-                                    .frame(width: 100.0, height: 100.0)
-                                        .padding(.vertical)
-                                }
-                                Spacer()
-                                VStack(alignment: .leading) {
-                                    Spacer()
-                                    Text("Shopping")
-                                        .font(.footnote)
-                                    Text("Rp. 100k/ 100k")
-                                        .font(.getFontFromDesign(design: .buttonTitle))
-                                        .foregroundColor(.purple)
-                                    Spacer()
-                                    Text("Foods & Drinks")
-                                        .font(.footnote)
-                                    Text("Rp. 200k/ 200k")
-                                        .font(.getFontFromDesign(design: .buttonTitle))
-                                        .foregroundColor(.init(.systemRed))
-                                    Spacer()
-                                    Text("Transport")
-                                        .font(.footnote)
-                                    Text("Rp. 50k/ 50k")
-                                        .font(.getFontFromDesign(design: .buttonTitle))
-                                        .foregroundColor(.init(.systemBlue))
-                                    Spacer()
-                                }
-                                Spacer()
-                            }.padding(.horizontal)
-                            VStack {
-                                ProgressView("Daily Budget: Rp. 175k/ 350k", value: 50, total: 100)
-                                    .font(.footnote)
-                                    .accentColor(.theme)
-                            }
-                        }.padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.init(.secondarySystemBackground))
-                        .cornerRadius(16)
                         .onTapGesture {
                             showAddBudget.toggle()
                         }
-                    }
-                    .padding([.horizontal, .bottom])
+                        .padding(.bottom, .small)
+                    BudgetHomeView(periodicBudgets: periodicBudgets)
                     HStack {
                         Text("Transactions")
                             .font(Font.getFontFromDesign(design: .sectionTitle))
@@ -96,6 +56,11 @@ struct XpenseView: View {
                                 let transaction = transactions[index]
                                 TransactionCellView(transaction: transaction, refreshFlag: $refreshFlag)
                             }
+                        }
+                        if transactions.count == 0 {
+                            VStack {
+                                Text("No Data")
+                            }.frame(minHeight: 200)
                         }
                     }
                     .padding(.horizontal)
@@ -126,6 +91,95 @@ struct XpenseView: View {
         request.fetchLimit = 3
         request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
         fetchRequest = FetchRequest<TransactionModel>(fetchRequest: request)
+    }
+}
+
+struct BudgetHomeView: View {
+    
+    var periodicBudgets: FetchedResults<PeriodicBudget>
+    @State var budgetsProgress:[Float] = [1.0, 1.0, 1.0]
+    
+    var body: some View {
+        if let periodicBudget = periodicBudgets.first {
+            if let budgets = periodicBudget.budgets {
+                let budgetsArray = budgets.allObjects as! [Budget]
+                let sortedBudgetsArray = budgetsArray.sorted { (first, second) -> Bool in
+                    return first.order < second.order
+                }
+                HStack(alignment: .center) {
+                    let initialSize:CGFloat = 120.0
+                    ZStack {
+                        ForEach(sortedBudgetsArray, id:\.self) {
+                            budget in
+                            let category = budget.category!
+                            let categoryColorData = category.color!
+                            let categoryUiColor = UIColor.color(data: categoryColorData)!
+                            let index = sortedBudgetsArray.firstIndex(of: budget)
+                            let size = initialSize - CGFloat((index! * 30))
+                            ProgressBar(progress: $budgetsProgress[index!], color: categoryUiColor)
+                                .frame(width: size, height: size)
+                                .padding(.vertical)
+                                .onAppear {
+                                    withAnimation {
+                                        let limit = budget.limit
+                                        let limitAmount = limit!.toDouble()
+                                        
+                                        let used = budget.usedAmount
+                                        let usedAmount = used!.toDouble()
+                                        
+                                        let progress = 1 - usedAmount / limitAmount
+                                        budgetsProgress[index!] = Float(progress)
+                                    }
+                                }
+                        }
+                    }.padding(.leading, .normal)
+                    .padding(.trailing, .tiny)
+                    .padding(.vertical)
+                    VStack(alignment: .leading) {
+                        Spacer()
+                        ForEach(sortedBudgetsArray, id: \.self) {
+                            budget in
+                            let category = budget.category!
+                            let categoryColorData = category.color!
+                            let categoryUiColor = UIColor.color(data: categoryColorData)!
+                            let used = budget.usedAmount
+                            let usedAmount = used!.toDouble()
+                            let limit = budget.limit
+                            let limitAmount = limit!.toDouble()
+                            let leftAmount = limitAmount - usedAmount
+                            let leftAmountDisplay = DisplayCurrencyValue(currencyValue: CurrencyValue(amount: String(leftAmount), currency: used!.currencyValue.currency), numOfDecimalPoint: used!.numOfDecimalPoint, decimalSeparator: used!.decimalSeparator, groupingSeparator: used!.groupingSeparator)
+                            HStack(spacing: .small) {
+                                CategoryIconDisplayView(category: category, iconWidth: 20.0, iconHeight: 20.0)
+                                VStack(alignment: .leading) {
+                                    HStack(spacing: 0) {
+                                        Text("Budget: ")
+                                        .font(.caption)
+                                        Text(leftAmountDisplay.toString())
+                                            .foregroundColor(Color(categoryUiColor))
+                                            .bold()
+                                            .font(.caption)
+                                    }
+                                    HStack(spacing: 0) {
+                                        Text("Limit: ")
+                                            .font(.caption)
+                                        Text(limit!.toString())
+                                            .font(.caption)
+                                            .foregroundColor(Color(categoryUiColor))
+                                    }
+                                }
+                            }
+                            Spacer()
+                        }
+                    }.padding(.leading, .normal)
+                    Spacer()
+                }
+                .padding(.horizontal, .small)
+                .frame(maxWidth: .infinity)
+                .background(Color.init(.secondarySystemBackground))
+                .cornerRadius(16)
+                .padding(.horizontal)
+            }
+        }
     }
 }
 

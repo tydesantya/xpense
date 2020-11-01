@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import SPAlert
 
 struct InputModel: Hashable {
     var category: CategoryModel
@@ -26,6 +27,7 @@ enum BudgetPeriod: String, CaseIterable {
 
 struct ConfigureBudgetView: View {
     
+    @Environment(\.managedObjectContext) private var viewContext
     @Binding var inputModels: [InputModel]
     @State var progressValue: Float = 1.0
     @Binding var showSheetView: Bool
@@ -47,14 +49,14 @@ struct ConfigureBudgetView: View {
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding([.horizontal, .bottom])
-                let initialSize:CGFloat = 60.0
+                let initialSize:CGFloat = 120.0
                 ZStack {
                     ForEach(inputModels, id: \.self) {
                         inputModel in
                         let category = inputModel.category
                         let index = inputModels.firstIndex(of: inputModel)!
                         if index < inputModels.count {
-                            let size = initialSize + CGFloat((index * 30))
+                            let size = initialSize - CGFloat((index * 30))
                             let categoryColorData = category.color
                             let categoryColor = UIColor.color(data: categoryColorData!)
                             ProgressBar(progress: self.$progressValue, color: categoryColor!)
@@ -93,7 +95,7 @@ struct ConfigureBudgetView: View {
                     }
                     .onMove(perform: move)
                     .alert(isPresented: $showConfirmationAlert, content: {
-                        Alert(title: Text("Confirmation"), message: Text("Create this setup of budget"), primaryButton: .default(Text("Confirm")) {
+                        Alert(title: Text("Confirmation"), message: Text("Create this setup of budget ?\nYou will not be able to edit the budget unless you delete all entries of existing budget"), primaryButton: .default(Text("Confirm")) {
                             createBudget()
                         }, secondaryButton: .cancel())
                     })
@@ -121,7 +123,37 @@ struct ConfigureBudgetView: View {
     }
     
     func createBudget() {
-        
+        let periodicBudget = PeriodicBudget(context: viewContext)
+        let period = self.segments[segmentIndex]
+        periodicBudget.period = period.rawValue
+        switch period {
+        case .daily:
+            periodicBudget.startDate = Date().startOfDay
+            periodicBudget.endDate = Date().endOfDay
+        case .weekly:
+            periodicBudget.startDate = Date().startOfWeek()
+            periodicBudget.endDate = Date().endOfWeek
+        case .monthly:
+            periodicBudget.startDate = Date().startOfMonth()
+            periodicBudget.endDate = Date().endOfMonth
+        }
+        var index = 0
+        for inputModel in inputModels {
+            let budget = Budget(context: viewContext)
+            budget.category = inputModel.category
+            budget.limit = DisplayCurrencyValue(currencyValue: CurrencyValue(amount: String(inputModel.amount), currency: inputModel.currencyValue.currency), numOfDecimalPoint: 0, decimalSeparator: ",", groupingSeparator: ".")
+            budget.usedAmount = DisplayCurrencyValue(currencyValue: CurrencyValue(amount: "0", currency: inputModel.currencyValue.currency), numOfDecimalPoint: 0, decimalSeparator: ",", groupingSeparator: ".")
+            budget.periodicBudget = periodicBudget
+            budget.order = Int64(index)
+            index += 1
+        }
+        do {
+            try viewContext.save()
+            SPAlert.present(title: "Budget Added", preset: .done)
+            showSheetView = false
+        } catch let createError {
+            print("Failed to create budget \(createError)")
+        }
     }
     
     func move(from source: IndexSet, to destination: Int) {

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="19G2021" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Budget" representedClassName="Budget" syncable="YES" codeGenerationType="class">
-        <attribute name="amount" optional="YES" attributeType="Transformable" valueTransformerName="DisplayCurrencyTransformer" customClassName="DisplayCurrencyValue"/>
-        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="period" optional="YES" attributeType="String"/>
-        <relationship name="categories" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="budget" inverseEntity="Category"/>
+        <attribute name="limit" optional="YES" attributeType="Transformable" valueTransformerName="DisplayCurrencyTransformer" customClassName="DisplayCurrencyValue"/>
+        <attribute name="order" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="usedAmount" optional="YES" attributeType="Transformable" valueTransformerName="DisplayCurrencyTransformer" customClassName="DisplayCurrencyValue"/>
+        <relationship name="category" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="budget" inverseEntity="Category"/>
+        <relationship name="periodicBudget" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PeriodicBudget" inverseName="budgets" inverseEntity="PeriodicBudget"/>
+        <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Transaction" inverseName="budget" inverseEntity="Transaction"/>
     </entity>
     <entity name="Category" representedClassName="CategoryModel" syncable="YES" codeGenerationType="class">
         <attribute name="color" optional="YES" attributeType="Binary"/>
@@ -15,7 +17,7 @@
         <attribute name="text" optional="YES" attributeType="String"/>
         <attribute name="timeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="type" optional="YES" attributeType="String"/>
-        <relationship name="budget" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Budget" inverseName="categories" inverseEntity="Budget"/>
+        <relationship name="budget" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Budget" inverseName="category" inverseEntity="Budget"/>
         <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Transaction" inverseName="category" inverseEntity="Transaction"/>
     </entity>
     <entity name="PaymentMethod" representedClassName="PaymentMethod" syncable="YES" codeGenerationType="class">
@@ -26,17 +28,25 @@
         <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Transaction" inverseName="paymentMethod" inverseEntity="Transaction"/>
     </entity>
+    <entity name="PeriodicBudget" representedClassName="PeriodicBudget" syncable="YES" codeGenerationType="class">
+        <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="period" optional="YES" attributeType="String"/>
+        <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="budgets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Budget" inverseName="periodicBudget" inverseEntity="Budget"/>
+    </entity>
     <entity name="Transaction" representedClassName="TransactionModel" syncable="YES" codeGenerationType="class">
         <attribute name="amount" optional="YES" attributeType="Transformable" valueTransformerName="DisplayCurrencyTransformer" customClassName="DisplayCurrencyValue"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="note" optional="YES" attributeType="String"/>
+        <relationship name="budget" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Budget" inverseName="transactions" inverseEntity="Budget"/>
         <relationship name="category" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="transactions" inverseEntity="Category"/>
         <relationship name="paymentMethod" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PaymentMethod" inverseName="transactions" inverseEntity="PaymentMethod"/>
     </entity>
     <elements>
-        <element name="Budget" positionX="-45" positionY="81" width="128" height="103"/>
+        <element name="Budget" positionX="482.9765625" positionY="107.98046875" width="128" height="133"/>
         <element name="Category" positionX="168.60546875" positionY="87.7734375" width="128" height="193"/>
         <element name="PaymentMethod" positionX="-442.26953125" positionY="42.140625" width="128" height="133"/>
-        <element name="Transaction" positionX="195.53515625" positionY="474.32421875" width="128" height="118"/>
+        <element name="PeriodicBudget" positionX="179.0859375" positionY="-49.703125" width="128" height="103"/>
+        <element name="Transaction" positionX="195.53515625" positionY="474.32421875" width="128" height="133"/>
     </elements>
 </model>

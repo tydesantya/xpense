@@ -105,11 +105,17 @@ struct TransactionDetailView: View {
     
     func deleteSelectedTransaction() {
         revertTransactionPaymentMethodAmount(transaction)
-        navigationActive.toggle()
+        if let budget = transaction.budget {
+            let initialBudgetUsedAmount = budget.usedAmount!.toDouble()
+            let newBudgetAmount = initialBudgetUsedAmount - transaction.amount!.toDouble()
+            budget.usedAmount = getDisplayCurrencyValueFromAmount(amt: newBudgetAmount)
+        }
         viewContext.delete(transaction)
         do {
             try viewContext.save()
             SPAlert.present(title: "Deleted", preset: .done)
+            navigationActive = false
+            refreshFlag = UUID()
         } catch let createError {
             print("Failed to delete transaction \(createError)")
         }

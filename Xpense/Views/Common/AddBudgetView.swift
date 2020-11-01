@@ -76,10 +76,6 @@ struct AddBudgetView: View {
             }).disabled(budgetInputModels.count == 0))
         .onAppear {
             print("budget count \(budgets.count)")
-            for budget in budgets {
-                print("check budget \(budget.period)")
-                print("check budget \(budget.amount)")
-            }
         }
     }
     

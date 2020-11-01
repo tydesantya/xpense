@@ -72,6 +72,12 @@ extension Date {
         components.second = -1
         return Calendar.iso8601.date(byAdding: components, to: startOfDay)!
     }
+    var endOfWeek: Date {
+        var components = DateComponents()
+        components.day = 7
+        components.second = -1
+        return Calendar.iso8601.date(byAdding: components, to: startOfWeek())!
+    }
     var endOfMonth: Date {
         var components = DateComponents()
         components.month = 1

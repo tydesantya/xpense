@@ -15,8 +15,8 @@ struct TransactionCellView: View {
     var category: CategoryModel? {
         transaction.category
     }
-    var paymentMethod: PaymentMethod {
-        transaction.paymentMethod!
+    var paymentMethod: PaymentMethod? {
+        transaction.paymentMethod
     }
     @State var navigationActive = false
     @Binding var refreshFlag: UUID
@@ -71,24 +71,26 @@ struct TransactionCellView: View {
                         }
                     }
                     Spacer()
-                    VStack(alignment: .trailing) {
-                        Text(paymentMethod.name ?? "")
-                            .font(.footnote)
-                            .bold()
-                            .foregroundColor(.white)
-                            .padding(.horizontal)
-                            .padding(.vertical, .tiny)
-                            .background(Capsule().fill(Color(UIColor.color(data: paymentMethod.color!)!)))
-                        Spacer()
-                        HStack {
-                            Text(transaction.date?.todayShortFormat() ?? "")
-                            if editable {
-                                Image(systemSymbol: .chevronRight)
-                            }
-                        }.padding(.top, .tiny)
+                    if let paymentMethod = paymentMethod {
+                        VStack(alignment: .trailing) {
+                            Text(paymentMethod.name ?? "")
+                                .font(.footnote)
+                                .bold()
+                                .foregroundColor(.white)
+                                .padding(.horizontal)
+                                .padding(.vertical, .tiny)
+                                .background(Capsule().fill(Color(UIColor.color(data: paymentMethod.color!)!)))
+                            Spacer()
+                            HStack {
+                                Text(transaction.date?.todayShortFormat() ?? "")
+                                if editable {
+                                    Image(systemSymbol: .chevronRight)
+                                }
+                            }.padding(.top, .tiny)
+                        }
+                        .foregroundColor(.init(.secondaryLabel))
+                        .font(.caption)
                     }
-                    .foregroundColor(.init(.secondaryLabel))
-                    .font(.caption)
                 }
                 .padding()
                 .background(

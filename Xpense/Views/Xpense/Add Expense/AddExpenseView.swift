@@ -41,6 +41,13 @@ struct AddExpenseView: View {
     var selectedTransaction: TransactionModel?
     @State var populatedTransactionDetail = false
     
+    @FetchRequest(
+        entity: PeriodicBudget.entity(),
+        sortDescriptors: [
+        ],
+        predicate: NSPredicate(format: "startDate <= %@ && endDate >= %@", Date() as NSDate, Date() as NSDate)
+    ) var periodicBudgets: FetchedResults<PeriodicBudget>
+    
     init(showSheetView:Binding<Bool>, refreshFlag:Binding<UUID>, selectedTransaction: TransactionModel? = nil) {
         self._showSheetView = showSheetView
         _refreshFlag = refreshFlag
@@ -321,6 +328,18 @@ struct AddExpenseView: View {
         selectedCategory!.lastUsed = Date()
         
         deductSelectedPaymentMethodWithCurrentAmount()
+        
+        if let periodicBudget = periodicBudgets.first {
+            let budgets = periodicBudget.budgets!.allObjects as! [Budget]
+            for budget in budgets {
+                if budget.category! == selectedCategory {
+                    let initialBudgetUsedAmount = budget.usedAmount!.toDouble()
+                    let newBudgetAmount = initialBudgetUsedAmount + amount
+                    budget.usedAmount = getDisplayCurrencyValueFromAmount(amt: newBudgetAmount)
+                    transaction.budget = budget
+                }
+            }
+        }
         do {
             try viewContext.save()
             refreshFlag = UUID()

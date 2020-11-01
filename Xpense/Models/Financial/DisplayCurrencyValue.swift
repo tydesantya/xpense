@@ -49,4 +49,9 @@ public class DisplayCurrencyValue: NSObject, NSSecureCoding {
         let string = CurrencyHelper.string(from: amount, currency: currencySign ?? "")
         return string
     }
+    
+    func toDouble() -> Double {
+        let amountString = currencyValue.amount
+        return Double(amountString) ?? 0
+    }
 }

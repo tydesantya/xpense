@@ -53,6 +53,7 @@ struct TransactionListView: View {
                         }.textCase(nil)
                     }
                 }.padding(.horizontal)
+                
                 .id(refreshFlag)
             }.navigationTitle("Transactions")
         }

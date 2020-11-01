@@ -27,103 +27,105 @@ struct ReportsView: View {
     var body: some View {
         ScrollView {
             VStack {
-                VStack {
-                    HStack {
-                        Text("Transactions")
-                            .font(.sectionTitle)
-                        Spacer()
-                    }
+                VStack(alignment: .leading) {
+                    Text("Transactions")
+                        .padding(.top)
+                        .font(.sectionTitle)
                     if weeklyExpenseTransactions.count > 0 {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: .medium)
-                                .fill(Color(UIColor.secondarySystemBackground))
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    Image(systemName: "chart.bar.xaxis")
-                                        .foregroundColor(Color(UIColor.systemRed))
-                                    Text("Weekly Expense")
-                                        .foregroundColor(Color(UIColor.systemRed))
-                                    Spacer()
-                                    Text(getLatestExpenseTransactionDateTimeThisWeek())
-                                        .font(.caption)
-                                        .foregroundColor(Color(UIColor.secondaryLabel))
-                                    Image(systemSymbol: .chevronRight)
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 10, height: 10)
-                                        .foregroundColor(Color(UIColor.secondaryLabel))
-                                }
-                                Divider()
-                                Text(getTotalExpenseTransactionThisWeek()).font(.header)
-                                Text("Total Expense This Week").font(.footnote)
-                                    .padding(.top, .tiny)
-                            }.padding()
-                        }.onTapGesture {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Image(systemName: "chart.bar.xaxis")
+                                    .foregroundColor(Color(UIColor.systemRed))
+                                Text("Weekly Expense")
+                                    .foregroundColor(Color(UIColor.systemRed))
+                                Spacer()
+                                Text(getLatestExpenseTransactionDateTimeThisWeek())
+                                    .font(.caption)
+                                    .foregroundColor(Color(UIColor.secondaryLabel))
+                                Image(systemSymbol: .chevronRight)
+                                    .renderingMode(.template)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 10, height: 10)
+                                    .foregroundColor(Color(UIColor.secondaryLabel))
+                            }
+                            Divider()
+                            Text(getTotalExpenseTransactionThisWeek()).font(.header)
+                            Text("Total Expense This Week").font(.footnote)
+                                .padding(.top, .tiny)
+                        }
+                        .padding()
+                        .background(
+                            Color.init(.secondarySystemBackground)
+                                .cornerRadius(.medium)
+                        )
+                        .onTapGesture {
                             destinationView = AnyView(WeeklyExpenseChartView())
                             navigate = true
                         }
                     }
                     let totalIncomeThisMonth = getTotalIncomeThisMonth()
                     if monthlyIncomeTransactions.count > 0 {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: .medium)
-                                .fill(Color(UIColor.secondarySystemBackground))
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    Image(systemName: "chart.pie.fill")
-                                        .foregroundColor(Color(UIColor.systemGreen))
-                                    Text("Income Report")
-                                        .foregroundColor(Color(UIColor.systemGreen))
-                                    Spacer()
-                                    Text(getLatestIncomeTransactionDateTimeThisMonth())
-                                        .font(.caption)
-                                        .foregroundColor(Color(UIColor.secondaryLabel))
-                                    Image(systemSymbol: .chevronRight)
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 10, height: 10)
-                                        .foregroundColor(Color(UIColor.secondaryLabel))
-                                }
-                                Divider()
-                                Text(totalIncomeThisMonth).font(.header)
-                                Text("Total Income This Month").font(.footnote)
-                                    .padding(.top, .tiny)
-                            }.padding()
-                        }.onTapGesture {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Image(systemName: "chart.pie.fill")
+                                    .foregroundColor(Color(UIColor.systemGreen))
+                                Text("Income Report")
+                                    .foregroundColor(Color(UIColor.systemGreen))
+                                Spacer()
+                                Text(getLatestIncomeTransactionDateTimeThisMonth())
+                                    .font(.caption)
+                                    .foregroundColor(Color(UIColor.secondaryLabel))
+                                Image(systemSymbol: .chevronRight)
+                                    .renderingMode(.template)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 10, height: 10)
+                                    .foregroundColor(Color(UIColor.secondaryLabel))
+                            }
+                            Divider()
+                            Text(totalIncomeThisMonth).font(.header)
+                            Text("Total Income This Month").font(.footnote)
+                                .padding(.top, .tiny)
+                        }.padding()
+                        .background(
+                            Color.init(.secondarySystemBackground)
+                                .cornerRadius(.medium)
+                        )
+                        .onTapGesture {
                             destinationView = AnyView(PieReportChartView(reportType: .income))
                             navigate.toggle()
                         }
                     }
                     let totalExpenseThisMonth = getTotalExpenseThisMonth()
                     if monthlyExpenseTransactions.count > 0 {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: .medium)
-                                .fill(Color(UIColor.secondarySystemBackground))
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    Image(systemName: "chart.pie.fill")
-                                        .foregroundColor(Color(UIColor.systemRed))
-                                    Text("Expense Report")
-                                        .foregroundColor(Color(UIColor.systemRed))
-                                    Spacer()
-                                    Text(getLatestExpenseTransactionDateTimeThisMonth())
-                                        .font(.caption)
-                                        .foregroundColor(Color(UIColor.secondaryLabel))
-                                    Image(systemSymbol: .chevronRight)
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 10, height: 10)
-                                        .foregroundColor(Color(UIColor.secondaryLabel))
-                                }
-                                Divider()
-                                Text(totalExpenseThisMonth).font(.header)
-                                Text("Total Expense This Month").font(.footnote)
-                                    .padding(.top, .tiny)
-                            }.padding()
-                        }.onTapGesture {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Image(systemName: "chart.pie.fill")
+                                    .foregroundColor(Color(UIColor.systemRed))
+                                Text("Expense Report")
+                                    .foregroundColor(Color(UIColor.systemRed))
+                                Spacer()
+                                Text(getLatestExpenseTransactionDateTimeThisMonth())
+                                    .font(.caption)
+                                    .foregroundColor(Color(UIColor.secondaryLabel))
+                                Image(systemSymbol: .chevronRight)
+                                    .renderingMode(.template)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 10, height: 10)
+                                    .foregroundColor(Color(UIColor.secondaryLabel))
+                            }
+                            Divider()
+                            Text(totalExpenseThisMonth).font(.header)
+                            Text("Total Expense This Month").font(.footnote)
+                                .padding(.top, .tiny)
+                        }.padding()
+                        .background(
+                            Color.init(.secondarySystemBackground)
+                                .cornerRadius(.medium)
+                        )
+                        .onTapGesture {
                             destinationView = AnyView(PieReportChartView(reportType: .expense))
                             navigate.toggle()
                         }
@@ -141,7 +143,7 @@ struct ReportsView: View {
                     if monthlyExpenseTransactions.count > 0 {
                         MonthlyHighlightReportView(largestWeeklyExpenseTuple: largestWeeklyExpenseTuple, largestMonthlyExpenseTuple: largestMonthlyExpenseTuple, largestMonthlyIncomeTuple: getLargestMonthlyIncome(), totalMonthlyIncome: totalIncomeThisMonth, totalMonthlyExpense: totalExpenseThisMonth)
                     }
-                }.padding()
+                }.padding(.horizontal)
                 NavigationLink(
                     destination: destinationView,
                     isActive: self.$navigate,
@@ -302,27 +304,20 @@ struct ReportsView: View {
     init() {
         // weekly income
         let startOfWeek = Date().startOfWeek(using: .iso8601)
-        var components = DateComponents()
-        components.year = 0
-        components.month = 0
-        components.day = 6
-        let endOfWeek = Calendar.iso8601.date(byAdding: components, to: startOfWeek)
+        let endOfWeek = Date().endOfWeek
         let sort = NSSortDescriptor(key: "date", ascending: true)
         let expenseType = CategoryType.expense.rawValue
-        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfWeek as NSDate , endOfWeek! as NSDate, expenseType)
+        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfWeek as NSDate , endOfWeek as NSDate, expenseType)
         weeklyExpenseFetchRequest = FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
         
         
         let startOfMonth = Date().startOfMonth(using: .iso8601)
-        components.year = 0
-        components.month = 1
-        components.day = 0
-        let endOfMonth = Calendar.iso8601.date(byAdding: components, to: startOfMonth)
+        let endOfMonth = Date().endOfMonth
         let incomeType = CategoryType.income.rawValue
-        let monthlyIncomePredicate = NSPredicate(format: "date >= %@ && date < %@ && category.type == %@", startOfMonth as NSDate , endOfMonth! as NSDate, incomeType)
+        let monthlyIncomePredicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfMonth as NSDate , endOfMonth as NSDate, incomeType)
         monthlyIncomeFetchRequest = FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: monthlyIncomePredicate, animation: .spring())
         
-        let monthlyExpensePredicate = NSPredicate(format: "date >= %@ && date < %@ && category.type == %@", startOfMonth as NSDate , endOfMonth! as NSDate, expenseType)
+        let monthlyExpensePredicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfMonth as NSDate , endOfMonth as NSDate, expenseType)
         monthlyExpenseFetchRequest = FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: monthlyExpensePredicate, animation: .spring())
     }
 }

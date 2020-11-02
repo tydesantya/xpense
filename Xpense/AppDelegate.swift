@@ -15,8 +15,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         registerBackgroundTask()
+        
         application.clearLaunchScreenCache()
         
+        let operationQueue = OperationQueue()
+        let operation = BudgetFetcherOperation()
+        
+        operationQueue.addOperations([operation], waitUntilFinished: false)
         return true
     }
     
@@ -78,6 +83,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         operationQueue.addOperations([operation], waitUntilFinished: false)
     }
+    
 }
 
 extension UIApplication {

@@ -22,69 +22,74 @@ struct ContentView: View {
     @State var addTransaction = false
     @State var addTransactionRefreshFlag = UUID()
     var body: some View {
-        NavigationView {
-            TabView(selection: $selection) {
-                XpenseView(uuid: $addTransactionRefreshFlag).tabItem {
-                    Image("xpense")
-                        .renderingMode(.template)
+        VStack {
+            NavigationView {
+                TabView(selection: $selection) {
+                    XpenseView(uuid: $addTransactionRefreshFlag).tabItem {
+                        Image("xpense")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 15, height: 15)
+                        Text("Xpense")
+                    }.tag(1)
+                    WalletView()
+                        .tabItem {
+                        Image(systemName: "creditcard")
+                        Text("Wallet")
+                    }.tag(2)
+                    ReportsView().tabItem {
+                        Image(systemName: "chart.bar.doc.horizontal")
+                        Text("Reports")
+                    }.tag(3)
+                    SettingsView().tabItem {
+                        Image(systemName: "gear")
+                        Text("Settings")
+                    }.tag(4)
+                }.sheet(isPresented: self.$addTransaction) {
+                    AddExpenseView(showSheetView: self.$addTransaction, refreshFlag: $addTransactionRefreshFlag)
+                        .environment(\.managedObjectContext, self.viewContext)
+                }
+                .navigationBarItems(trailing: Button(action: {
+                    self.addTransaction.toggle()
+                }, label: {
+                    Image(systemName: "note.text.badge.plus")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 15, height: 15)
-                    Text("Xpense")
-                }.tag(1)
-                WalletView().tabItem {
-                    Image(systemName: "creditcard")
-                    Text("Wallet")
-                }.tag(2)
-                ReportsView().tabItem {
-                    Image(systemName: "chart.bar.doc.horizontal")
-                    Text("Reports")
-                }.tag(3)
-                SettingsView().tabItem {
-                    Image(systemName: "gear")
-                    Text("Settings")
-                }.tag(4)
-            }.sheet(isPresented: self.$addTransaction) {
-                AddExpenseView(showSheetView: self.$addTransaction, refreshFlag: $addTransactionRefreshFlag)
-                    .environment(\.managedObjectContext, self.viewContext)
+                        .scaleEffect(1.2)
+                }))
+                .navigationBarTitle(self.navigationBarTitle)
+                .onChange(of: selection, perform: { value in
+                    switch value {
+                    case 1:
+                        self.navigationBarTitle = "Xpense"
+                    case 2:
+                        self.navigationBarTitle = "Wallet"
+                    case 3:
+                        self.navigationBarTitle = "Reports"
+                    case 4:
+                        self.navigationBarTitle = "Settings"
+                    default:
+                        break
+                    }
+                })
             }
-            .navigationBarItems(trailing: Button(action: {
-                self.addTransaction.toggle()
-            }, label: {
-                Image(systemName: "note.text.badge.plus")
-                    .resizable()
-                    .scaledToFit()
-                    .scaleEffect(1.2)
-            }))
-            .navigationBarTitle(self.navigationBarTitle)
-            .onChange(of: selection, perform: { value in
-                switch value {
-                case 1:
-                    self.navigationBarTitle = "Xpense"
-                case 2:
-                    self.navigationBarTitle = "Wallet"
-                case 3:
-                    self.navigationBarTitle = "Reports"
-                case 4:
-                    self.navigationBarTitle = "Settings"
-                default:
-                    break
-                }
+            .onAppear {
+                self.checkPaymentMethods()
+            }
+            .addPartialSheet()
+            .accentColor(.theme)
+            .sheet(isPresented: self.$neverSetupCash, content: {
+                CreatePaymentMethodView(paymentMethodType: .cash, sheetFlag: self.$neverSetupCash)
+                    .presentation(isModal: self.$showModally) {
+                        print("Attempted to dismiss")
+                    }
+                    .accentColor(.theme)
+                    .environment(\.managedObjectContext, self.viewContext)
+                    .navigationViewStyle(StackNavigationViewStyle())
             })
         }
-        .onAppear {
-            self.checkPaymentMethods()
-        }
-        .sheet(isPresented: self.$neverSetupCash, content: {
-            CreatePaymentMethodView(paymentMethodType: .cash, sheetFlag: self.$neverSetupCash)
-                .presentation(isModal: self.$showModally) {
-                    print("Attempted to dismiss")
-                }
-                .accentColor(.theme)
-                .environment(\.managedObjectContext, self.viewContext)
-        })
-        .addPartialSheet()
-        .accentColor(.theme)
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     func deletePaymentMethods() {

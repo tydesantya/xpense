@@ -31,17 +31,21 @@ struct XpenseView: View {
         ZStack {
             ScrollView {
                 VStack(alignment: .leading) {
-                    BudgetHomeView(periodicBudgets: periodicBudgets)
+                    if periodicBudgets.count > 0 {
+                        BudgetHomeView(periodicBudgets: periodicBudgets)
+                    }
+                    else {
+                        BudgetPreviewView()
+                    }
                     HStack {
                         Text("Transactions")
-                            .font(Font.getFontFromDesign(design: .sectionTitle))
+                            .font(.sectionTitle)
                         Spacer()
                         NavigationLink(destination: TransactionListView()) {
                             Text("See All")
-                                .font(.getFontFromDesign(design: .buttonTitle))
                         }
                     }.padding(.horizontal)
-                    .padding(.top, .small)
+                    .padding(.top)
                     LazyVStack {
                         ForEach(0..<transactionLimit) { index in
                             if index < transactions.count {
@@ -51,7 +55,7 @@ struct XpenseView: View {
                         }
                         if transactions.count == 0 {
                             VStack {
-                                Text("No Data")
+                                Text("No Transactions")
                             }.frame(minHeight: 200)
                         }
                     }
@@ -78,15 +82,10 @@ struct XpenseView: View {
 
 struct BudgetHomeView: View {
     
-    @Environment(\.managedObjectContext) private var viewContext
-    @State var showAddBudget: Bool = false
     var periodicBudgets: FetchedResults<PeriodicBudget>
     @State var budgetsProgress:[Float] = [1.0, 1.0, 1.0]
-    var dummyBudget: [DummyBudget] = [
-        DummyBudget(color: .systemRed, leftAmountString: "200000", categoryText: "🍔"),
-        DummyBudget(color: .systemOrange, leftAmountString: "500000", categoryText: "🏥"),
-        DummyBudget(color: .link, leftAmountString: "250000", categoryText: "🍿"),
-    ]
+    @State var navigateToBudgetDetail: Bool = false
+    @State var hasAnimated = false
     
     var body: some View {
         if let periodicBudget = periodicBudgets.first {
@@ -101,6 +100,7 @@ struct BudgetHomeView: View {
                         .padding([.top, .horizontal])
                         .padding(.bottom, .small)
                     HStack(alignment: .center) {
+                        Spacer()
                         let initialSize:CGFloat = 120.0
                         ZStack {
                             ForEach(sortedBudgetsArray, id:\.self) {
@@ -117,18 +117,19 @@ struct BudgetHomeView: View {
                                         withAnimation {
                                             let limit = budget.limit
                                             let limitAmount = limit!.toDouble()
-                                            
+
                                             let used = budget.usedAmount
                                             let usedAmount = used!.toDouble()
-                                            
+
                                             let progress = 1 - usedAmount / limitAmount
                                             budgetsProgress[index!] = Float(progress)
                                         }
                                     }
                             }
-                        }.padding(.leading, .normal)
-                        .padding(.trailing, .tiny)
+                        }
+                        .padding(.trailing, .medium)
                         .padding(.vertical)
+                        Spacer()
                         VStack(alignment: .leading) {
                             Spacer()
                             ForEach(sortedBudgetsArray, id: \.self) {
@@ -148,7 +149,7 @@ struct BudgetHomeView: View {
                                         HStack(spacing: 0) {
                                             Text("Budget: ")
                                                 .font(.caption)
-                                            Text(leftAmountDisplay.toString())
+                                            Text(leftAmount < 0 ? "Over Limit!" : leftAmountDisplay.toString())
                                                 .foregroundColor(Color(categoryUiColor))
                                                 .bold()
                                                 .font(.caption)
@@ -164,112 +165,137 @@ struct BudgetHomeView: View {
                                 }
                                 Spacer()
                             }
-                        }.padding(.leading, .normal)
+                        }
                         Spacer()
+                    }
+                    .onTapGesture {
+                        navigateToBudgetDetail = true
                     }
                     .padding(.horizontal, .small)
                     .frame(maxWidth: .infinity)
                     .background(Color.init(.secondarySystemBackground))
                     .cornerRadius(16)
                     .padding(.horizontal)
+                    NavigationLink(
+                        destination: BudgetDetailView(),
+                        isActive: $navigateToBudgetDetail,
+                        label: {
+                            EmptyView()
+                        })
                 }
             }
         }
-        else {
-            VStack(alignment: .leading) {
-                Text("Budget")
-                    .font(Font.getFontFromDesign(design: .sectionTitle))
-                    .padding([.top, .horizontal])
-                    .padding(.bottom, .small)
-                ZStack {
-                    HStack(alignment: .center) {
-                        let initialSize:CGFloat = 120.0
-                        ZStack {
-                            ForEach(dummyBudget, id:\.self) {
-                                budget in
-                                let index = dummyBudget.firstIndex(of: budget)
-                                let size = initialSize - CGFloat((index! * 30))
-                                ProgressBar(progress: $budgetsProgress[index!], color: budget.color)
-                                    .frame(width: size, height: size)
-                                    .padding(.vertical)
-                            }
-                        }.padding(.leading, .normal)
-                        .padding(.trailing, .tiny)
-                        .padding(.vertical)
-                        VStack(alignment: .leading) {
-                            Spacer()
-                            ForEach(dummyBudget, id:\.self) {
-                                budget in
-                                let leftAmountDisplay = DisplayCurrencyValue(currencyValue: CurrencyValue(amount: String(budget.leftAmountString), currency: "IDR"), numOfDecimalPoint: 0, decimalSeparator: ",", groupingSeparator: ",")
-                                HStack(spacing: .small) {
-                                    let customTextIcon = budget.categoryText
-                                    let iconWidth:CGFloat = 20.0
-                                    let iconHeight:CGFloat = 20.0
-                                    ZStack {
-                                        Circle()
-                                            .fill(
-                                                LinearGradient(gradient: .init(colors: [Color(budget.color.lighter()!), Color(budget.color)]), startPoint: .top, endPoint: .bottom)
-                                            )
-                                            .frame(width: iconWidth, height: iconHeight)
-                                        Text(customTextIcon)
-                                            .font(.system(size: iconWidth/2, weight: .bold, design: .rounded))
-                                            .foregroundColor(.white)
-                                        
+    }
+}
+
+struct BudgetPreviewView: View {
+    
+    @Environment(\.managedObjectContext) private var viewContext
+    @State var showAddBudget: Bool = false
+    @State var budgetsProgress:[Float] = [1.0, 1.0, 1.0]
+    var dummyBudget: [DummyBudget] = [
+        DummyBudget(color: .systemRed, leftAmountString: "200000", categoryText: "🍔"),
+        DummyBudget(color: .systemOrange, leftAmountString: "500000", categoryText: "🏥"),
+        DummyBudget(color: .link, leftAmountString: "250000", categoryText: "🍿"),
+    ]
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Budget")
+                .font(Font.getFontFromDesign(design: .sectionTitle))
+                .padding([.top, .horizontal])
+                .padding(.bottom, .small)
+            ZStack {
+                HStack(alignment: .center) {
+                    let initialSize:CGFloat = 120.0
+                    Spacer()
+                    ZStack {
+                        ForEach(dummyBudget, id:\.self) {
+                            budget in
+                            let index = dummyBudget.firstIndex(of: budget)
+                            let size = initialSize - CGFloat((index! * 30))
+                            ProgressBar(progress: $budgetsProgress[index!], color: budget.color)
+                                .frame(width: size, height: size)
+                                .padding(.vertical)
+                        }
+                    }
+                    .padding(.trailing, .medium)
+                    .padding(.vertical)
+                    Spacer()
+                    VStack(alignment: .leading) {
+                        Spacer()
+                        ForEach(dummyBudget, id:\.self) {
+                            budget in
+                            let leftAmountDisplay = DisplayCurrencyValue(currencyValue: CurrencyValue(amount: String(budget.leftAmountString), currency: "IDR"), numOfDecimalPoint: 0, decimalSeparator: ",", groupingSeparator: ",")
+                            HStack(spacing: .small) {
+                                let customTextIcon = budget.categoryText
+                                let iconWidth:CGFloat = 20.0
+                                let iconHeight:CGFloat = 20.0
+                                ZStack {
+                                    Circle()
+                                        .fill(
+                                            LinearGradient(gradient: .init(colors: [Color(budget.color.lighter()!), Color(budget.color)]), startPoint: .top, endPoint: .bottom)
+                                        )
+                                        .frame(width: iconWidth, height: iconHeight)
+                                    Text(customTextIcon)
+                                        .font(.system(size: iconWidth/2, weight: .bold, design: .rounded))
+                                        .foregroundColor(.white)
+                                    
+                                }
+                                VStack(alignment: .leading) {
+                                    HStack(spacing: 0) {
+                                        Text("Budget: ")
+                                            .font(.caption)
+                                        Text(leftAmountDisplay.toString())
+                                            .foregroundColor(Color(budget.color))
+                                            .bold()
+                                            .font(.caption)
                                     }
-                                    VStack(alignment: .leading) {
-                                        HStack(spacing: 0) {
-                                            Text("Budget: ")
-                                                .font(.caption)
-                                            Text(leftAmountDisplay.toString())
-                                                .foregroundColor(Color(budget.color))
-                                                .bold()
-                                                .font(.caption)
-                                        }
-                                        HStack(spacing: 0) {
-                                            Text("Limit: ")
-                                                .font(.caption)
-                                            Text(leftAmountDisplay.toString())
-                                                .font(.caption)
-                                                .foregroundColor(Color(budget.color))
-                                        }
+                                    HStack(spacing: 0) {
+                                        Text("Limit: ")
+                                            .font(.caption)
+                                        Text(leftAmountDisplay.toString())
+                                            .font(.caption)
+                                            .foregroundColor(Color(budget.color))
                                     }
                                 }
-                                Spacer()
                             }
-                        }.padding(.leading, .normal)
-                        Spacer()
+                            Spacer()
+                        }
                     }
-                    .padding(.horizontal, .small)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.init(.secondarySystemBackground))
+                    Spacer()
+                }
+                .padding(.horizontal, .small)
+                .frame(maxWidth: .infinity)
+                .background(Color.init(.secondarySystemBackground))
+                .cornerRadius(.medium)
+                .padding(.horizontal)
+                Blur(style: .systemUltraThinMaterial)
                     .cornerRadius(.medium)
                     .padding(.horizontal)
-                    Blur(style: .systemUltraThinMaterial)
-                        .cornerRadius(.medium)
-                        .padding(.horizontal)
-                        .opacity(0.95)
-                    VStack(spacing: .normal) {
-                        Image(systemName: "gearshape.2")
-                        Text("Setup Budget")
-                            .font(.sectionTitle)
-                            .bold()
-                            .shadow(radius: 20)
-                    }
+                    .opacity(0.95)
+                VStack(spacing: .normal) {
+                    Image(systemName: "gearshape.2")
+                    Text("Setup Budget")
+                        .font(.sectionTitle)
+                        .bold()
+                        .shadow(radius: 20)
                 }
-                .onTapGesture {
-                    showAddBudget.toggle()
-                }
-                .sheet(isPresented: $showAddBudget, content: {
-                    NavigationView {
-                        AddBudgetView(showSheetView: $showAddBudget)
-                            .environment(\.managedObjectContext, self.viewContext)
-                    }.accentColor(.theme)
-                    .presentation(isModal: .constant(true)) {
-                        print("Attempted to dismiss")
-                    }
-                    .edgesIgnoringSafeArea(.bottom)
-                })
             }
+            .onTapGesture {
+                print("toggle \(showAddBudget ? "true": "false")")
+                showAddBudget.toggle()
+            }
+            .sheet(isPresented: $showAddBudget, content: {
+                NavigationView {
+                    AddBudgetView(showSheetView: $showAddBudget)
+                        .environment(\.managedObjectContext, self.viewContext)
+                }.accentColor(.theme)
+                .presentation(isModal: .constant(true)) {
+                    print("Attempted to dismiss")
+                }
+                .edgesIgnoringSafeArea(.bottom)
+            })
         }
     }
 }

@@ -10,11 +10,6 @@ import SwiftUI
 
 struct AddBudgetView: View {
     
-    @FetchRequest(
-        entity: Budget.entity(),
-        sortDescriptors: [
-        ]
-    ) var budgets: FetchedResults<Budget>
     @State var budgetInputModels: [InputModel] = []
     @State private var refreshID = UUID()
     @Binding var showSheetView: Bool
@@ -74,9 +69,6 @@ struct AddBudgetView: View {
             label: {
                 Text("Next").bold()
             }).disabled(budgetInputModels.count == 0))
-        .onAppear {
-            print("budget count \(budgets.count)")
-        }
     }
     
     

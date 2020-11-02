@@ -85,7 +85,6 @@ struct BudgetHomeView: View {
     var periodicBudgets: FetchedResults<PeriodicBudget>
     @State var budgetsProgress:[Float] = [1.0, 1.0, 1.0]
     @State var navigateToBudgetDetail: Bool = false
-    @State var hasAnimated = false
     
     var body: some View {
         if let periodicBudget = periodicBudgets.first {
@@ -101,32 +100,7 @@ struct BudgetHomeView: View {
                         .padding(.bottom, .small)
                     HStack(alignment: .center) {
                         Spacer()
-                        let initialSize:CGFloat = 120.0
-                        ZStack {
-                            ForEach(sortedBudgetsArray, id:\.self) {
-                                budget in
-                                let category = budget.category!
-                                let categoryColorData = category.color!
-                                let categoryUiColor = UIColor.color(data: categoryColorData)!
-                                let index = sortedBudgetsArray.firstIndex(of: budget)
-                                let size = initialSize - CGFloat((index! * 30))
-                                ProgressBar(progress: $budgetsProgress[index!], color: categoryUiColor)
-                                    .frame(width: size, height: size)
-                                    .padding(.vertical)
-                                    .onAppear {
-                                        withAnimation {
-                                            let limit = budget.limit
-                                            let limitAmount = limit!.toDouble()
-
-                                            let used = budget.usedAmount
-                                            let usedAmount = used!.toDouble()
-
-                                            let progress = 1 - usedAmount / limitAmount
-                                            budgetsProgress[index!] = Float(progress)
-                                        }
-                                    }
-                            }
-                        }
+                        BudgetRingView(periodicBudget: periodicBudget, largestSize: 120.0)
                         .padding(.trailing, .medium)
                         .padding(.vertical)
                         Spacer()
@@ -168,20 +142,23 @@ struct BudgetHomeView: View {
                         }
                         Spacer()
                     }
-                    .onTapGesture {
-                        navigateToBudgetDetail = true
-                    }
                     .padding(.horizontal, .small)
                     .frame(maxWidth: .infinity)
                     .background(Color.init(.secondarySystemBackground))
                     .cornerRadius(16)
                     .padding(.horizontal)
                     NavigationLink(
-                        destination: BudgetDetailView(),
+                        destination: BudgetDetailView(budgetPeriod: BudgetPeriod(rawValue: periodicBudget.period!)!),
                         isActive: $navigateToBudgetDetail,
                         label: {
                             EmptyView()
                         })
+                }
+                .onTapGesture {
+                    print("toggle \(navigateToBudgetDetail ? "true": "false")")
+                    DispatchQueue.main.async {
+                        navigateToBudgetDetail = true
+                    }
                 }
             }
         }
@@ -283,7 +260,6 @@ struct BudgetPreviewView: View {
                 }
             }
             .onTapGesture {
-                print("toggle \(showAddBudget ? "true": "false")")
                 showAddBudget.toggle()
             }
             .sheet(isPresented: $showAddBudget, content: {

@@ -29,9 +29,11 @@ struct ReportCategoryGroupingDetailView: View {
                             let color = amountColor
                             let currency = chartModel.transactions.first?.amount?.currencyValue.currency ?? ""
                             let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency) ?? ""
-                            Text(CurrencyHelper.string(from: chartModel.amount, currency: currencySign))
-                                .font(.sectionTitle)
-                                .foregroundColor(color)
+                            if chartModel.amount > 0 {
+                                Text(CurrencyHelper.string(from: chartModel.amount, currency: currencySign))
+                                    .font(.sectionTitle)
+                                    .foregroundColor(color)
+                            }
                             if let paymentMethodName = paymentMethodName {
                                 let pillColorData = chartModel.transactions.first?.paymentMethod?.color!
                                 let pillColor = Color(UIColor.color(data: pillColorData!)!)
@@ -61,6 +63,11 @@ struct ReportCategoryGroupingDetailView: View {
                     }
                     ForEach(data) { transaction in
                         TransactionCellView(transaction: transaction, refreshFlag: $refreshFlag, editable: false)
+                    }
+                    if data.count == 0 {
+                        VStack {
+                            Text("No Transactions For This Budget Period")
+                        }.frame(minHeight: 200)
                     }
                 }.padding()
             }.id(refreshFlag)

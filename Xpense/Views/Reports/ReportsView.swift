@@ -444,13 +444,19 @@ private struct MonthlyHighlightReportView: View {
                     }
                 }
                 else {
-                    Text("Your largest expense amount this month is \(largestMonthlyExpenseTuple.0) from")
-                        .font(.footnote)
-                    let transaction = largestMonthlyExpenseTuple.1
-                    let category = transaction!.category!
-                    HStack {
-                        CategoryIconDisplayView(category: category, iconWidth: 20, iconHeight: 20)
-                        Text("\(category.name ?? ""): \(transaction!.date!.dateTimeFormat())").font(.footnote)
+                    if largestWeeklyExpenseTuple == largestMonthlyExpenseTuple {
+                        Text("Your largest expense of this month is the same largest expense of this week").fixedSize(horizontal: false, vertical: true).padding(.bottom, .tiny)
+                            .font(.footnote)
+                    }
+                    else {
+                        Text("Your largest expense amount is \(largestMonthlyExpenseTuple.0) from")
+                            .font(.footnote)
+                        let transaction = largestMonthlyExpenseTuple.1
+                        let category = transaction!.category!
+                        HStack {
+                            CategoryIconDisplayView(category: category, iconWidth: 20, iconHeight: 20)
+                            Text("\(category.name ?? ""): \(transaction!.date!.dateTimeFormat())").font(.footnote)
+                        }
                     }
                 }
             }.padding()

@@ -152,6 +152,7 @@ struct ReportsView: View {
                         let largestMonthlyExpenseTuple = getLargestMonthlyExpense()
                         if monthlyExpenseTransactions.count > 0 {
                             MonthlyHighlightReportView(largestWeeklyExpenseTuple: largestWeeklyExpenseTuple, largestMonthlyExpenseTuple: largestMonthlyExpenseTuple, largestMonthlyIncomeTuple: getLargestMonthlyIncome(), totalMonthlyIncome: totalIncomeThisMonth, totalMonthlyExpense: totalExpenseThisMonth)
+                                .padding(.bottom)
                         }
                     }
                 }.padding(.horizontal)
@@ -441,15 +442,15 @@ private struct MonthlyHighlightReportView: View {
                             Text("You have a net balance of \(CurrencyHelper.string(from: net, currency: "Rp")) this month").font(.footnote)
                         }
                     }
-                    else {
-                        Text("Your largest expense amount this month is \(largestMonthlyExpenseTuple.0) from")
-                            .font(.footnote)
-                        let transaction = largestMonthlyExpenseTuple.1
-                        let category = transaction!.category!
-                        HStack {
-                            CategoryIconDisplayView(category: category, iconWidth: 20, iconHeight: 20)
-                            Text("\(category.name ?? ""): \(transaction!.date!.dateTimeFormat())").font(.footnote)
-                        }
+                }
+                else {
+                    Text("Your largest expense amount this month is \(largestMonthlyExpenseTuple.0) from")
+                        .font(.footnote)
+                    let transaction = largestMonthlyExpenseTuple.1
+                    let category = transaction!.category!
+                    HStack {
+                        CategoryIconDisplayView(category: category, iconWidth: 20, iconHeight: 20)
+                        Text("\(category.name ?? ""): \(transaction!.date!.dateTimeFormat())").font(.footnote)
                     }
                 }
             }.padding()

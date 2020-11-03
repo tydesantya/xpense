@@ -16,10 +16,11 @@ struct BudgetDetailView: View {
     @State var refreshFlag = UUID()
     @State var startDate = Date()
     @State var endDate = Date()
+    @State var hasSetupEndDate = false
     var budgetPeriod: BudgetPeriod
     var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = budgetPeriod == .daily ? "dd MMMM yyyy" : "yyyy"
+        formatter.dateFormat = budgetPeriod == .daily ? "dd MMM yyyy" : "MMMM yyyy"
         return formatter
     }
     
@@ -60,6 +61,22 @@ struct BudgetDetailView: View {
                     .padding()
             }
         })
+        .onAppear {
+            if !hasSetupEndDate {
+                switch budgetPeriod {
+                case .daily:
+                    startDate = startDate.startOfDay
+                    endDate = startDate.endOfDay
+                case .weekly:
+                    startDate = startDate.startOfWeek()
+                    endDate = startDate.endOfWeek
+                case .monthly:
+                    startDate = startDate.startOfMonth()
+                    endDate = startDate.endOfMonth
+                }
+                hasSetupEndDate = true
+            }
+        }
     }
     
     func makeSelectedDateBudgetFetchRequest() -> FetchRequest<PeriodicBudget> {
@@ -86,7 +103,7 @@ struct BudgetDetailContentView: View {
                     let sortedBudgetsArray = budgetsArray.sorted { (first, second) -> Bool in
                         return first.order < second.order
                     }
-                    BudgetRingView(periodicBudget: periodBudget, largestSize: 200.0).padding(.vertical)
+                    BudgetRingView(periodicBudget: periodBudget, largestSize: 200.0, lineWidth: 25).padding(.vertical)
                     ForEach(sortedBudgetsArray, id:\.self) {
                         budget in
                         let category = budget.category!
@@ -145,6 +162,17 @@ struct BudgetDetailContentView: View {
                             )
                     }
                 }
+            }
+            else {
+                VStack(spacing: .small) {
+                    Text("No Data")
+                        .bold()
+                    Text("Your Budget Detail Will Appear Here for Past Date only")
+                        .foregroundColor(Color(.secondaryLabel))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }.frame(minHeight: 200)
             }
         }
         .id(refreshFlag)

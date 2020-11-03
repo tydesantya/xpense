@@ -65,6 +65,7 @@
 		C3E2678D2550687600519784 /* BudgetDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E2678C2550687600519784 /* BudgetDetailView.swift */; };
 		C3E2679525506DFD00519784 /* BudgetDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E2679425506DFD00519784 /* BudgetDatePickerView.swift */; };
 		C3E267982550839E00519784 /* BudgetRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E267972550839E00519784 /* BudgetRingView.swift */; };
+		C3E2679B2551C80400519784 /* BudgetSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E2679A2551C80400519784 /* BudgetSettingsView.swift */; };
 		C3E7ED722543429D005A41BE /* CategoryType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E7ED712543429D005A41BE /* CategoryType.swift */; };
 		C3F77DC2251E733100CA68BB /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC1251E733100CA68BB /* ProgressBar.swift */; };
 		C3F77DC5251E7D4400CA68BB /* ReportDatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F77DC4251E7D4400CA68BB /* ReportDatePicker.swift */; };
@@ -126,6 +127,7 @@
 		C3E2678C2550687600519784 /* BudgetDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetailView.swift; sourceTree = "<group>"; };
 		C3E2679425506DFD00519784 /* BudgetDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDatePickerView.swift; sourceTree = "<group>"; };
 		C3E267972550839E00519784 /* BudgetRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetRingView.swift; sourceTree = "<group>"; };
+		C3E2679A2551C80400519784 /* BudgetSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSettingsView.swift; sourceTree = "<group>"; };
 		C3E7ED712543429D005A41BE /* CategoryType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryType.swift; sourceTree = "<group>"; };
 		C3F77DC1251E733100CA68BB /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
 		C3F77DC4251E7D4400CA68BB /* ReportDatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportDatePicker.swift; sourceTree = "<group>"; };
@@ -279,6 +281,7 @@
 			children = (
 				C35D419A251F9CCC00B45BD7 /* Categories */,
 				C35D419C251F9D3800B45BD7 /* SettingsView.swift */,
+				C3E2679A2551C80400519784 /* BudgetSettingsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -450,6 +453,7 @@
 				C3288277246489FD00F846DC /* URLImage.swift in Sources */,
 				C3F77DC2251E733100CA68BB /* ProgressBar.swift in Sources */,
 				C381C4B32544A557002DB1D7 /* DateFormat.swift in Sources */,
+				C3E2679B2551C80400519784 /* BudgetSettingsView.swift in Sources */,
 				C3369DA92532226000CA5647 /* CurrencyHelper.swift in Sources */,
 				C35D41B5252CEA3900B45BD7 /* WalletView.swift in Sources */,
 				C3288278246489FD00F846DC /* Design.swift in Sources */,

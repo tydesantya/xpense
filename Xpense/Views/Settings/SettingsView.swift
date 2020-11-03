@@ -21,7 +21,7 @@ struct SettingsView: View {
                     .font(.getFontFromDesign(design: .sectionTitle))
                 VStack {
                     LazyVStack {
-                        MenuView(iconName: "dollarsign.circle.fill", text: "Budget", action: self.menuTapped(title:))
+                        MenuView(iconName: "largecircle.fill.circle", text: "Budget", action: self.menuTapped(title:))
                         Divider()
                             .padding(.bottom, .tiny)
                         MenuView(iconName: "rectangle.stack.fill", text: "Categories", action: self.menuTapped(title:))
@@ -48,7 +48,7 @@ struct SettingsView: View {
     func menuTapped(title: String) {
         switch title {
         case "Budget":
-            destinationView = AnyView(SwiftUIView())
+            destinationView = AnyView(BudgetSettingsView())
         case "Categories":
             print("temp todo")
             destinationView = AnyView(

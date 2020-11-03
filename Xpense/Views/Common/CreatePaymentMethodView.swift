@@ -28,6 +28,8 @@ struct CreatePaymentMethodView: View {
     @State var validationAlertMessage: String = ""
     @State var showValidationAlert: Bool = false
     @State var editingPaymentMethod: PaymentMethod?
+    @State var monthlyReminderOn: Bool = false
+    @State var reminderDateSelection: Date = Date()
     var paymentMethodType: PaymentMethodType
     var numberFormatter: NumberFormatter!
     
@@ -44,45 +46,11 @@ struct CreatePaymentMethodView: View {
                         .padding()
                         amountInputView()
                         paymentMethodSetupComponents()
-                        Text("Number Formatting")
-                            .font(.footnote)
-                            .foregroundColor(.init(.secondaryLabel))
-                            .padding(.top)
-                        VStack {
-                            HStack {
-                                Text("Currency")
-                                Spacer()
-                                Text(self.currencyText)
-                            }.padding(.horizontal)
-                            Divider().padding(.horizontal)
-                            HStack {
-                                Text("Grouping Separator")
-                                Spacer()
-                                Text(groupingSeparator)
-                            }.padding(.horizontal)
-                            Divider().padding(.horizontal)
-                            HStack {
-                                Text("Decimal Points")
-                                Spacer()
-                                Text("\(numOfDecimalPoint)")
-                            }.padding(.horizontal)
-                            Divider().padding(.horizontal)
-                            HStack {
-                                Text("Decimal Separator")
-                                Spacer()
-                                Text(decimalSeparator)
-                            }.padding(.horizontal)
+                        if paymentMethodType == .cash {
+                            CurrencyFormattingView(numOfDecimalPoint: $numOfDecimalPoint, decimalSeparator: $decimalSeparator, groupingSeparator: $groupingSeparator, currencyText: $currencyText)
                         }
-                        .foregroundColor(.init(.quaternaryLabel))
-                        .padding(.vertical)
-                        .background(Color.init(.secondarySystemBackground)
-                                        .cornerRadius(.normal))
-                        .opacity(0.7)
-                        HStack {
-                            Spacer()
-                            Text("Customization is currently not supported")
-                                .font(.caption)
-                                .foregroundColor(.init(.tertiaryLabel))
+                        if paymentMethodType == .creditCard {
+                            PaymentMethodReminderSetupView(monthlyReminderOn: $monthlyReminderOn, monthlyReminderDate: $reminderDateSelection)
                         }
                     }
                     .padding()
@@ -165,7 +133,7 @@ struct CreatePaymentMethodView: View {
                     Spacer()
                     Text(cardName.count > 0 ? cardName : "Card Name")
                         .bold()
-                        .font(.title3)
+                        .font(.subheadline)
                         .foregroundColor(.white)
                 }
                 Spacer()
@@ -480,6 +448,97 @@ private struct CardSetupComponents: View {
         }
         .onAppear {
             latestInputText = identifier
+        }
+    }
+}
+
+struct CurrencyFormattingView: View {
+    
+    @Binding var numOfDecimalPoint: Int
+    @Binding var decimalSeparator: String
+    @Binding var groupingSeparator: String
+    @Binding var currencyText: String!
+    
+    var body: some View {
+        VStack {
+            Text("Number Formatting")
+                .font(.footnote)
+                .foregroundColor(.init(.secondaryLabel))
+                .padding(.top)
+            VStack {
+                HStack {
+                    Text("Currency")
+                    Spacer()
+                    Text(self.currencyText)
+                }.padding(.horizontal)
+                Divider().padding(.horizontal)
+                HStack {
+                    Text("Grouping Separator")
+                    Spacer()
+                    Text(groupingSeparator)
+                }.padding(.horizontal)
+                Divider().padding(.horizontal)
+                HStack {
+                    Text("Decimal Points")
+                    Spacer()
+                    Text("\(numOfDecimalPoint)")
+                }.padding(.horizontal)
+                Divider().padding(.horizontal)
+                HStack {
+                    Text("Decimal Separator")
+                    Spacer()
+                    Text(decimalSeparator)
+                }.padding(.horizontal)
+            }
+            .foregroundColor(.init(.quaternaryLabel))
+            .padding(.vertical)
+            .background(Color.init(.secondarySystemBackground)
+                            .cornerRadius(.normal))
+            .opacity(0.7)
+            HStack {
+                Spacer()
+                Text("Customization is currently not supported")
+                    .font(.caption)
+                    .foregroundColor(.init(.tertiaryLabel))
+            }
+        }
+    }
+}
+
+struct PaymentMethodReminderSetupView: View {
+    
+    @Binding var monthlyReminderOn: Bool
+    @Binding var monthlyReminderDate: Date
+    
+    var body: some View {
+        VStack {
+            Text("Reminder")
+                .font(.footnote)
+                .foregroundColor(.init(.secondaryLabel))
+                .padding(.top)
+            VStack {
+                HStack {
+                    Toggle(isOn: $monthlyReminderOn, label: {
+                        Text("Monthly Reminder").foregroundColor(Color(.label))
+                    })
+                }.padding(.horizontal)
+                if monthlyReminderOn {
+                    Divider().padding(.horizontal)
+                    DatePicker("", selection: $monthlyReminderDate)
+                        .padding(.horizontal).foregroundColor(Color(.label))
+                }
+            }
+            .foregroundColor(.init(.quaternaryLabel))
+            .padding(.vertical)
+            .background(Color.init(.secondarySystemBackground)
+                            .cornerRadius(.normal))
+            .opacity(0.7)
+            HStack {
+                Spacer()
+                Text("You will be reminded every month of same date and time")
+                    .font(.caption)
+                    .foregroundColor(.init(.tertiaryLabel))
+            }
         }
     }
 }

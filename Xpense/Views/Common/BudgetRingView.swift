@@ -13,6 +13,7 @@ struct BudgetRingView: View {
     @State var budgetsProgress:[Float] = [1.0, 1.0, 1.0]
     var periodicBudget: PeriodicBudget
     var largestSize: CGFloat
+    var lineWidth: CGFloat = 15.0
     
     var body: some View {
         if let budgets = periodicBudget.budgets {
@@ -28,8 +29,8 @@ struct BudgetRingView: View {
                     let categoryColorData = category.color!
                     let categoryUiColor = UIColor.color(data: categoryColorData)!
                     let index = sortedBudgetsArray.firstIndex(of: budget)
-                    let size = initialSize - CGFloat((index! * 30))
-                    ProgressBar(progress: $budgetsProgress[index!], color: categoryUiColor)
+                    let size = initialSize - CGFloat((CGFloat(index!) * CGFloat(lineWidth * 2.0)))
+                    ProgressBar(progress: $budgetsProgress[index!], color: categoryUiColor, lineWidth: lineWidth)
                         .frame(width: size, height: size)
                         .padding(.vertical)
                         .onAppear {

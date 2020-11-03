@@ -54,8 +54,14 @@ struct XpenseView: View {
                             }
                         }
                         if transactions.count == 0 {
-                            VStack {
+                            VStack(spacing: .small) {
                                 Text("No Transactions")
+                                    .bold()
+                                Text("Your Recent Transactions Will Appear Here")
+                                    .foregroundColor(Color(.secondaryLabel))
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
                             }.frame(minHeight: 200)
                         }
                     }
@@ -155,7 +161,6 @@ struct BudgetHomeView: View {
                         })
                 }
                 .onTapGesture {
-                    print("toggle \(navigateToBudgetDetail ? "true": "false")")
                     DispatchQueue.main.async {
                         navigateToBudgetDetail = true
                     }

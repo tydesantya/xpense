@@ -95,7 +95,7 @@ struct ConfigureBudgetView: View {
                     }
                     .onMove(perform: move)
                     .alert(isPresented: $showConfirmationAlert, content: {
-                        Alert(title: Text("Confirmation"), message: Text("Create this setup of budget ?\nYou will not be able to edit the budget unless you delete all entries of existing budget"), primaryButton: .default(Text("Confirm")) {
+                        Alert(title: Text("Confirmation"), message: Text("Create this setup of budget ?\nYou will not be able to edit the budget unless you delete all entries of this budget"), primaryButton: .default(Text("Confirm")) {
                             createBudget()
                         }, secondaryButton: .cancel())
                     })

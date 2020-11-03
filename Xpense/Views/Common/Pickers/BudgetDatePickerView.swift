@@ -17,6 +17,7 @@ struct BudgetDatePickerView: View {
         ]
     ) var budgets: FetchedResults<PeriodicBudget>
     
+    @State var weekIndex: Int = 0
     @State var monthIndex: Int = 0
     @State var yearIndex: Int = 0
     @Binding var dateSelection: Date
@@ -24,6 +25,9 @@ struct BudgetDatePickerView: View {
 
     var type: BudgetPeriod
     let monthSymbols = Calendar.current.monthSymbols
+    var weekList: [[Date:Date]] {
+        mapWeeklyDates()
+    }
     let years = Array(Array(Date().year-11..<Date().year+1).reversed())
 
     var body: some View {
@@ -48,6 +52,24 @@ struct BudgetDatePickerView: View {
                         HStack(spacing: 0) {
                             Spacer()
                             if type == .weekly {
+                                Picker(selection: self.$weekIndex, label: Text("")) {
+                                    ForEach(0..<weekList.count) { index in
+                                        let week = weekList[index]
+                                        let startDate = week.first?.key
+                                        let endDate = week.first?.value
+                                        Text(dateRangeFormatter.string(from: startDate!, to: endDate!))
+                                    }
+                                    .onChange(of: weekIndex, perform: { value in
+                                        let selectedWeek = weekList[value]
+                                        dateSelection = selectedWeek.first!.key
+                                        endingDateSelection = selectedWeek.first!.value
+                                    })
+                                }
+                                .pickerStyle(WheelPickerStyle())
+                                .labelsHidden()
+                            }
+                            
+                            if type == .monthly {
                                 Picker(selection: self.$monthIndex, label: Text("")) {
                                     ForEach(0..<self.monthSymbols.count) { index in
                                         Text(self.monthSymbols[index])
@@ -60,23 +82,35 @@ struct BudgetDatePickerView: View {
                                 .clipped()
                                 .pickerStyle(WheelPickerStyle())
                                 .labelsHidden()
-                            }
-                            Picker(selection: self.$yearIndex, label: Text("")) {
-                                ForEach(0..<self.years.count) { index in
-                                    Text(String(self.years[index]))
+                                
+                                Picker(selection: self.$yearIndex, label: Text("")) {
+                                    ForEach(0..<self.years.count) { index in
+                                        Text(String(self.years[index]))
+                                    }
                                 }
+                                .onChange(of: self.yearIndex, perform: { value in
+                                    self.yearChanged(value)
+                                })
+                                .frame(maxWidth: getYearPickerWidth(geometryWidth: geometry.size.width))
+                                .clipped()
+                                .pickerStyle(WheelPickerStyle())
+                                .labelsHidden()
                             }
-                            .onChange(of: self.yearIndex, perform: { value in
-                                self.yearChanged(value)
-                            })
-                            .frame(maxWidth: getYearPickerWidth(geometryWidth: geometry.size.width))
-                            .clipped()
-                            .pickerStyle(WheelPickerStyle())
-                            .labelsHidden()
+                            
                             Spacer()
                         }
                     }
                 }.onAppear {
+                    for week in weekList {
+                        let weekStart = week.first!.key
+                        let weekEnd = week.first!.value
+                        
+                        if weekStart == dateSelection && weekEnd == endingDateSelection {
+                            let index = weekList.firstIndex(of: week)!
+                            weekIndex = index
+                            break
+                        }
+                    }
                     if let monthInt = Calendar.iso8601.dateComponents([.month], from: dateSelection).month {
                         self.monthIndex = monthInt - 1
                     }
@@ -99,12 +133,12 @@ struct BudgetDatePickerView: View {
         case .weekly:
             return "Select Start & End Date"
         default:
-            return "Select Year"
+            return "Select Month & Year"
         }
     }
     
     func getYearPickerWidth(geometryWidth: CGFloat) -> CGFloat {
-        return geometryWidth
+        return type == .monthly ? geometryWidth / 2 : geometryWidth
     }
     
     func monthChanged(_ index: Int) {
@@ -120,6 +154,7 @@ struct BudgetDatePickerView: View {
         let monthYear = "\(month) \(year)"
         if let date = dateFormatter.date(from: monthYear) {
             dateSelection = date
+            endingDateSelection = date.endOfMonth
         }
     }
     
@@ -145,6 +180,13 @@ struct BudgetDatePickerView: View {
     
     var maxDate: Date {
         budgets.last!.startDate!
+    }
+    
+    var dateRangeFormatter: DateIntervalFormatter {
+        let formatter = DateIntervalFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter
     }
 }
 

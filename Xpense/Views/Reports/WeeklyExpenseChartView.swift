@@ -34,39 +34,52 @@ struct WeeklyExpenseChartView: View {
     var body: some View {
         ScrollView {
             VStack {
-                ZStack(alignment: .bottom) {
-                    TabView(selection: $tabSelection) {
-                        let prevIndex = lastTabSelection + 1
-                        if prevIndex < activeData.count {
-                            getChartViewFromWeekMapping(activeData[prevIndex])
-                                .tag(prevIndex)
-                        }
-                        if lastTabSelection < activeData.count {
-                            getChartViewFromWeekMapping(activeData[lastTabSelection])
-                                .tag(lastTabSelection)
-                        }
-                        let nextIndex = lastTabSelection - 1
-                        if nextIndex < activeData.count && nextIndex >= 0 {
-                            getChartViewFromWeekMapping(activeData[nextIndex])
-                                .tag(nextIndex)
-                        }
-                    }.id(refreshFlag)
-                    .tabViewStyle(PageTabViewStyle())
-                    .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .never))
-                    .frame(height: 250)
-                    .onChange(of: tabSelection) { (selection) in
-                        if tabSelection != lastTabSelection {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                lastTabSelection = tabSelection
-                                refreshFlag = UUID()
+                if activeData.count > 0 {
+                    ZStack(alignment: .bottom) {
+                        TabView(selection: $tabSelection) {
+                            let prevIndex = lastTabSelection + 1
+                            if prevIndex < activeData.count {
+                                getChartViewFromWeekMapping(activeData[prevIndex])
+                                    .tag(prevIndex)
+                            }
+                            if lastTabSelection < activeData.count {
+                                getChartViewFromWeekMapping(activeData[lastTabSelection])
+                                    .tag(lastTabSelection)
+                            }
+                            let nextIndex = lastTabSelection - 1
+                            if nextIndex < activeData.count && nextIndex >= 0 {
+                                getChartViewFromWeekMapping(activeData[nextIndex])
+                                    .tag(nextIndex)
+                            }
+                        }.id(refreshFlag)
+                        .tabViewStyle(PageTabViewStyle())
+                        .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .never))
+                        .frame(height: 250)
+                        .onChange(of: tabSelection) { (selection) in
+                            if tabSelection != lastTabSelection {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    lastTabSelection = tabSelection
+                                    refreshFlag = UUID()
+                                }
                             }
                         }
+                        Rectangle().fill(Color(UIColor.systemBackground)).frame(width: 200, height: 25)
                     }
-                    Rectangle().fill(Color(UIColor.systemBackground)).frame(width: 200, height: 25)
+                    .padding(.top)
+                    if lastTabSelection < activeData.count {
+                        WeeklyExpenseDetailView(weekMapping: activeData[lastTabSelection])
+                    }
                 }
-                .padding(.top)
-                if lastTabSelection < activeData.count {
-                    WeeklyExpenseDetailView(weekMapping: activeData[lastTabSelection])
+                else {
+                    VStack(spacing: .small) {
+                        Text("No Transactions")
+                            .bold()
+                        Text("Your Weekly Transactions Report Will Appear Here")
+                            .foregroundColor(Color(.secondaryLabel))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }.frame(minHeight: 200)
                 }
             }
         }.id(transactions.count)

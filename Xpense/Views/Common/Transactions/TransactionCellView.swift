@@ -18,6 +18,12 @@ struct TransactionCellView: View {
     var paymentMethod: PaymentMethod? {
         transaction.paymentMethod
     }
+    var topUpSource: TopUp? {
+        transaction.topUpSource
+    }
+    var topUpTarget: TopUp? {
+        transaction.topUpTarget
+    }
     @State var navigationActive = false
     @Binding var refreshFlag: UUID
     var editable: Bool = true
@@ -30,29 +36,7 @@ struct TransactionCellView: View {
                 HStack {
                     if let category = category {
                         HStack(spacing: .medium) {
-                            ZStack {
-                                let customTextIcon = category.text
-                                let symbolSelection:SFSymbol = SFSymbol(rawValue: category.symbolName ?? "") ?? .archiveboxFill
-                                Circle()
-                                    .fill(
-                                        LinearGradient(gradient: .init(colors: [Color(UIColor.color(data: category.lighterColor!)!), Color(UIColor.color(data: category.color!)!)]), startPoint: .top, endPoint: .bottom)
-                                    )
-                                    .frame(width: 40, height: 40)
-                                if let text = customTextIcon {
-                                    Text(text)
-                                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                                        .foregroundColor(.white)
-                                }
-                                else {
-                                    Image(systemSymbol: symbolSelection)
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 20, height: 20)
-                                        .foregroundColor(.white)
-                                        .foregroundColor(.white)
-                                }
-                            }
+                            CategoryIconDisplayView(category: category, iconWidth: 40.0, iconHeight: 40.0)
                             VStack(alignment: .leading) {
                                 Text(category.name ?? "")
                                     .foregroundColor(.init(.label))
@@ -67,6 +51,33 @@ struct TransactionCellView: View {
                                         .font(.header)
                                         .foregroundColor(.init(.systemRed))
                                 }
+                            }
+                        }
+                    }
+                    if let topUpSource = topUpSource {
+                        HStack(spacing: .medium) {
+                            TopUpIconDisplayView(iconWidth: 40, iconHeight: 40, uiColor: .systemGreen)
+                            VStack(alignment: .leading) {
+                                Text(topUpSource.topUpSource?.paymentMethod?.name ?? "")
+                                    .foregroundColor(.init(.label))
+                                    .bold()
+                                Text(getTransactionAmount())
+                                    .font(.header)
+                                    .foregroundColor(.init(.systemGreen))
+                            }
+                        }
+                    }
+                    
+                    if let target = topUpTarget {
+                        HStack(spacing: .medium) {
+                            TopUpIconDisplayView(iconWidth: 40, iconHeight: 40, uiColor: .systemRed)
+                            VStack(alignment: .leading) {
+                                Text(target.topUpTarget?.paymentMethod?.name ?? "")
+                                    .foregroundColor(.init(.label))
+                                    .bold()
+                                Text("-\(getTransactionAmount())")
+                                    .font(.header)
+                                    .foregroundColor(.init(.systemRed))
                             }
                         }
                     }

@@ -230,7 +230,7 @@ struct PaymentMethodCard: View {
             Rectangle()
                 .fill(backgroundColor)
                 .cornerRadius(10.0)
-                .shadow(radius: 10.0)
+                .shadow(radius: shadow)
             Rectangle()
                 .stroke(Color.white, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
                 .padding()

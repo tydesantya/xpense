@@ -32,11 +32,16 @@ struct AddExpenseView: View {
         ]
     }
     
+    @State var transactionTypes: [String] = []
+    @State var transactionTypeSelectedIndex: Int = 0
     
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "lastUsed", ascending: false)])
-    private var categories: FetchedResults<CategoryModel>
+    
+    @FetchRequest(sortDescriptors: [], predicate: NSPredicate(format: "type == %ld", PaymentMethodType.eWallet.rawValue))
+    private var eWallets: FetchedResults<PaymentMethod>
+    @State var topUpWithFee: Bool = true
     @State var selectedCategory: CategoryModel? = nil
     @State var categorySelectNavigation = false
+    @State var selectedTopUpMethod: PaymentMethod?
     
     var selectedTransaction: TransactionModel?
     @State var populatedTransactionDetail = false
@@ -47,6 +52,9 @@ struct AddExpenseView: View {
         ],
         predicate: NSPredicate(format: "startDate <= %@ && endDate >= %@", Date() as NSDate, Date() as NSDate)
     ) var periodicBudgets: FetchedResults<PeriodicBudget>
+    var isSelectingTopUp: Bool {
+        eWallets.count > 0 && transactionTypeSelectedIndex == 0
+    }
     
     init(showSheetView:Binding<Bool>, refreshFlag:Binding<UUID>, selectedTransaction: TransactionModel? = nil) {
         self._showSheetView = showSheetView
@@ -61,107 +69,21 @@ struct AddExpenseView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .center) {
-                    ZStack {
-                        if let selectedCategory = selectedCategory {
-                            let selectedCategoryColor = Color(UIColor.color(data: selectedCategory.color!)!)
-                            let selectedCategoryLighterColor = Color(UIColor.color(data: selectedCategory.lighterColor!)!)
-                            Circle()
-                                .fill(
-                                    LinearGradient(gradient: .init(colors: [selectedCategoryLighterColor, selectedCategoryColor]), startPoint: .top, endPoint: .bottom)
-                                )
-                                .frame(width: 100, height: 100)
-                            if let text = selectedCategory.text {
-                                Text(text)
-                                    .font(.system(size: 50, weight: .bold, design: .rounded))
-                                    .foregroundColor(.white)
-                            }
-                            else {
-                                let symbolSelection:SFSymbol = SFSymbol(rawValue: selectedCategory.symbolName ?? "") ?? .archiveboxFill
-                                Image(systemSymbol: symbolSelection)
-                                    .renderingMode(.template)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 50, height: 50)
-                                    .foregroundColor(.white)
-                                .foregroundColor(.white)
-                            }
+                    Picker(selection: $transactionTypeSelectedIndex, label: Text("")) {
+                        ForEach(0..<transactionTypes.count) {
+                            index in
+                            Text(transactionTypes[index])
                         }
-                    }.padding(.top, .large)
-                    Text(selectedCategory?.name ?? "")
-                        .bold()
-                        .padding(.top, .small)
-                    HStack(alignment: .top) {
-                        Spacer()
-                        ForEach(0 ..< (categories.count > 5 ? 4 : categories.count)) { i in
-                            let category = categories[i]
-                            if category != selectedCategory {
-                                let customTextIcon = category.text
-                                let symbolSelection:SFSymbol = SFSymbol(rawValue: category.symbolName ?? "") ?? .archiveboxFill
-                                Button(action: {
-                                    selectedCategory = category
-                                }) {
-                                    VStack {
-                                        ZStack {
-                                            Circle()
-                                                .fill(
-                                                    LinearGradient(gradient: .init(colors: [Color(UIColor.color(data: category.lighterColor!)!), Color(UIColor.color(data: category.color!)!)]), startPoint: .top, endPoint: .bottom)
-                                                )
-                                                .frame(width: 50, height: 50)
-                                            if let text = customTextIcon {
-                                                Text(text)
-                                                    .font(.system(size: 25, weight: .bold, design: .rounded))
-                                                    .foregroundColor(.white)
-                                            }
-                                            else {
-                                                Image(systemSymbol: symbolSelection)
-                                                    .renderingMode(.template)
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 25, height: 25)
-                                                    .foregroundColor(.white)
-                                                .foregroundColor(.white)
-                                            }
-                                        }.padding(.top, .large)
-                                        Text(category.name ?? "")
-                                            .bold()
-                                            .font(.caption)
-                                            .padding(.top, .tiny)
-                                            .padding(.bottom, .medium)
-                                            .frame(width: 50)
-                                            .foregroundColor(Color(UIColor.label))
-                                    }
-                                }
-                                Spacer()
-                            }
-                        }
-                        NavigationLink(
-                            destination: CategoriesView(selectionAction: onCategoriesViewSelectedCategory)
-                                .environment(\.managedObjectContext, self.viewContext),
-                            isActive: self.$categorySelectNavigation,
-                            label: {
-                                VStack {
-                                    ZStack {
-                                        Circle()
-                                            .fill(
-                                                Color.blue.opacity(0.5)
-                                            )
-                                            .frame(width: 50, height: 50)
-                                        Image(systemSymbol: .ellipsis)
-                                            .renderingMode(.template)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 25, height: 25)
-                                            .foregroundColor(.blue)
-                                    }.padding(.top, .large)
-                                    Text("More")
-                                        .bold()
-                                        .font(.caption)
-                                        .padding(.top, .tiny)
-                                        .padding(.bottom, .medium)
-                                        .foregroundColor(Color(UIColor.label))
-                                }
-                            })
-                        Spacer()
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .id(transactionTypes.count)
+                    .padding()
+                    if isSelectingTopUp {
+                        EWalletSelectionView(eWallets: eWallets, topUpSelection: $selectedTopUpMethod, topUpWithFee: $topUpWithFee)
+                    }
+                    else {
+                        let categoryType = CategoryType(rawValue: transactionTypes[transactionTypeSelectedIndex])
+                        CategorySelectionView(selectedCategory: $selectedCategory, onCategoriesViewSelectedCategory: onCategoriesViewSelectedCategory(_:), categorySelectNavigation: $categorySelectNavigation, fetchRequest: makeCategoriesFetchRequest(), type: categoryType)
                     }
                     VStack {
                         Text("Enter amount")
@@ -202,7 +124,7 @@ struct AddExpenseView: View {
                         let width = CGFloat(150)
                         let height = CGFloat(80)
                         LazyHStack {
-                            ForEach(paymentMethods) { paymentMethod in
+                            ForEach(getPaymentMethods()) { paymentMethod in
                                 PaymentMethodCardView(paymentMethod: paymentMethod, selectedPaymentMethod: $selectedPaymentMethod)
                                     .frame(width: width, height: height)
                             }
@@ -226,7 +148,7 @@ struct AddExpenseView: View {
                     .padding()
                     .frame(minHeight: 200)
                 }
-            }.navigationBarTitle(Text("Add Expense"), displayMode: .inline)
+            }.navigationBarTitle(Text("Add Transaction"), displayMode: .inline)
             .navigationBarItems(leading: Button(action: {
                 self.showSheetView = false
             }) {
@@ -249,14 +171,23 @@ struct AddExpenseView: View {
                 if selectedPaymentMethod == nil {
                     selectedPaymentMethod = paymentMethods.first
                 }
-                if selectedCategory == nil {
-                    selectedCategory = categories.first
-                }
                 if let transaction = selectedTransaction {
                     if !populatedTransactionDetail {
                         populatedTransactionDetail = true
                         populateSelectedTransactionDetail(transaction)
                     }
+                }
+                
+                if transactionTypes.count == 0 {
+                    if eWallets.count > 0 {
+                        transactionTypes.append("Top Up")
+                        transactionTypeSelectedIndex = 1
+                    }
+                    else {
+                        transactionTypeSelectedIndex = 0
+                    }
+                    transactionTypes.append(contentsOf: CategoryType.allCases.map{$0.rawValue})
+                    
                 }
             }
         }.alert(isPresented: $showValidationAlert) {
@@ -319,6 +250,15 @@ struct AddExpenseView: View {
     }
     
     func createTransaction() {
+        if isSelectingTopUp {
+            createTopUpTransaction()
+        }
+        else {
+            createCategoryTransaction()
+        }
+    }
+    
+    func createCategoryTransaction() {
         let transaction = TransactionModel(context: viewContext)
         transaction.amount = getDisplayCurrencyValueFromAmount(amt: amount)
         transaction.note = notes
@@ -350,14 +290,61 @@ struct AddExpenseView: View {
         }
     }
     
+    func createTopUpTransaction() {
+        // create top up model
+        let topup = TopUp(context: viewContext)
+        
+        
+        // create transaction from source payment method
+        let transactionDate = Date()
+        
+        let transaction = TransactionModel(context: viewContext)
+        transaction.amount = getDisplayCurrencyValueFromAmount(amt: amount)
+        transaction.note = notes
+        transaction.paymentMethod = selectedPaymentMethod
+        transaction.date = transactionDate
+        
+        deductSelectedPaymentMethodWithCurrentAmount()
+        
+        
+        let topUpTargetTransaction = TransactionModel(context: viewContext)
+        topUpTargetTransaction.amount = getDisplayCurrencyValueFromAmount(amt: amount)
+        topUpTargetTransaction.note = notes
+        topUpTargetTransaction.paymentMethod = selectedTopUpMethod
+        topUpTargetTransaction.date = transactionDate
+        
+        increaseTopUpTargetBalanceWithCurrentAmount()
+        
+        topup.topUpSource = transaction
+        topup.topUpTarget = topUpTargetTransaction
+        
+        do {
+            try viewContext.save()
+            refreshFlag = UUID()
+            SPAlert.present(title: "Added Transaction", preset: .done)
+            self.showSheetView = false
+        } catch let createError {
+            print("Failed to edit Category \(createError)")
+        }
+    }
+    
     func deductSelectedPaymentMethodWithCurrentAmount() {
         let initialAmountString: String = selectedPaymentMethod?.balance?.currencyValue.amount ?? ""
         let initialAmount = Double(initialAmountString) ?? 0
         let categoryType = CategoryType(rawValue: selectedCategory?.type ?? "") ?? .expense
-        let deductedCurrentAmount = categoryType == .expense ? initialAmount - amount : initialAmount + amount
+        let deductedCurrentAmount = categoryType == .expense || isSelectingTopUp ? initialAmount - amount : initialAmount + amount
         
         let balance = getDisplayCurrencyValueFromAmount(amt: deductedCurrentAmount)
         selectedPaymentMethod?.balance = balance
+    }
+    
+    func increaseTopUpTargetBalanceWithCurrentAmount() {
+        let initialAmountString: String = selectedTopUpMethod?.balance?.currencyValue.amount ?? ""
+        let initialAmount = Double(initialAmountString) ?? 0
+        let increasedAmount = initialAmount + amount
+        
+        let balance = getDisplayCurrencyValueFromAmount(amt: increasedAmount)
+        selectedTopUpMethod?.balance = balance
     }
     
     func revertTransactionPaymentMethodAmount(_ transaction: TransactionModel) {
@@ -380,6 +367,23 @@ struct AddExpenseView: View {
         let currency = CurrencyValue(amount: amountString, currency: selectedPaymentMethod?.balance?.currencyValue.currency ?? "")
         return DisplayCurrencyValue(currencyValue: currency, numOfDecimalPoint: numOfDecimalPoint ?? 0, decimalSeparator: decimalSeparator ?? ",", groupingSeparator: groupingSeparator ?? ".")
     }
+    
+    func makeCategoriesFetchRequest() -> FetchRequest<CategoryModel> {
+        let type = transactionTypes[transactionTypeSelectedIndex]
+        let predicate = NSPredicate(format: "type == %@", type)
+        let sort = NSSortDescriptor(key: "lastUsed", ascending: false)
+        return FetchRequest<CategoryModel>(entity: CategoryModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
+    }
+    
+    func getPaymentMethods() -> [PaymentMethod] {
+        return paymentMethods.filter { (method) -> Bool in
+            let isEWalletActive = isSelectingTopUp
+            let isEWallet = method.type == PaymentMethodType.eWallet.rawValue
+            let shouldInclude = isEWallet && isEWalletActive
+            return !shouldInclude
+        }
+    }
+    
 }
 
 struct PaymentMethodCardView: View {
@@ -421,8 +425,179 @@ struct PaymentMethodCardView: View {
                     }
                 }.padding(.horizontal, .normal)
             }
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.theme, lineWidth: selectedPaymentMethod == paymentMethod ? 2 : 0)
+            )
         }
     }
+}
+
+struct CategorySelectionView: View {
+    
+    @Environment(\.managedObjectContext) private var viewContext
+    @Binding var selectedCategory: CategoryModel?
+    var onCategoriesViewSelectedCategory: (CategoryModel) -> Void
+    @Binding var categorySelectNavigation: Bool
+    
+    var fetchRequest: FetchRequest<CategoryModel>
+    var categories: FetchedResults<CategoryModel> {
+        fetchRequest.wrappedValue
+    }
+    var type: CategoryType?
+    
+    var body: some View {
+        ZStack {
+            if let selectedCategory = selectedCategory {
+                let selectedCategoryColor = Color(UIColor.color(data: selectedCategory.color!)!)
+                let selectedCategoryLighterColor = Color(UIColor.color(data: selectedCategory.lighterColor!)!)
+                Circle()
+                    .fill(
+                        LinearGradient(gradient: .init(colors: [selectedCategoryLighterColor, selectedCategoryColor]), startPoint: .top, endPoint: .bottom)
+                    )
+                    .frame(width: 100, height: 100)
+                if let text = selectedCategory.text {
+                    Text(text)
+                        .font(.system(size: 50, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                }
+                else {
+                    let symbolSelection:SFSymbol = SFSymbol(rawValue: selectedCategory.symbolName ?? "") ?? .archiveboxFill
+                    Image(systemSymbol: symbolSelection)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 50, height: 50)
+                        .foregroundColor(.white)
+                    .foregroundColor(.white)
+                }
+            }
+        }
+        Text(selectedCategory?.name ?? "")
+            .bold()
+            .padding(.top, .small)
+        HStack(alignment: .top) {
+            Spacer()
+            ForEach(0 ..< (categories.count > 5 ? 4 : categories.count)) { i in
+                let category = categories[i]
+                if category != selectedCategory {
+                    let customTextIcon = category.text
+                    let symbolSelection:SFSymbol = SFSymbol(rawValue: category.symbolName ?? "") ?? .archiveboxFill
+                    Button(action: {
+                        selectedCategory = category
+                    }) {
+                        VStack {
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        LinearGradient(gradient: .init(colors: [Color(UIColor.color(data: category.lighterColor!)!), Color(UIColor.color(data: category.color!)!)]), startPoint: .top, endPoint: .bottom)
+                                    )
+                                    .frame(width: 50, height: 50)
+                                if let text = customTextIcon {
+                                    Text(text)
+                                        .font(.system(size: 25, weight: .bold, design: .rounded))
+                                        .foregroundColor(.white)
+                                }
+                                else {
+                                    Image(systemSymbol: symbolSelection)
+                                        .renderingMode(.template)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 25, height: 25)
+                                        .foregroundColor(.white)
+                                    .foregroundColor(.white)
+                                }
+                            }.padding(.top, .large)
+                            Text(category.name ?? "")
+                                .bold()
+                                .font(.caption)
+                                .padding(.top, .tiny)
+                                .padding(.bottom, .medium)
+                                .frame(width: 50)
+                                .foregroundColor(Color(UIColor.label))
+                        }
+                    }
+                    Spacer()
+                }
+            }
+            NavigationLink(
+                destination: CategoriesView(selectionAction: onCategoriesViewSelectedCategory, specificType: type)
+                    .environment(\.managedObjectContext, self.viewContext),
+                isActive: self.$categorySelectNavigation,
+                label: {
+                    VStack {
+                        ZStack {
+                            Circle()
+                                .fill(
+                                    Color.blue.opacity(0.5)
+                                )
+                                .frame(width: 50, height: 50)
+                            Image(systemSymbol: .ellipsis)
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 25, height: 25)
+                                .foregroundColor(.blue)
+                        }.padding(.top, .large)
+                        Text("More")
+                            .bold()
+                            .font(.caption)
+                            .padding(.top, .tiny)
+                            .padding(.bottom, .medium)
+                            .foregroundColor(Color(UIColor.label))
+                    }
+                })
+            Spacer()
+        }.onAppear {
+            if selectedCategory == nil || selectedCategory?.type != type?.rawValue {
+                selectedCategory = categories.first
+            }
+        }
+        .onChange(of: categories.count, perform: { value in
+            selectedCategory = categories.first
+        })
+    }
+}
+
+struct EWalletSelectionView: View {
+    
+    var eWallets: FetchedResults<PaymentMethod>
+    @Binding var topUpSelection: PaymentMethod?
+    @Binding var topUpWithFee: Bool
+    
+    var body: some View {
+        VStack {
+            Text("Select E-Wallet to Top Up")
+                .font(.footnote)
+                .foregroundColor(.init(.secondaryLabel))
+            ScrollView (.horizontal, showsIndicators: false) {
+                let width = CGFloat(150)
+                let height = CGFloat(80)
+                LazyHStack {
+                    ForEach(eWallets) { paymentMethod in
+                        PaymentMethodCardView(paymentMethod: paymentMethod, selectedPaymentMethod: $topUpSelection)
+                            .frame(width: width, height: height)
+                    }
+                }
+                .padding(.horizontal)
+            }.frame(height: 80)
+            Toggle(isOn: $topUpWithFee, label: {
+                Text("Top Up with Fee")
+            })
+            .padding()
+            .background(Color.init(.secondarySystemBackground)
+                            .cornerRadius(.normal))
+            .padding([.horizontal, .bottom])
+        }
+        .padding(.bottom)
+        .onAppear {
+            topUpSelection = eWallets.first
+        }
+        .onChange(of: eWallets.count, perform: { value in
+            topUpSelection = eWallets.first
+        })
+    }
+    
 }
 
 struct AddExpenseView_Previews: PreviewProvider {

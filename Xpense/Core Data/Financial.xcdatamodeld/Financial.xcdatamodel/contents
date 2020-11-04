@@ -34,6 +34,10 @@
         <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="budgets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Budget" inverseName="periodicBudget" inverseEntity="Budget"/>
     </entity>
+    <entity name="TopUp" representedClassName="TopUp" syncable="YES" codeGenerationType="class">
+        <relationship name="topUpSource" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Transaction" inverseName="topUpTarget" inverseEntity="Transaction"/>
+        <relationship name="topUpTarget" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Transaction" inverseName="topUpSource" inverseEntity="Transaction"/>
+    </entity>
     <entity name="Transaction" representedClassName="TransactionModel" syncable="YES" codeGenerationType="class">
         <attribute name="amount" optional="YES" attributeType="Transformable" valueTransformerName="DisplayCurrencyTransformer" customClassName="DisplayCurrencyValue"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -41,12 +45,15 @@
         <relationship name="budget" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Budget" inverseName="transactions" inverseEntity="Budget"/>
         <relationship name="category" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="transactions" inverseEntity="Category"/>
         <relationship name="paymentMethod" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PaymentMethod" inverseName="transactions" inverseEntity="PaymentMethod"/>
+        <relationship name="topUpSource" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TopUp" inverseName="topUpTarget" inverseEntity="TopUp"/>
+        <relationship name="topUpTarget" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TopUp" inverseName="topUpSource" inverseEntity="TopUp"/>
     </entity>
     <elements>
         <element name="Budget" positionX="482.9765625" positionY="107.98046875" width="128" height="133"/>
         <element name="Category" positionX="168.60546875" positionY="87.7734375" width="128" height="193"/>
         <element name="PaymentMethod" positionX="-442.26953125" positionY="42.140625" width="128" height="133"/>
         <element name="PeriodicBudget" positionX="179.0859375" positionY="-49.703125" width="128" height="103"/>
-        <element name="Transaction" positionX="195.53515625" positionY="474.32421875" width="128" height="133"/>
+        <element name="TopUp" positionX="-234" positionY="108" width="128" height="73"/>
+        <element name="Transaction" positionX="195.53515625" positionY="474.32421875" width="128" height="163"/>
     </elements>
 </model>

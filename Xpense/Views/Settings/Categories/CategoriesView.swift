@@ -19,6 +19,7 @@ struct CategoriesView: View {
     @State private var refreshID = UUID()
     var selectionAction:((CategoryModel) -> Void)? = nil
     var migrationSelection: CategoryModel?
+    var specificType: CategoryType?
     
     var body: some View {
         VStack {
@@ -27,18 +28,21 @@ struct CategoriesView: View {
                     Text("To receive transaction migration from \(migration.name ?? "")")
                         .fixedSize(horizontal: false, vertical: true)
                         .font(.footnote)
+                        .padding(.top)
                     Spacer()
                 }.padding(.horizontal)
             }
-            Picker(selection: self.$segmentIndex, label: Text("")) {
-                ForEach(0..<self.segments.count) { index in
-                    Text(self.segments[index].rawValue)
+            if migrationSelection == nil && specificType == nil {
+                Picker(selection: self.$segmentIndex, label: Text("")) {
+                    ForEach(0..<self.segments.count) { index in
+                        Text(self.segments[index].rawValue)
+                    }
                 }
+                .padding([.top, .horizontal])
+                .pickerStyle(SegmentedPickerStyle())
             }
-            .padding()
-            .pickerStyle(SegmentedPickerStyle())
             CategoriesGrid(fetchRequest: makeFetchRequest(), categoryTapAction: onCategoryTapped(category:), refreshFlag: $refreshID)
-                .id(refreshID)
+                .id(refreshID).padding(.top)
         }
         .sheet(isPresented: $addCategoryFlag, content: {
             NavigationView {
@@ -84,10 +88,14 @@ struct CategoriesView: View {
     }
     
     func makeFetchRequest() -> FetchRequest<CategoryModel> {
-        let type = CategoryType.allCases[self.segmentIndex].rawValue
+        var type = CategoryType.allCases[self.segmentIndex].rawValue
         var predicate = NSPredicate(format: "type == %@", type)
         if let migration = migrationSelection {
+            type = migration.type!
             predicate = NSPredicate(format: "type == %@ && SELF != %@", type, migration)
+        }
+        if let specificType = specificType {
+            predicate = NSPredicate(format: "type == %@", specificType.rawValue)
         }
         let sort = NSSortDescriptor(key: "timeStamp", ascending: true)
         return FetchRequest<CategoryModel>(entity: CategoryModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())

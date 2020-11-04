@@ -62,6 +62,7 @@
 		C389120B253E133000A646AD /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = C389120A253E133000A646AD /* Introspect */; };
 		C389120F2540A5C700A646AD /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = C389120E2540A5C700A646AD /* Common.swift */; };
 		C3A2342B254C95B2000B8A11 /* PartialSheet in Frameworks */ = {isa = PBXBuildFile; productRef = C3A2342A254C95B2000B8A11 /* PartialSheet */; };
+		C3B7072C25533ED400CD5E66 /* TopUpIconDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3B7072B25533ED400CD5E66 /* TopUpIconDisplayView.swift */; };
 		C3CCD16A2549E2C500578B52 /* CategoryIconDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CCD1692549E2C500578B52 /* CategoryIconDisplayView.swift */; };
 		C3CCD16D2549E5F200578B52 /* WeeklyExpenseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CCD16C2549E5F200578B52 /* WeeklyExpenseChartView.swift */; };
 		C3CCD171254A02E300578B52 /* TransactionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CCD170254A02E300578B52 /* TransactionDetailView.swift */; };
@@ -127,6 +128,7 @@
 		C381C4D82549C973002DB1D7 /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
 		C38912052532BD4700A646AD /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		C389120E2540A5C700A646AD /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
+		C3B7072B25533ED400CD5E66 /* TopUpIconDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopUpIconDisplayView.swift; sourceTree = "<group>"; };
 		C3CCD1692549E2C500578B52 /* CategoryIconDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconDisplayView.swift; sourceTree = "<group>"; };
 		C3CCD16C2549E5F200578B52 /* WeeklyExpenseChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyExpenseChartView.swift; sourceTree = "<group>"; };
 		C3CCD170254A02E300578B52 /* TransactionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailView.swift; sourceTree = "<group>"; };
@@ -365,6 +367,7 @@
 				C3E2678C2550687600519784 /* BudgetDetailView.swift */,
 				C3E267972550839E00519784 /* BudgetRingView.swift */,
 				C36320A02553041A00DBEC08 /* ReminderDetailView.swift */,
+				C3B7072B25533ED400CD5E66 /* TopUpIconDisplayView.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -509,6 +512,7 @@
 				C3288275246489FD00F846DC /* Util.swift in Sources */,
 				C30958D32541CC82006C0CB5 /* EmojiTextField.swift in Sources */,
 				C3288274246489FD00F846DC /* APIService.swift in Sources */,
+				C3B7072C25533ED400CD5E66 /* TopUpIconDisplayView.swift in Sources */,
 				C3288276246489FD00F846DC /* API.swift in Sources */,
 				C3369DB22532364300CA5647 /* ModalView.swift in Sources */,
 				C328825E2464894100F846DC /* ContentView.swift in Sources */,

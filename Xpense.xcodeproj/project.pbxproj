@@ -47,6 +47,9 @@
 		C35D41B5252CEA3900B45BD7 /* WalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41B4252CEA3800B45BD7 /* WalletView.swift */; };
 		C35D41B9252E37D100B45BD7 /* CardListDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41B8252E37CF00B45BD7 /* CardListDetailView.swift */; };
 		C35D41BC2531D60900B45BD7 /* TransactionCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35D41BB2531D60800B45BD7 /* TransactionCellView.swift */; };
+		C363209B2552F33E00DBEC08 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C363209A2552F33E00DBEC08 /* Constants.swift */; };
+		C36320A12553041A00DBEC08 /* ReminderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36320A02553041A00DBEC08 /* ReminderDetailView.swift */; };
+		C36320A525530E5000DBEC08 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36320A425530E5000DBEC08 /* UserSettings.swift */; };
 		C36D757F254E106A000596E2 /* KeyboardUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36D757E254E1069000596E2 /* KeyboardUtil.swift */; };
 		C380513125436E6000580A1E /* Persistence+CategorySeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C380513025436E6000580A1E /* Persistence+CategorySeed.swift */; };
 		C381C4B32544A557002DB1D7 /* DateFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4B22544A557002DB1D7 /* DateFormat.swift */; };
@@ -113,6 +116,9 @@
 		C35D41B4252CEA3800B45BD7 /* WalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletView.swift; sourceTree = "<group>"; };
 		C35D41B8252E37CF00B45BD7 /* CardListDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardListDetailView.swift; sourceTree = "<group>"; };
 		C35D41BB2531D60800B45BD7 /* TransactionCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCellView.swift; sourceTree = "<group>"; };
+		C363209A2552F33E00DBEC08 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		C36320A02553041A00DBEC08 /* ReminderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderDetailView.swift; sourceTree = "<group>"; };
+		C36320A425530E5000DBEC08 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 		C36D757E254E1069000596E2 /* KeyboardUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardUtil.swift; sourceTree = "<group>"; };
 		C380513025436E6000580A1E /* Persistence+CategorySeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Persistence+CategorySeed.swift"; sourceTree = "<group>"; };
 		C381C4B22544A557002DB1D7 /* DateFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormat.swift; sourceTree = "<group>"; };
@@ -219,6 +225,8 @@
 				C3F77DC1251E733100CA68BB /* ProgressBar.swift */,
 				C3369DA82532226000CA5647 /* CurrencyHelper.swift */,
 				C381C4B22544A557002DB1D7 /* DateFormat.swift */,
+				C363209A2552F33E00DBEC08 /* Constants.swift */,
+				C36320A425530E5000DBEC08 /* UserSettings.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -356,6 +364,7 @@
 				C326DF7C254DC224006B50D0 /* ConfigureBudgetView.swift */,
 				C3E2678C2550687600519784 /* BudgetDetailView.swift */,
 				C3E267972550839E00519784 /* BudgetRingView.swift */,
+				C36320A02553041A00DBEC08 /* ReminderDetailView.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -475,6 +484,7 @@
 				C3E267982550839E00519784 /* BudgetRingView.swift in Sources */,
 				C3369D8F2532069000CA5647 /* DisplayCurrencyValue.swift in Sources */,
 				C3369DAE2532244F00CA5647 /* CreatePaymentMethodView.swift in Sources */,
+				C36320A525530E5000DBEC08 /* UserSettings.swift in Sources */,
 				C3E7ED722543429D005A41BE /* CategoryType.swift in Sources */,
 				C389120F2540A5C700A646AD /* Common.swift in Sources */,
 				C35D41B12520F07F00B45BD7 /* AddExpenseView.swift in Sources */,
@@ -492,7 +502,9 @@
 				C380513125436E6000580A1E /* Persistence+CategorySeed.swift in Sources */,
 				C328827A24648A3100F846DC /* XpenseView.swift in Sources */,
 				C35D41A3251FAAEE00B45BD7 /* CategoriesGrid.swift in Sources */,
+				C363209B2552F33E00DBEC08 /* Constants.swift in Sources */,
 				C3369DA52532152500CA5647 /* CoreDataManager.swift in Sources */,
+				C36320A12553041A00DBEC08 /* ReminderDetailView.swift in Sources */,
 				C3369D9E253212DF00CA5647 /* Financial.xcdatamodeld in Sources */,
 				C3288275246489FD00F846DC /* Util.swift in Sources */,
 				C30958D32541CC82006C0CB5 /* EmojiTextField.swift in Sources */,

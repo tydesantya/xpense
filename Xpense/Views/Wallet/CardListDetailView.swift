@@ -8,9 +8,11 @@
 
 import SwiftUI
 import SPAlert
+import PartialSheet
 
 struct CardListDetailView: View {
     
+    @EnvironmentObject var partialSheetManager: PartialSheetManager
     @State var paymentMethodType: PaymentMethodType
     @State var destinationView: AnyView?
     @State var navigate: Bool = false
@@ -40,7 +42,9 @@ struct CardListDetailView: View {
                         Text(getTitle())
                             .font(.sectionTitle)
                             .bold()
-                        Text("Total Balance: \(getTotalWalletBalance())")
+                        if paymentMethodType != .creditCard {
+                            Text("Total Balance: \(getTotalWalletBalance())")
+                        }
                     }
                     Spacer()
                     getAddCardButton()
@@ -56,8 +60,10 @@ struct CardListDetailView: View {
                             Text(selectedPaymentMethod?.name ?? "empty")
                                 .font(.subheadline)
                                 .bold()
-                            Text("Balance: \(getBalanceFromPaymentMethod(selectedPaymentMethod))")
-                                .font(.footnote)
+                            if paymentMethodType != .creditCard {
+                                Text("Balance: \(getBalanceFromPaymentMethod(selectedPaymentMethod))")
+                                    .font(.footnote)
+                            }
                         }
                         Spacer()
                         getCardActionView()
@@ -71,24 +77,6 @@ struct CardListDetailView: View {
                 .background(Color.init(.secondarySystemBackground))
             }
             .edgesIgnoringSafeArea(.bottom)
-            Button(action: {
-                
-            }) {
-                HStack {
-                    Image(systemSymbol: .sliderHorizontal3)
-                        .font(.getFontFromDesign(design: .buttonTitle))
-                    Text("Sort & Filter")
-                        .font(.getFontFromDesign(design: .buttonTitle))
-                }
-                .padding(.vertical, .small)
-                .padding(.horizontal)
-                .background(
-                    RoundedRectangle(cornerRadius: 30)
-                        .fill(Color.theme)
-                        .shadow(radius: 5)
-                )
-                .foregroundColor(.white)
-            }
         }
         .onChange(of: pagerSelection, perform: { value in
             if pagerSelection >= 0 && pagerSelection < paymentMethods.count {
@@ -184,6 +172,27 @@ struct CardListDetailView: View {
         case .debitCard, .creditCard:
             return AnyView(
                 HStack {
+                    if paymentMethodType == .creditCard {
+                        Button(action: {
+                            self.partialSheetManager.showPartialSheet({
+                                    print("Partial sheet dismissed")
+                                }) {
+                                ReminderDetailView()
+                                    .accentColor(.theme)
+                            }
+                        }, label: {
+                            VStack {
+                                Image(systemSymbol: .bell)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 15, height: 15)
+                                    .foregroundColor(Color.init(.label))
+                                Text("Reminder")
+                                    .font(.caption2)
+                                    .foregroundColor(Color.init(.label))
+                            }
+                        }).padding(.trailing)
+                    }
                     Button(action: {
                         let select = selectedPaymentMethod
                         let edit = editedPaymentMethod

@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import PartialSheet
 
 enum WalletViewSheet: Int, Identifiable {
     case cashDetail
@@ -14,12 +15,14 @@ enum WalletViewSheet: Int, Identifiable {
     case addDebitCard
     case debitCardList
     case editCard
+    case creditCardList
     var id: Int {
         hashValue
     }
 }
 struct WalletView: View {
     
+    @EnvironmentObject var partialSheetManager: PartialSheetManager
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(sortDescriptors: [])
     private var paymentMethods: FetchedResults<PaymentMethod>
@@ -63,8 +66,7 @@ struct WalletView: View {
                         VStack {
                             CashWalletView(parentWidth: reader.size.width, cashTapAction: showCashDetail)
                             DebitCardWalletView(parentWidth: reader.size.width, addDebitAction: showAddDebitCard, debitDetailAction: showDebitCardList)
-                            CreditCardWalletView(parentWidth: reader.size.width, showSheetAction: showAddCreditCard)
-                            
+                            CreditCardWalletView(parentWidth: reader.size.width, showSheetAction: showAddCreditCard, creditCardDetail: showCreditCardDetail)
                             HStack {
                                 Text("E-Wallet")
                                     .font(Font.getFontFromDesign(design: .sectionTitle))
@@ -93,6 +95,10 @@ struct WalletView: View {
                 getDebitCardSheet()
             case .addDebitCard:
                 getAddDebitCardSheet()
+            case .creditCardList:
+                getCreditCardSheet()
+                    .addPartialSheet()
+                    .environmentObject(partialSheetManager)
             default:
                 getAddCreditCardSheet()
             }
@@ -141,6 +147,15 @@ struct WalletView: View {
         )
     }
     
+    func getCreditCardSheet() -> AnyView {
+        AnyView(
+            NavigationView {
+                CardListDetailView(paymentMethodType: .creditCard, presentedFlag: $activeSheet)
+                    .environment(\.managedObjectContext, self.viewContext)
+            }
+        )
+    }
+    
     func getCashCardSheet() -> AnyView {
         AnyView(
             NavigationView {
@@ -164,6 +179,10 @@ struct WalletView: View {
     
     func showCashDetail() {
         self.activeSheet = .cashDetail
+    }
+    
+    func showCreditCardDetail() {
+        self.activeSheet = .creditCardList
     }
 }
 
@@ -325,11 +344,27 @@ struct CreditCardWalletView: View {
     private var ccPaymentMethod: FetchedResults<PaymentMethod>
     var parentWidth: CGFloat
     var showSheetAction: () -> Void
+    var creditCardDetail: () -> Void
     
     var body: some View {
         let width = parentWidth > 0 ? parentWidth : 200
         if (ccPaymentMethod.count > 0) {
-            
+            VStack {
+                HStack {
+                    Text("Credit Cards")
+                        .padding(.horizontal)
+                        .padding(.top, .large)
+                    Spacer()
+                }
+                ZStack {
+                    ForEach(ccPaymentMethod) {
+                        element in
+                        getCardView(paymentMethod:element, width: width)
+                    }
+                }.onTapGesture {
+                    creditCardDetail()
+                }
+            }
         }
         else {
             VStack {
@@ -347,6 +382,49 @@ struct CreditCardWalletView: View {
                     }
             }
         }
+    }
+    
+    func getCardView(paymentMethod:PaymentMethod, width: CGFloat) -> AnyView {
+        let index = ccPaymentMethod.firstIndex(of: paymentMethod)
+        let offset = 10.0 * CGFloat(index!)
+        let reverseIndex = ccPaymentMethod.count - 1 - index!
+        let cardWidth = width - 100.0 - (20.0 * CGFloat(reverseIndex))
+        return AnyView(
+            ZStack {
+                PaymentMethodCard(backgroundColor: Color(UIColor.color(data: paymentMethod.color!)!))
+                VStack {
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading) {
+                            PlaceHolderView()
+                                .frame(width: 150, height: 5)
+                            PlaceHolderView()
+                                .frame(width: 100, height: 5)
+                            PlaceHolderView()
+                                .frame(width: 50, height: 5)
+                        }
+                        Spacer()
+                        Text(paymentMethod.name ?? "")
+                            .bold()
+                            .font(.title3)
+                            .foregroundColor(.white)
+                    }
+                    Spacer()
+                    VStack(alignment: .center) {
+                        Text("XXXX XXXX XXXX \(paymentMethod.identifierNumber ?? "XXXX")")
+                            .font(.title3)
+                            .foregroundColor(.white)
+                    }
+                    Spacer()
+                    HStack {
+                        Text("Teddy Santya")
+                            .bold()
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                }.padding()
+            }.frame(width: abs(cardWidth), height: 160)
+            .offset(y: offset)
+        )
     }
 }
 

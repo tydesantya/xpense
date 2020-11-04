@@ -84,6 +84,12 @@ extension Date {
         components.second = -1
         return Calendar.iso8601.date(byAdding: components, to: startOfMonth())!
     }
+    var nextMonth: Date {
+        var components = DateComponents()
+        components.month = 1
+        return Calendar.iso8601.date(byAdding: components, to: self)!
+    }
+    
     var endOfYear: Date {
         var components = DateComponents()
         components.year = 1

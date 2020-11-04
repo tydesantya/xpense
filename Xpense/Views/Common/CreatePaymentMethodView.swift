@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SPAlert
+import UserNotifications
 
 struct CreatePaymentMethodView: View {
     
@@ -28,10 +29,10 @@ struct CreatePaymentMethodView: View {
     @State var validationAlertMessage: String = ""
     @State var showValidationAlert: Bool = false
     @State var editingPaymentMethod: PaymentMethod?
-    @State var monthlyReminderOn: Bool = false
-    @State var reminderDateSelection: Date = Date()
     var paymentMethodType: PaymentMethodType
     var numberFormatter: NumberFormatter!
+    
+    @ObservedObject var settings = UserSettings()
     
     var body: some View {
         NavigationView {
@@ -50,7 +51,7 @@ struct CreatePaymentMethodView: View {
                             CurrencyFormattingView(numOfDecimalPoint: $numOfDecimalPoint, decimalSeparator: $decimalSeparator, groupingSeparator: $groupingSeparator, currencyText: $currencyText)
                         }
                         if paymentMethodType == .creditCard {
-                            PaymentMethodReminderSetupView(monthlyReminderOn: $monthlyReminderOn, monthlyReminderDate: $reminderDateSelection)
+                            PaymentMethodReminderSetupView(monthlyReminderOn: $settings.creditCardReminderEnabled, monthlyReminderDate: $settings.creditCardNotificationDate)
                         }
                     }
                     .padding()
@@ -325,6 +326,9 @@ struct CreatePaymentMethodView: View {
             return
         }
         
+        if settings.creditCardReminderEnabled {
+            createReminderNotification()
+        }
         let ccIdentifier = isIdentifierValidated ? identifierNumber : "XXXX"
         let displayCurrencyValue = getDisplayCurrencyValueFromCurrentAmount()
         
@@ -342,6 +346,41 @@ struct CreatePaymentMethodView: View {
             SPAlert.present(title: "Added to Wallet", preset: .done)
         } catch let createError {
             print("Failed to create PaymentMethod \(createError)")
+        }
+    }
+    
+    func createReminderNotification() {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+           var identifiers: [String] = []
+           for notification:UNNotificationRequest in notificationRequests {
+            if notification.identifier == NotificationsName.creditCardNotification {
+                  identifiers.append(notification.identifier)
+               }
+           }
+           UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        }
+        
+        let content = UNMutableNotificationContent()
+        content.title = NotificationsName.creditCardNotificationTitle
+        content.subtitle = NotificationsName.creditCardNotificationDescription
+        content.sound = UNNotificationSound.default
+        
+        let nextReminderDate: Date = settings.creditCardNotificationDate
+        let components = Calendar.current.dateComponents([.day, .hour, .minute], from: nextReminderDate)
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        
+        // Create the request
+        let creditCardNotificationName = NotificationsName.creditCardNotification
+        let request = UNNotificationRequest(identifier: creditCardNotificationName,
+                    content: content, trigger: trigger)
+        
+        // Schedule the request with the system.
+        let notificationCenter = UNUserNotificationCenter.current()
+        notificationCenter.add(request) { (error) in
+           if error != nil {
+              // Handle any errors.
+           }
         }
     }
     
@@ -522,6 +561,17 @@ struct PaymentMethodReminderSetupView: View {
                         Text("Monthly Reminder").foregroundColor(Color(.label))
                     })
                 }.padding(.horizontal)
+                .onChange(of: monthlyReminderOn, perform: { value in
+                    if value {
+                        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+                            if success {
+                                print("Notifications enabled")
+                            } else if error != nil {
+                                monthlyReminderOn = false
+                            }
+                        }
+                    }
+                })
                 if monthlyReminderOn {
                     Divider().padding(.horizontal)
                     DatePicker("", selection: $monthlyReminderDate)
@@ -535,7 +585,13 @@ struct PaymentMethodReminderSetupView: View {
             .opacity(0.7)
             HStack {
                 Spacer()
-                Text("You will be reminded every month of same date and time")
+                Text("Select date for your next reminder")
+                    .font(.caption)
+                    .foregroundColor(.init(.tertiaryLabel))
+            }
+            HStack {
+                Spacer()
+                Text("You will be reminded every month of exact day and time")
                     .font(.caption)
                     .foregroundColor(.init(.tertiaryLabel))
             }

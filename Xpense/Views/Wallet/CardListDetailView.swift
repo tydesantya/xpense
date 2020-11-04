@@ -138,7 +138,7 @@ struct CardListDetailView: View {
     
     func getAddCardButton() -> AnyView {
         switch paymentMethodType {
-        case .creditCard, .debitCard:
+        case .creditCard, .debitCard, .eWallet:
             return AnyView(
                 Button(action: {
                     let select = selectedPaymentMethod
@@ -169,7 +169,7 @@ struct CardListDetailView: View {
     
     func getCardActionView() -> AnyView {
         switch paymentMethodType {
-        case .debitCard, .creditCard:
+        case .debitCard, .creditCard, .eWallet:
             return AnyView(
                 HStack {
                     if paymentMethodType == .creditCard {
@@ -249,7 +249,7 @@ struct CardListDetailView: View {
         case .debitCard:
             return "Debit Cards"
         default:
-            return ""
+            return "E-Wallets"
         }
     }
     
@@ -304,16 +304,15 @@ struct ViewPager: View {
                                     .frame(width: 50, height: 5)
                             }
                             Spacer()
-                            Text(card.name ?? "")
-                                .bold()
-                                .font(.title3)
-                                .foregroundColor(.white)
+                            if PaymentMethodType(rawValue: card.type) != .eWallet {
+                                Text(card.name ?? "")
+                                    .bold()
+                                    .font(.title3)
+                                    .foregroundColor(.white)
+                            }
                         }
                         getCardBottomDesignFromCard(card: card)
                     }.padding()
-                }
-                .tabItem {
-                    Text("test")
                 }
                 .tag(cards.firstIndex(of: card)!)
                 .aspectRatio(CGSize(width: 2, height: 1), contentMode: .fit)
@@ -359,10 +358,11 @@ struct ViewPager: View {
         default:
             let currency = card.balance?.currencyValue.currency ?? ""
             let currencySign = CurrencyHelper.getCurrencySignFromCurrency(currency)
+            let textToShow = type == .eWallet ? card.name ?? "" : currencySign ?? ""
             return AnyView(
                 HStack {
                     Spacer()
-                    Text(currencySign ?? "")
+                    Text(textToShow)
                         .font(.hugeTitle)
                         .foregroundColor(.white)
                         .opacity(0.5)

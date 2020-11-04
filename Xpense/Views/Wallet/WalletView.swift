@@ -16,6 +16,8 @@ enum WalletViewSheet: Int, Identifiable {
     case debitCardList
     case editCard
     case creditCardList
+    case addEWallet
+    case eWalletDetail
     var id: Int {
         hashValue
     }
@@ -67,17 +69,7 @@ struct WalletView: View {
                             CashWalletView(parentWidth: reader.size.width, cashTapAction: showCashDetail)
                             DebitCardWalletView(parentWidth: reader.size.width, addDebitAction: showAddDebitCard, debitDetailAction: showDebitCardList)
                             CreditCardWalletView(parentWidth: reader.size.width, showSheetAction: showAddCreditCard, creditCardDetail: showCreditCardDetail)
-                            HStack {
-                                Text("E-Wallet")
-                                    .font(Font.getFontFromDesign(design: .sectionTitle))
-                                    .padding(.horizontal)
-                                    .padding(.top, .medium)
-                                Spacer()
-                            }
-                            .padding(.top, .normal)
-                            AddCardPlaceholder(text: "Add E-Wallet")
-                                .frame(width: abs(reader.size.width - 100), height: 150)
-                                .padding(.bottom, .large)
+                            EWalletWalletView(parentWidth: reader.size.width, addEWallet: showAddEWallet, eWalletDetailAction: showEWalletDetail)
                         }.padding(.horizontal)
                         .background(
                             Color.init(.secondarySystemBackground)
@@ -99,6 +91,10 @@ struct WalletView: View {
                 getCreditCardSheet()
                     .addPartialSheet()
                     .environmentObject(partialSheetManager)
+            case .addEWallet:
+                getAddEWalletSheet()
+            case .eWalletDetail:
+                getEWalletDetailSheet()
             default:
                 getAddCreditCardSheet()
             }
@@ -165,6 +161,25 @@ struct WalletView: View {
         )
     }
     
+    func getAddEWalletSheet() -> AnyView {
+        AnyView(
+            CreatePaymentMethodView(paymentMethodType: .eWallet, showSheetView: self.$activeSheet)
+                .presentation(isModal: self.$showModally) {
+                    print("Attempted to dismiss")
+                }
+                .accentColor(.theme)
+        )
+    }
+    
+    func getEWalletDetailSheet() -> AnyView {
+        AnyView(
+            NavigationView {
+                CardListDetailView(paymentMethodType: .eWallet, presentedFlag: $activeSheet)
+                    .environment(\.managedObjectContext, self.viewContext)
+            }
+        )
+    }
+    
     func showAddCreditCard() {
         self.activeSheet = .addCreditCard
     }
@@ -183,6 +198,14 @@ struct WalletView: View {
     
     func showCreditCardDetail() {
         self.activeSheet = .creditCardList
+    }
+    
+    func showAddEWallet() {
+        self.activeSheet = .addEWallet
+    }
+    
+    func showEWalletDetail() {
+        self.activeSheet = .eWalletDetail
     }
 }
 
@@ -504,6 +527,109 @@ struct CashWalletView: View {
         return CurrencyHelper.string(from: cashBalance, currency: currencySign!)
     }
 }
+
+
+struct EWalletWalletView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        sortDescriptors: [],
+        predicate: NSPredicate(format: "type == %ld", PaymentMethodType.eWallet.rawValue))
+    private var eWalletPaymentMethod: FetchedResults<PaymentMethod>
+    var parentWidth: CGFloat
+    var addEWallet: () -> Void
+    var eWalletDetailAction: () -> Void
+    
+    var body: some View {
+        let width = parentWidth > 0 ? parentWidth : 200
+        if (eWalletPaymentMethod.count > 0) {
+            VStack {
+                HStack {
+                    Text("E-Wallet")
+                        .padding(.horizontal)
+                        .padding(.top, .large)
+                    Spacer()
+                }
+                ZStack {
+                    ForEach(eWalletPaymentMethod) {
+                        element in
+                        getEWalletView(paymentMethod:element, width: width)
+                    }
+                }.onTapGesture {
+                    eWalletDetailAction()
+                }
+            }.padding(.bottom)
+        }
+        else {
+            VStack {
+                HStack {
+                    Text("E-Wallet")
+                        .padding(.horizontal)
+                        .padding(.top, .medium)
+                    Spacer()
+                }
+                .padding(.top)
+                AddCardPlaceholder(text: "Add E-Wallet")
+                    .frame(width: abs(width - 100), height: 150)
+                    .onTapGesture {
+                        addEWallet()
+                    }
+            }.padding(.bottom)
+        }
+    }
+    
+    func getEWalletView(paymentMethod:PaymentMethod, width: CGFloat) -> AnyView {
+        let index = eWalletPaymentMethod.firstIndex(of: paymentMethod)
+        let offset = 10.0 * CGFloat(index!)
+        let reverseIndex = eWalletPaymentMethod.count - 1 - index!
+        let cardWidth = width - 100.0 - (20.0 * CGFloat(reverseIndex))
+        return AnyView(
+            ZStack {
+                PaymentMethodCard(backgroundColor: Color(UIColor.color(data: paymentMethod.color!)!))
+                VStack {
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading) {
+                            PlaceHolderView()
+                                .frame(width: 150, height: 5)
+                            PlaceHolderView()
+                                .frame(width: 100, height: 5)
+                            PlaceHolderView()
+                                .frame(width: 50, height: 5)
+                        }
+                        Spacer()
+                    }
+                    HStack(alignment: .bottom) {
+                        VStack(alignment: .leading) {
+                            Spacer()
+                            Text(getTotalWalletBalance())
+                                .bold()
+                                .foregroundColor(.white)
+                        }
+                        Spacer()
+                        Text(paymentMethod.name ?? "")
+                            .font(.hugeTitle)
+                            .foregroundColor(.white)
+                            .opacity(0.5)
+                    }
+                }.padding()
+            }.frame(width: abs(cardWidth), height: 150)
+            .offset(y: offset)
+        )
+    }
+    
+    func getTotalWalletBalance() -> String {
+        var balance: Double = 0.0
+        var currencySign: String = ""
+        for method in eWalletPaymentMethod {
+            let amount = method.balance!.toDouble()
+            balance += amount
+            if currencySign.count == 0 {
+                currencySign = CurrencyHelper.getCurrencySignFromCurrency(method.balance?.currencyValue.currency ?? "") ?? ""
+            }
+        }
+        return CurrencyHelper.string(from: balance, currency: currencySign)
+    }
+}
+
 
 struct WalletView_Previews: PreviewProvider {
     static var previews: some View {

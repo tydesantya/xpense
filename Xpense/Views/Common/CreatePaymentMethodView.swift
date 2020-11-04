@@ -17,6 +17,7 @@ struct CreatePaymentMethodView: View {
     @Binding var sheetFlag: Bool
     @State var amount: Double = 0
     @State var currency: CurrencyValue
+    @State var topUpAmount: Double = 0
     @State var currencySign: String!
     @State var numOfDecimalPoint: Int = 0
     @State var decimalSeparator: String = ","
@@ -40,12 +41,19 @@ struct CreatePaymentMethodView: View {
                 reader in
                 ScrollView {
                     VStack(alignment: .center) {
+                        if paymentMethodType == .cash {
+                            Text("Setup your cash balance to start using Xpense")
+                                .font(.footnote)
+                        }
                         ZStack(alignment: .center) {
                             PaymentMethodCard(backgroundColor: paymentMethodColor())
                             paymentMethodForegroundView()
                         }.frame(width: abs(reader.size.width - 100), height: 150)
                         .padding()
                         amountInputView()
+                        if paymentMethodType == .eWallet {
+                            getTopUpFeeView()
+                        }
                         paymentMethodSetupComponents()
                         if paymentMethodType == .cash {
                             CurrencyFormattingView(numOfDecimalPoint: $numOfDecimalPoint, decimalSeparator: $decimalSeparator, groupingSeparator: $groupingSeparator, currencyText: $currencyText)
@@ -115,8 +123,39 @@ struct CreatePaymentMethodView: View {
         case .creditCard, .debitCard:
             return getCardForegroundView()
         default:
-            return AnyView(EmptyView())
+            return getEWalletForegroundView()
         }
+    }
+    
+    func getEWalletForegroundView() -> AnyView {
+        AnyView(
+            VStack {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading) {
+                        PlaceHolderView()
+                            .frame(width: 150, height: 5)
+                        PlaceHolderView()
+                            .frame(width: 100, height: 5)
+                        PlaceHolderView()
+                            .frame(width: 50, height: 5)
+                    }
+                    Spacer()
+                }
+                HStack(alignment: .bottom) {
+                    VStack(alignment: .leading) {
+                        Spacer()
+                        Text(CurrencyHelper.string(from: amount, currency: self.currencySign))
+                            .bold()
+                            .foregroundColor(.white)
+                    }
+                    Spacer()
+                    Text(cardName)
+                        .font(.hugeTitle)
+                        .foregroundColor(.white)
+                        .opacity(0.5)
+                }
+            }.padding()
+        )
     }
     
     func getCardForegroundView() -> AnyView {
@@ -213,6 +252,27 @@ struct CreatePaymentMethodView: View {
         )
     }
     
+    func getTopUpFeeView() -> AnyView {
+        AnyView(
+            VStack {
+                Text("Top Up Fee")
+                    .font(.footnote)
+                    .foregroundColor(.init(.secondaryLabel))
+                CurrencyTextField(amount: self.$topUpAmount, currency: self.$currency)
+                    .background(Color.init(.secondarySystemBackground)
+                                    .cornerRadius(.normal))
+                HStack {
+                    Spacer()
+                    Text("Automatically deduct this amount everytime you top up")
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.trailing)
+                        .font(.caption)
+                        .foregroundColor(.init(.tertiaryLabel))
+                }
+            }.padding()
+        )
+    }
+    
     func getLeadingNavigationItem() -> AnyView {
         switch paymentMethodType {
         case .cash:
@@ -255,20 +315,26 @@ struct CreatePaymentMethodView: View {
                 }
             )
         default:
-            return AnyView(EmptyView())
+            return AnyView(
+                Button(action: {
+                    self.createEWalletAndDismiss()
+                }) {
+                    Text("Done").bold()
+                }
+            )
         }
     }
     
     func getNavigationTitle() -> String {
         switch paymentMethodType {
         case .cash:
-            return "Cash"
+            return "Setup Wallet"
         case .creditCard:
             return "Credit Card"
         case .debitCard:
             return "Debit Card"
         default:
-            return ""
+            return "E-Wallet"
         }
     }
     
@@ -287,8 +353,8 @@ struct CreatePaymentMethodView: View {
     
     func paymentMethodSetupComponents() -> AnyView {
         switch paymentMethodType {
-        case .creditCard, .debitCard:
-            return AnyView(CardSetupComponents(colorSelection: $cardColorSelection, identifier: $identifierNumber, isIdentifierValidated: $isIdentifierValidated, cardName: $cardName))
+        case .creditCard, .debitCard, .eWallet:
+            return AnyView(CardSetupComponents(colorSelection: $cardColorSelection, identifier: $identifierNumber, isIdentifierValidated: $isIdentifierValidated, cardName: $cardName, type: paymentMethodType))
         default:
             return AnyView(EmptyView())
         }
@@ -337,6 +403,31 @@ struct CreatePaymentMethodView: View {
         newPaymentMethod.balance = displayCurrencyValue
         newPaymentMethod.type = PaymentMethodType.creditCard.rawValue
         newPaymentMethod.identifierNumber = ccIdentifier
+        newPaymentMethod.color = UIColor(cardColorSelection).encode()
+        
+        do {
+            try viewContext.save()
+            self.showSheetView = nil
+            self.sheetFlag = false
+            SPAlert.present(title: "Added to Wallet", preset: .done)
+        } catch let createError {
+            print("Failed to create PaymentMethod \(createError)")
+        }
+    }
+    
+    func createEWalletAndDismiss() {
+        if (cardName.count == 0) {
+            validationAlertMessage = "Please enter your e-Wallet name!"
+            showValidationAlert = true
+            return
+        }
+        
+        let displayCurrencyValue = getDisplayCurrencyValueFromCurrentAmount()
+        
+        let newPaymentMethod = editingPaymentMethod ?? PaymentMethod(context: viewContext)
+        newPaymentMethod.name = cardName
+        newPaymentMethod.balance = displayCurrencyValue
+        newPaymentMethod.type = PaymentMethodType.eWallet.rawValue
         newPaymentMethod.color = UIColor(cardColorSelection).encode()
         
         do {
@@ -449,37 +540,46 @@ private struct CardSetupComponents: View {
     @Binding var identifier: String
     @Binding var isIdentifierValidated: Bool
     @Binding var cardName: String
+    var type: PaymentMethodType
+    var typeName: String {
+        return type == .eWallet ? "E-Wallet" : "Card"
+    }
+    var namePreview: String {
+        return type == .eWallet ? "G*pay/OV*/..." : "BC*/Mandir*/..."
+    }
     
     var body: some View {
         VStack {
-            Text("Card Styling")
+            Text("\(typeName) Styling")
                 .font(.footnote)
                 .foregroundColor(.init(.secondaryLabel))
                 .padding(.top)
             VStack {
                 HStack {
-                    Text("Card Name")
-                    TextField("BCA/Mandiri", text: $cardName)
+                    Text("\(typeName) Name")
+                    TextField(namePreview, text: $cardName)
                         .multilineTextAlignment(.trailing)
                         .introspectTextField(customize: UITextField.introspect())
                 }
                 Divider()
-                HStack {
-                    Text("Identifier Number")
-                    TextField("XXXX", text: $identifier)
-                        .introspectTextField(customize: UITextField.introspect())
-                        .keyboardType(.decimalPad)
-                        .multilineTextAlignment(.trailing)
-                        .onChange(of: identifier, perform: { value in
-                            if value.count > 4 {
-                                identifier = latestInputText
-                                return
-                            }
-                            isIdentifierValidated = value.count == 4
-                            latestInputText = identifier
-                        })
+                if type != .eWallet {
+                    HStack {
+                        Text("Identifier Number")
+                        TextField("XXXX", text: $identifier)
+                            .introspectTextField(customize: UITextField.introspect())
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .onChange(of: identifier, perform: { value in
+                                if value.count > 4 {
+                                    identifier = latestInputText
+                                    return
+                                }
+                                isIdentifierValidated = value.count == 4
+                                latestInputText = identifier
+                            })
+                    }
+                    Divider()
                 }
-                Divider()
                 ColorPicker("Select Color", selection: $colorSelection)
             }.padding()
             .background(Color.init(.secondarySystemBackground)

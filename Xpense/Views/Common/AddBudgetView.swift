@@ -74,11 +74,11 @@ struct AddBudgetView: View {
     
     func makeFetchRequest() -> FetchRequest<CategoryModel> {
         let type = CategoryType.expense.rawValue
-        var predicateString = "type == %@"
+        var predicateString = "type == %@ && shouldHide == 0"
         var argumentArray: [Any] = [type]
         for inputModel in budgetInputModels {
             let category = inputModel.category
-            predicateString.append(" && SELF != %@")
+            predicateString.append(" && SELF != %@ && shouldHide == 0")
             argumentArray.append(category)
         }
         let predicate = NSPredicate(format: predicateString, argumentArray: argumentArray)

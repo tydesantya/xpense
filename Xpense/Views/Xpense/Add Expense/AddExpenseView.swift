@@ -38,7 +38,6 @@ struct AddExpenseView: View {
     
     @FetchRequest(sortDescriptors: [], predicate: NSPredicate(format: "type == %ld", PaymentMethodType.eWallet.rawValue))
     private var eWallets: FetchedResults<PaymentMethod>
-    @State var topUpWithFee: Bool = true
     @State var selectedCategory: CategoryModel? = nil
     @State var categorySelectNavigation = false
     @State var selectedTopUpMethod: PaymentMethod?
@@ -79,9 +78,9 @@ struct AddExpenseView: View {
                     .id(transactionTypes.count)
                     .padding()
                     if isSelectingTopUp {
-                        EWalletSelectionView(eWallets: eWallets, topUpSelection: $selectedTopUpMethod, topUpWithFee: $topUpWithFee)
+                        EWalletSelectionView(eWallets: eWallets, topUpSelection: $selectedTopUpMethod)
                     }
-                    else {
+                    else if transactionTypeSelectedIndex < transactionTypes.count {
                         let categoryType = CategoryType(rawValue: transactionTypes[transactionTypeSelectedIndex])
                         CategorySelectionView(selectedCategory: $selectedCategory, onCategoriesViewSelectedCategory: onCategoriesViewSelectedCategory(_:), categorySelectNavigation: $categorySelectNavigation, fetchRequest: makeCategoriesFetchRequest(), type: categoryType)
                     }
@@ -291,10 +290,6 @@ struct AddExpenseView: View {
     }
     
     func createTopUpTransaction() {
-        // create top up model
-        let topup = TopUp(context: viewContext)
-        
-        
         // create transaction from source payment method
         let transactionDate = Date()
         
@@ -303,6 +298,7 @@ struct AddExpenseView: View {
         transaction.note = notes
         transaction.paymentMethod = selectedPaymentMethod
         transaction.date = transactionDate
+        transaction.category = selectedTopUpMethod?.topupPaymentCategory
         
         deductSelectedPaymentMethodWithCurrentAmount()
         
@@ -312,11 +308,9 @@ struct AddExpenseView: View {
         topUpTargetTransaction.note = notes
         topUpTargetTransaction.paymentMethod = selectedTopUpMethod
         topUpTargetTransaction.date = transactionDate
+        topUpTargetTransaction.category = selectedTopUpMethod?.topupCategory
         
         increaseTopUpTargetBalanceWithCurrentAmount()
-        
-        topup.topUpSource = transaction
-        topup.topUpTarget = topUpTargetTransaction
         
         do {
             try viewContext.save()
@@ -370,7 +364,7 @@ struct AddExpenseView: View {
     
     func makeCategoriesFetchRequest() -> FetchRequest<CategoryModel> {
         let type = transactionTypes[transactionTypeSelectedIndex]
-        let predicate = NSPredicate(format: "type == %@", type)
+        let predicate = NSPredicate(format: "type == %@ && shouldHide == 0", type)
         let sort = NSSortDescriptor(key: "lastUsed", ascending: false)
         return FetchRequest<CategoryModel>(entity: CategoryModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
     }
@@ -563,7 +557,6 @@ struct EWalletSelectionView: View {
     
     var eWallets: FetchedResults<PaymentMethod>
     @Binding var topUpSelection: PaymentMethod?
-    @Binding var topUpWithFee: Bool
     
     var body: some View {
         VStack {
@@ -581,13 +574,6 @@ struct EWalletSelectionView: View {
                 }
                 .padding(.horizontal)
             }.frame(height: 80)
-            Toggle(isOn: $topUpWithFee, label: {
-                Text("Top Up with Fee")
-            })
-            .padding()
-            .background(Color.init(.secondarySystemBackground)
-                            .cornerRadius(.normal))
-            .padding([.horizontal, .bottom])
         }
         .padding(.bottom)
         .onAppear {

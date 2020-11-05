@@ -46,7 +46,7 @@ struct CategoriesView: View {
         }
         .sheet(isPresented: $addCategoryFlag, content: {
             NavigationView {
-                NewCategoryView(showSheetView: $addCategoryFlag, existingCategory: $selectedCategory, categoryType: newCategoryType, refreshFlagUUID: $refreshID).environment(\.managedObjectContext, self.viewContext)
+                NewCategoryView(showSheetView: $addCategoryFlag, existingCategory: $selectedCategory, categoryType: getCategoryType(), refreshFlagUUID: $refreshID).environment(\.managedObjectContext, self.viewContext)
             }.accentColor(.theme)
         })
         .navigationTitle(migrationSelection != nil ? "Select Category" : "Categories")
@@ -56,25 +56,31 @@ struct CategoriesView: View {
                     Menu {
                         Section {
                             Button(action: {
-                                selectedCategory = nil
-                                newCategoryType = .income
-                                addCategoryFlag.toggle()
-                            }) {
-                                Label {
-                                    Text("New Income Category")
-                                } icon: {
-                                    Image(systemSymbol: .plusCircle)
+                                DispatchQueue.main.async {
+                                    selectedCategory = nil
+                                    newCategoryType = .expense
+                                    refreshID = UUID()
+                                    addCategoryFlag.toggle()
                                 }
-                            }
-                            Button(action: {
-                                selectedCategory = nil
-                                newCategoryType = .expense
-                                addCategoryFlag.toggle()
                             }) {
                                 Label {
                                     Text("New Expense Category")
                                 } icon: {
                                     Image(systemSymbol: .minusCircle)
+                                }
+                            }
+                            Button(action: {
+                                DispatchQueue.main.async {
+                                    selectedCategory = nil
+                                    newCategoryType = .income
+                                    refreshID = UUID()
+                                    addCategoryFlag.toggle()
+                                }
+                            }) {
+                                Label {
+                                    Text("New Income Category")
+                                } icon: {
+                                    Image(systemSymbol: .plusCircle)
                                 }
                             }
                         }
@@ -87,15 +93,19 @@ struct CategoriesView: View {
         })
     }
     
+    func getCategoryType() -> CategoryType {
+        return newCategoryType
+    }
+    
     func makeFetchRequest() -> FetchRequest<CategoryModel> {
         var type = CategoryType.allCases[self.segmentIndex].rawValue
-        var predicate = NSPredicate(format: "type == %@", type)
+        var predicate = NSPredicate(format: "type == %@ && shouldHide == 0", type)
         if let migration = migrationSelection {
             type = migration.type!
-            predicate = NSPredicate(format: "type == %@ && SELF != %@", type, migration)
+            predicate = NSPredicate(format: "type == %@ && SELF != %@ && shouldHide == 0", type, migration)
         }
         if let specificType = specificType {
-            predicate = NSPredicate(format: "type == %@", specificType.rawValue)
+            predicate = NSPredicate(format: "type == %@ && shouldHide == 0", specificType.rawValue)
         }
         let sort = NSSortDescriptor(key: "timeStamp", ascending: true)
         return FetchRequest<CategoryModel>(entity: CategoryModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())

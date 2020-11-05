@@ -40,6 +40,7 @@ struct PieReportChartView: View {
     @State var segmentIndex = 1
     @State var groupingType: ReportGroupingType = .categories
     @State var refreshFlag: UUID = UUID()
+    @State var showTopUp: Bool = false
     
     var segments = ReportDatePickerType.allCases
     var dateFormatter: DateFormatter {
@@ -102,6 +103,38 @@ struct PieReportChartView: View {
                         }
                     }
                 }
+                Section {
+                    Button(action: {
+                        // Show By Category
+                        showTopUp = false
+                    }) {
+                        Label {
+                            Text("Exclude Top Ups")
+                        } icon: {
+                            if !showTopUp {
+                                Image(systemName: "checkmark.circle.fill")
+                            }
+                            else {
+                                EmptyView()
+                            }
+                        }
+                    }
+                    Button(action: {
+                        // Show By Category
+                        showTopUp = true
+                    }) {
+                        Label {
+                            Text("Include Top Ups")
+                        } icon: {
+                            if showTopUp {
+                                Image(systemName: "checkmark.circle.fill")
+                            }
+                            else {
+                                EmptyView()
+                            }
+                        }
+                    }
+                }
             }
             label: {
                 Image(systemSymbol: .lineHorizontal3DecreaseCircle)
@@ -147,7 +180,7 @@ struct PieReportChartView: View {
         let endOfDay = selectedDate.endOfDay
         let sort = NSSortDescriptor(key: "date", ascending: true)
         let categoryType = reportType.rawValue
-        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfDay as NSDate, endOfDay as NSDate, categoryType)
+        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == %@", startOfDay as NSDate, endOfDay as NSDate, categoryType, NSNumber(booleanLiteral: showTopUp))
         return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
     }
     
@@ -156,7 +189,7 @@ struct PieReportChartView: View {
         let endOfMonth = selectedDate.endOfMonth
         let sort = NSSortDescriptor(key: "date", ascending: true)
         let categoryType = reportType.rawValue
-        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfMonth as NSDate , endOfMonth as NSDate, categoryType)
+        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == %@", startOfMonth as NSDate , endOfMonth as NSDate, categoryType, NSNumber(booleanLiteral: showTopUp))
         return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
     }
     
@@ -166,7 +199,7 @@ struct PieReportChartView: View {
         
         let sort = NSSortDescriptor(key: "date", ascending: true)
         let categoryType = reportType.rawValue
-        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfYear as NSDate, endOfYear as NSDate, categoryType)
+        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == %@", startOfYear as NSDate, endOfYear as NSDate, categoryType, NSNumber(booleanLiteral: showTopUp))
         return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
     }
     
@@ -399,7 +432,7 @@ struct ReportDetailListView: View {
                 }
             }
             if let _ = totalDays {
-                if elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod!.1 {
+                if elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod!.1 && reportType == .expense {
                     totalDays = elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod!.0
                 }
             }

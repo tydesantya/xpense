@@ -319,17 +319,17 @@ struct ReportsView: View {
         let endOfWeek = Date().endOfWeek
         let sort = NSSortDescriptor(key: "date", ascending: true)
         let expenseType = CategoryType.expense.rawValue
-        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfWeek as NSDate , endOfWeek as NSDate, expenseType)
+        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == 0", startOfWeek as NSDate , endOfWeek as NSDate, expenseType)
         weeklyExpenseFetchRequest = FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
         
         
         let startOfMonth = Date().startOfMonth(using: .iso8601)
         let endOfMonth = Date().endOfMonth
         let incomeType = CategoryType.income.rawValue
-        let monthlyIncomePredicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfMonth as NSDate , endOfMonth as NSDate, incomeType)
+        let monthlyIncomePredicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == 0", startOfMonth as NSDate , endOfMonth as NSDate, incomeType)
         monthlyIncomeFetchRequest = FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: monthlyIncomePredicate, animation: .spring())
         
-        let monthlyExpensePredicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfMonth as NSDate , endOfMonth as NSDate, expenseType)
+        let monthlyExpensePredicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == 0", startOfMonth as NSDate , endOfMonth as NSDate, expenseType)
         monthlyExpenseFetchRequest = FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: monthlyExpensePredicate, animation: .spring())
     }
 }

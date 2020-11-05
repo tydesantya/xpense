@@ -18,12 +18,6 @@ struct TransactionCellView: View {
     var paymentMethod: PaymentMethod? {
         transaction.paymentMethod
     }
-    var topUpSource: TopUp? {
-        transaction.topUpSource
-    }
-    var topUpTarget: TopUp? {
-        transaction.topUpTarget
-    }
     @State var navigationActive = false
     @Binding var refreshFlag: UUID
     var editable: Bool = true
@@ -51,33 +45,6 @@ struct TransactionCellView: View {
                                         .font(.header)
                                         .foregroundColor(.init(.systemRed))
                                 }
-                            }
-                        }
-                    }
-                    if let topUpSource = topUpSource {
-                        HStack(spacing: .medium) {
-                            TopUpIconDisplayView(iconWidth: 40, iconHeight: 40, uiColor: .systemGreen)
-                            VStack(alignment: .leading) {
-                                Text(topUpSource.topUpSource?.paymentMethod?.name ?? "")
-                                    .foregroundColor(.init(.label))
-                                    .bold()
-                                Text(getTransactionAmount())
-                                    .font(.header)
-                                    .foregroundColor(.init(.systemGreen))
-                            }
-                        }
-                    }
-                    
-                    if let target = topUpTarget {
-                        HStack(spacing: .medium) {
-                            TopUpIconDisplayView(iconWidth: 40, iconHeight: 40, uiColor: .systemRed)
-                            VStack(alignment: .leading) {
-                                Text(target.topUpTarget?.paymentMethod?.name ?? "")
-                                    .foregroundColor(.init(.label))
-                                    .bold()
-                                Text("-\(getTransactionAmount())")
-                                    .font(.header)
-                                    .foregroundColor(.init(.systemRed))
                             }
                         }
                     }

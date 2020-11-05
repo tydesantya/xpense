@@ -23,7 +23,7 @@ private struct DailyTransaction: Hashable {
 
 struct WeeklyExpenseChartView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \TransactionModel.date, ascending: false)], predicate: NSPredicate(format: "category.type == %@", CategoryType.expense.rawValue))
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \TransactionModel.date, ascending: false)], predicate: NSPredicate(format: "category.type == %@ && category.shouldHide == 0", CategoryType.expense.rawValue))
     private var transactions: FetchedResults<TransactionModel>
     
     let config = ChartConfiguration()

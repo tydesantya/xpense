@@ -51,9 +51,6 @@ struct CreatePaymentMethodView: View {
                         }.frame(width: abs(reader.size.width - 100), height: 150)
                         .padding()
                         amountInputView()
-                        if paymentMethodType == .eWallet {
-                            getTopUpFeeView()
-                        }
                         paymentMethodSetupComponents()
                         if paymentMethodType == .cash {
                             CurrencyFormattingView(numOfDecimalPoint: $numOfDecimalPoint, decimalSeparator: $decimalSeparator, groupingSeparator: $groupingSeparator, currencyText: $currencyText)
@@ -252,27 +249,6 @@ struct CreatePaymentMethodView: View {
         )
     }
     
-    func getTopUpFeeView() -> AnyView {
-        AnyView(
-            VStack {
-                Text("Top Up Fee")
-                    .font(.footnote)
-                    .foregroundColor(.init(.secondaryLabel))
-                CurrencyTextField(amount: self.$topUpAmount, currency: self.$currency)
-                    .background(Color.init(.secondarySystemBackground)
-                                    .cornerRadius(.normal))
-                HStack {
-                    Spacer()
-                    Text("Automatically deduct this amount everytime you top up")
-                        .fixedSize(horizontal: false, vertical: true)
-                        .multilineTextAlignment(.trailing)
-                        .font(.caption)
-                        .foregroundColor(.init(.tertiaryLabel))
-                }
-            }.padding()
-        )
-    }
-    
     func getLeadingNavigationItem() -> AnyView {
         switch paymentMethodType {
         case .cash:
@@ -430,6 +406,8 @@ struct CreatePaymentMethodView: View {
         newPaymentMethod.type = PaymentMethodType.eWallet.rawValue
         newPaymentMethod.color = UIColor(cardColorSelection).encode()
         
+        createNewTopUpCategory(with: newPaymentMethod)
+        
         do {
             try viewContext.save()
             self.showSheetView = nil
@@ -518,6 +496,29 @@ struct CreatePaymentMethodView: View {
         let amountString = numOfDecimalPoint == 0 ? String(format: "%.0f", amount) : String(amount)
         let currency = CurrencyValue(amount: amountString, currency: self.currencyText)
         return DisplayCurrencyValue(currencyValue: currency, numOfDecimalPoint: self.numOfDecimalPoint, decimalSeparator: self.decimalSeparator, groupingSeparator: self.groupingSeparator)
+    }
+    
+    func createNewTopUpCategory(with method: PaymentMethod) {
+        let incomeTopupCategory = CategoryModel(context: viewContext)
+        incomeTopupCategory.name = "Top Up \(cardName)"
+        incomeTopupCategory.type = CategoryType.income.rawValue
+        incomeTopupCategory.text = "\(Array(cardName)[0])"
+        incomeTopupCategory.color = UIColor.systemGreen.encode()
+        incomeTopupCategory.lighterColor = UIColor.systemGreen.encode()
+        incomeTopupCategory.timeStamp = Date()
+        incomeTopupCategory.shouldHide = true
+        incomeTopupCategory.topupMethod = method
+        
+        let expenseTopupCategory = CategoryModel(context: viewContext)
+        expenseTopupCategory.name = "Top Up \(cardName)"
+        expenseTopupCategory.type = CategoryType.expense.rawValue
+        expenseTopupCategory.text = "\(Array(cardName)[0])"
+        expenseTopupCategory.color = UIColor.systemRed.encode()
+        expenseTopupCategory.lighterColor = UIColor.systemRed.encode()
+        expenseTopupCategory.timeStamp = Date()
+        expenseTopupCategory.shouldHide = true
+        expenseTopupCategory.topupPaymentMethod = method
+        
     }
     
 }

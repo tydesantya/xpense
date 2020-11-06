@@ -38,6 +38,17 @@ extension Date {
         return dateFormatter.string(from: self)
     }
     
+    func mediumDateTimeFormat() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.autoupdatingCurrent // Using system locale
+        dateFormatter.doesRelativeDateFormatting = true // Enabling relative date formatting
+        
+        // other dataFormatter settings here, irrelevant for example
+        dateFormatter.timeStyle = .short
+        dateFormatter.dateStyle = .medium
+        return dateFormatter.string(from: self)
+    }
+    
     func dayFormat() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.autoupdatingCurrent // Using system locale

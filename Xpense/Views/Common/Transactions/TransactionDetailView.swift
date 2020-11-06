@@ -43,13 +43,15 @@ struct TransactionDetailView: View {
                     }
                     Divider()
                         .padding(.bottom)
-                    HStack(alignment: .top, spacing: .medium) {
-                        VStack(alignment: .leading, spacing: .small) {
-                            Text("Notes")
-                            Text("Date/Time")
-                            Text("Payment Method")
-                        }
-                        VStack(alignment: .leading, spacing: .small) {
+                    VStack(alignment: .leading, spacing: .small) {
+                        HStack(alignment: .top) {
+                            HStack {
+                                Text("Notes")
+                                    .multilineTextAlignment(.leading)
+                                    .font(.callout)
+                                Spacer()
+                            }
+                            .frame(width: 150)
                             if transaction.note?.count ?? 0 > 0 {
                                 Text(transaction.note!)
                             }
@@ -57,9 +59,25 @@ struct TransactionDetailView: View {
                                 Text("No Notes")
                                     .foregroundColor(Color(UIColor.secondaryLabel))
                             }
+                        }
+                        HStack(alignment: .top) {
+                            HStack {
+                                Text("Date/Time")
+                                    .multilineTextAlignment(.leading)
+                                    .font(.callout)
+                                Spacer()
+                            }.frame(width: 150)
                             if let date = transaction.date {
-                                Text(date.dateTimeFormat())
+                                Text(date.mediumDateTimeFormat())
                             }
+                        }
+                        HStack(alignment: .top) {
+                            HStack {
+                                Text("Payment Method")
+                                    .multilineTextAlignment(.leading)
+                                    .font(.callout)
+                                Spacer()
+                            }.frame(width: 150)
                             if let paymentMethod = transaction.paymentMethod {
                                 let width = CGFloat(150)
                                 let height = CGFloat(80)
@@ -67,7 +85,6 @@ struct TransactionDetailView: View {
                                     .frame(width: width, height: height)
                             }
                         }
-                        Spacer()
                     }.id(refreshFlag)
                     Divider().padding(.vertical)
                     Button(action: {

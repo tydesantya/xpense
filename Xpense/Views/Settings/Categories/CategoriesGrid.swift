@@ -45,32 +45,34 @@ struct CategoriesGrid: View {
                             }
                         }
                         .actionSheet(isPresented: $showDeleteConfirmation, content: {
+                            let budgetExists = longPressedCategory!.budgets!.count > 0
                             if longPressedCategory?.transactions?.count ?? 0 > 0 {
                                 let transactionsCount = longPressedCategory!.transactions!.count
-                                return ActionSheet(title: Text("Delete Confirmation"), message: Text("there are \(transactionsCount) transactions in this category, do you want to merge it to another category or delete all of it ?"), buttons: [
+                                let budgetText = budgetExists ? "and budget setup " : ""
+                                return ActionSheet(title: Text("Delete Confirmation"), message: Text("There are \(transactionsCount) transactions \(budgetText)in this category, do you want to merge it to another category or delete all of it ?"), buttons: [
                                     .default(Text("Merge to another category")) {
                                         categorySelectNavigation = true
                                     },
                                     .destructive(Text("Delete")) {
-                                        if let transactions = longPressedCategory!.transactions {
-                                            let transactionGroup = groupTransactionByPaymentMethod(transactions.allObjects as! [TransactionModel])
-                                            for key in Array(transactionGroup.keys) {
-                                                var paymentMethodRevertAmount: Double = 0
-                                                for transaction in transactionGroup[key]! {
-                                                    let transactionAmountString = transaction.amount?.currencyValue.amount ?? ""
-                                                    let transactionAmount = Double(transactionAmountString) ?? 0
-                                                    paymentMethodRevertAmount += transactionAmount
-                                                    viewContext.delete(transaction)
-                                                }
-                                                revertPaymentMethodAmount(key, amount: paymentMethodRevertAmount)
-                                            }
-                                        }
+                                        revertCategoryAmount()
                                         deleteCategory(longPressedCategory!)
                                     },
                                     .cancel()
                                 ])
                             }
-                            return ActionSheet(title: Text("Delete Confirmation"), message: Text("Are you sure you want to delete ?"), buttons: [
+                            else if budgetExists {
+                                return ActionSheet(title: Text("Delete Confirmation"), message: Text("There are budget setup in this category, do you want to merge it to another category or delete from budget"), buttons: [
+                                    .default(Text("Merge to another category")) {
+                                        categorySelectNavigation = true
+                                    },
+                                    .destructive(Text("Delete")) {
+                                        revertCategoryAmount()
+                                        deleteCategoryAlongWithBudget(longPressedCategory!)
+                                    },
+                                    .cancel()
+                                ])
+                            }
+                            return ActionSheet(title: Text("Delete Confirmation"), message: Text("Are you sure you want to delete this category ?"), buttons: [
                                 .destructive(Text("Delete")) {
                                     deleteCategory(longPressedCategory!)
                                 },
@@ -93,12 +95,22 @@ struct CategoriesGrid: View {
     }
     
     func onSelectCategoryToMigrate(_ category: CategoryModel) {
+        let budgetExists = longPressedCategory!.budgets!.count > 0
         categorySelectNavigation = false
         if let transactions = longPressedCategory!.transactions {
             let transactionGroup = groupTransactionByPaymentMethod(transactions.allObjects as! [TransactionModel])
             for key in Array(transactionGroup.keys) {
                 for transaction in transactionGroup[key]! {
                     transaction.category = category
+                }
+            }
+        }
+        if budgetExists {
+            let budgets = longPressedCategory!.budgets!.allObjects as! [Budget]
+            let currentBudgetExist = category.budgets!.count > 0
+            if !currentBudgetExist {
+                for budget in budgets {
+                    budget.category = category
                 }
             }
         }
@@ -140,6 +152,38 @@ struct CategoriesGrid: View {
             print("Failed to delete Category \(createError)")
         }
     }
+    
+    func deleteCategoryAlongWithBudget(_ category: CategoryModel) {
+        do {
+            let budgets = category.budgets!.allObjects as! [Budget]
+            for budget in budgets {
+                viewContext.delete(budget)
+            }
+            viewContext.delete(category)
+            try viewContext.save()
+            SPAlert.present(title: "Deleted Category", preset: .done)
+            refreshFlag = UUID()
+        } catch let createError {
+            print("Failed to delete Category \(createError)")
+        }
+    }
+    
+    func revertCategoryAmount() {
+        if let transactions = longPressedCategory!.transactions {
+            let transactionGroup = groupTransactionByPaymentMethod(transactions.allObjects as! [TransactionModel])
+            for key in Array(transactionGroup.keys) {
+                var paymentMethodRevertAmount: Double = 0
+                for transaction in transactionGroup[key]! {
+                    let transactionAmountString = transaction.amount?.currencyValue.amount ?? ""
+                    let transactionAmount = Double(transactionAmountString) ?? 0
+                    paymentMethodRevertAmount += transactionAmount
+                    viewContext.delete(transaction)
+                }
+                revertPaymentMethodAmount(key, amount: paymentMethodRevertAmount)
+            }
+        }
+    }
+
 }
 
 struct CategoryItem: View {

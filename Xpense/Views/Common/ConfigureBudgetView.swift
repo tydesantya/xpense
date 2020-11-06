@@ -67,8 +67,7 @@ struct ConfigureBudgetView: View {
                 }
                 Text("Budget Ring Preview")
                     .font(.caption)
-                Divider()
-                    .padding()
+                EmptyBudgetCreationView(showSheetView: $showSheetView, showConfirmationAlert: $showConfirmationAlert, segmentIndex: $segmentIndex, inputModels: $inputModels, fetchRequest: makeTransactionFetchRequest())
                 Text("Setup Budget Amount and Order")
                     .font(.sectionTitle)
                 List {
@@ -94,18 +93,13 @@ struct ConfigureBudgetView: View {
                         }.frame(height: 100)
                     }
                     .onMove(perform: move)
-                    .alert(isPresented: $showConfirmationAlert, content: {
-                        Alert(title: Text("Confirmation"), message: Text("Create this setup of budget ?\nYou will not be able to edit the budget unless you delete all entries of this budget"), primaryButton: .default(Text("Confirm")) {
-                            createBudget()
-                        }, secondaryButton: .cancel())
+                    .alert(isPresented: $showErrorAlert, content: {
+                        Alert(title: Text("Error"), message: Text("Please enter all budget amount!"), dismissButton: .default(Text("Got it")))
                     })
                 }
                 .environment(\.defaultMinListRowHeight, 100)
                 .frame(height: 116.0 * CGFloat(inputModels.count))
             }
-            .alert(isPresented: $showErrorAlert, content: {
-                Alert(title: Text("Error"), message: Text("Please enter all budget amount!"), dismissButton: .default(Text("Got it")))
-            })
             .navigationTitle("Configure Budget")
             .navigationBarItems(trailing: Button(action: {
                 for inputModel in inputModels {
@@ -122,7 +116,85 @@ struct ConfigureBudgetView: View {
         }
     }
     
+    func makeTransactionFetchRequest() -> FetchRequest<TransactionModel> {
+        var startDate = Date()
+        var endDate = Date()
+        
+        let period = self.segments[segmentIndex]
+        switch period {
+        case .daily:
+            startDate = Date().startOfDay
+            endDate = Date().endOfDay
+        case .weekly:
+            startDate = Date().startOfWeek()
+            endDate = Date().endOfWeek
+        case .monthly:
+            startDate = Date().startOfMonth()
+            endDate = Date().endOfMonth
+        }
+        
+        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == 0", startDate as NSDate, endDate as NSDate, CategoryType.expense.rawValue)
+        return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [], predicate: predicate, animation: .spring())
+    }
+    
+    func move(from source: IndexSet, to destination: Int) {
+        inputModels.move(fromOffsets: source, toOffset: destination)
+    }
+    
+    private func updateAmountOfInputModel(_ inputModel: InputModel, amount: Double) {
+        let index = inputModels.firstIndex(of: inputModel)!
+        inputModels[index].amount = amount
+    }
+    
+    
+    private func updateCurrencyValueOfInputModel(_ inputModel: InputModel, currencyValue: CurrencyValue) {
+        let index = inputModels.firstIndex(of: inputModel)!
+        inputModels[index].currencyValue = currencyValue
+    }
+}
+
+
+struct EmptyBudgetCreationView: View {
+    
+    @Environment(\.managedObjectContext) private var viewContext
+    @Binding var showSheetView: Bool
+    @Binding var showConfirmationAlert: Bool
+    @Binding var segmentIndex: Int
+    @Binding var inputModels: [InputModel]
+    var segments = BudgetPeriod.allCases
+    var fetchRequest: FetchRequest<TransactionModel>
+    private var data: FetchedResults<TransactionModel> {
+        fetchRequest.wrappedValue
+    }
+    
+    var body: some View {
+        VStack {
+            Divider()
+                .padding()
+        }
+        .alert(isPresented: $showConfirmationAlert, content: {
+            Alert(title: Text("Confirmation"), message: Text("Create this setup of budget ?\nYou will not be able to edit the budget unless you delete all entries of this budget"), primaryButton: .default(Text("Confirm")) {
+                createBudget()
+            }, secondaryButton: .cancel())
+        })
+    }
+    
+    func checkTransactions() {
+        for transaction in data {
+            print(transaction.amount!.toString())
+        }
+    }
+    
+    func groupDataIntoCategories() -> [CategoryModel: [TransactionModel]] {
+        return Dictionary(grouping: data){ (transaction : TransactionModel) -> CategoryModel in
+            // group by category
+            return transaction.category!
+        }
+    }
+    
+    
     func createBudget() {
+        let transactionGroup = groupDataIntoCategories()
         let periodicBudget = PeriodicBudget(context: viewContext)
         let period = self.segments[segmentIndex]
         periodicBudget.period = period.rawValue
@@ -142,9 +214,20 @@ struct ConfigureBudgetView: View {
             let budget = Budget(context: viewContext)
             budget.category = inputModel.category
             budget.limit = DisplayCurrencyValue(currencyValue: CurrencyValue(amount: String(inputModel.amount), currency: inputModel.currencyValue.currency), numOfDecimalPoint: 0, decimalSeparator: ",", groupingSeparator: ".")
-            budget.usedAmount = DisplayCurrencyValue(currencyValue: CurrencyValue(amount: "0", currency: inputModel.currencyValue.currency), numOfDecimalPoint: 0, decimalSeparator: ",", groupingSeparator: ".")
             budget.periodicBudget = periodicBudget
             budget.order = Int64(index)
+            
+            var budgetUsedAmount: Double = 0.0
+            let group = transactionGroup[inputModel.category]
+            if let categoryGroup = group {
+                for transaction in categoryGroup {
+                    transaction.budget = budget
+                    let amount = transaction.amount!.toDouble()
+                    budgetUsedAmount += amount
+                }
+            }
+            
+            budget.usedAmount = DisplayCurrencyValue(currencyValue: CurrencyValue(amount: String(budgetUsedAmount), currency: inputModel.currencyValue.currency), numOfDecimalPoint: 0, decimalSeparator: ",", groupingSeparator: ".")
             index += 1
         }
         do {
@@ -155,20 +238,4 @@ struct ConfigureBudgetView: View {
             print("Failed to create budget \(createError)")
         }
     }
-    
-    func move(from source: IndexSet, to destination: Int) {
-        inputModels.move(fromOffsets: source, toOffset: destination)
-    }
-    
-    private func updateAmountOfInputModel(_ inputModel: InputModel, amount: Double) {
-        let index = inputModels.firstIndex(of: inputModel)!
-        inputModels[index].amount = amount
-    }
-    
-    
-    private func updateCurrencyValueOfInputModel(_ inputModel: InputModel, currencyValue: CurrencyValue) {
-        let index = inputModels.firstIndex(of: inputModel)!
-        inputModels[index].currencyValue = currencyValue
-    }
 }
-

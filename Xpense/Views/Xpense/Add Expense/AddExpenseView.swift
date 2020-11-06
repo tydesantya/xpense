@@ -385,10 +385,16 @@ struct PaymentMethodCardView: View {
     var paymentMethod: PaymentMethod
     @Binding var selectedPaymentMethod: PaymentMethod?
     var showLabel: Bool = true
+    var customAction:(() -> (Void))? = nil
     
     var body: some View {
         Button(action: {
-            selectedPaymentMethod = paymentMethod
+            if let action = customAction {
+                action()
+            }
+            else {
+                selectedPaymentMethod = paymentMethod
+            }
         }) {
             ZStack {
                 PaymentMethodCard(backgroundColor: Color.init(UIColor.color(data: paymentMethod.color!)!), shadow: 0.0)

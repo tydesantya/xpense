@@ -91,12 +91,30 @@ struct CardListDetailView: View {
             CreatePaymentMethodView(paymentMethodType: paymentMethodType, sheetFlag: $createPaymentMethodFlag, paymentMethod: editedPaymentMethod)
                 .accentColor(.theme)
         }
-        .alert(isPresented:$showingAlert) {
-            Alert(title: Text("Warning"), message: Text("Are you sure you want to delete this card?"), primaryButton: .destructive(Text("Delete")) {
-                pagerSelection -= 1
-                deleteSelectedCard()
-            }, secondaryButton: .cancel())
-        }
+        .actionSheet(isPresented: $showingAlert, content: {
+            let transactionCount = selectedPaymentMethod?.transactions?.count ?? 0
+            let transactionExists = transactionCount > 0
+            if transactionExists {
+                return ActionSheet(title: Text("Delete Confirmation"), message: Text("There are \(transactionCount) transactions in this payment method, do you want to merge it to another payment method or delete all of it ?"), buttons: [
+                    .default(Text("Merge to another Payment Method")) {
+                        destinationView = AnyView(PaymentMethodMigrationSelectionView(excludedPaymentMethod: selectedPaymentMethod!, migrateAction: migrateTransaction))
+                        navigate = true
+                    },
+                    .destructive(Text("Delete")) {
+                        pagerSelection -= 1
+                        deleteSelectedCard()
+                    },
+                    .cancel()
+                ])
+            }
+            return ActionSheet(title: Text("Delete Confirmation"), message: Text("Are you sure you want to delete this payment method ?"), buttons: [
+                .destructive(Text("Delete")) {
+                    pagerSelection -= 1
+                    deleteSelectedCard()
+                },
+                .cancel()
+            ])
+        })
     }
     
     func navigateToView(_ destination: AnyView?) {
@@ -268,6 +286,18 @@ struct CardListDetailView: View {
         let predicate = NSPredicate(format: "paymentMethod == %@", selectedPaymentMethod)
         let sort = NSSortDescriptor(key: "date", ascending: false)
         return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
+    }
+    
+    func migrateTransaction(from paymentMethod: PaymentMethod, toPaymentMethod: PaymentMethod) {
+        let transactions = paymentMethod.transactions!.allObjects as! [TransactionModel]
+        if transactions.count > 0 {
+            for transaction in transactions {
+                transaction.paymentMethod = toPaymentMethod
+            }
+        }
+        navigate = false
+        pagerSelection -= 1
+        deleteSelectedCard()
     }
 }
 

@@ -21,10 +21,13 @@ struct CardListDetailView: View {
     @State var pagerSelection: Int = 0
     @State var selectedPaymentMethod: PaymentMethod?
     @State var editedPaymentMethod: PaymentMethod?
+    @State var cardReminderDate: Date = Date()
+    @State var cardReminderEnabled: Bool = false
     @Binding var presentedFlag: SheetFlags?
     @Environment(\.managedObjectContext) private var viewContext
     var fetchRequest: FetchRequest<PaymentMethod>
     var paymentMethods : FetchedResults<PaymentMethod>{fetchRequest.wrappedValue}
+    @ObservedObject var settings = UserSettings()
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -81,6 +84,12 @@ struct CardListDetailView: View {
         .onChange(of: pagerSelection, perform: { value in
             if pagerSelection >= 0 && pagerSelection < paymentMethods.count {
                 selectedPaymentMethod = paymentMethods[pagerSelection]
+                let reminders = settings.creditCardReminderDict
+                let notificationName = NotificationsName.creditCardNotification + selectedPaymentMethod!.name!
+                if let date = reminders[notificationName] {
+                    cardReminderEnabled = true
+                    cardReminderDate = date
+                }
             }
             if paymentMethods.count <= 0 {
                 presentedFlag = nil
@@ -186,6 +195,8 @@ struct CardListDetailView: View {
     }
     
     func getCardActionView() -> AnyView {
+        let paymentMethodName = selectedPaymentMethod?.name ?? ""
+        let creditCardNotificationName = NotificationsName.creditCardNotification + paymentMethodName
         switch paymentMethodType {
         case .debitCard, .creditCard, .eWallet:
             return AnyView(
@@ -195,7 +206,7 @@ struct CardListDetailView: View {
                             self.partialSheetManager.showPartialSheet({
                                     print("Partial sheet dismissed")
                                 }) {
-                                ReminderDetailView()
+                                ReminderDetailView(reminderDate: $cardReminderDate, reminderEnabled: $cardReminderEnabled, notificationName: creditCardNotificationName, cardName: paymentMethodName)
                                     .accentColor(.theme)
                             }
                         }, label: {

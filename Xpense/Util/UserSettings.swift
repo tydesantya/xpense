@@ -32,16 +32,9 @@ struct UserDefault<T> {
 final class UserSettings: ObservableObject {
 
     let objectWillChange = PassthroughSubject<Void, Never>()
-
-    @UserDefault("creditCardReminderEnabled", defaultValue: true)
-    var creditCardReminderEnabled: Bool {
-        willSet {
-            objectWillChange.send()
-        }
-    }
     
-    @UserDefault(UserDefaultsKey.creditCardNotificationDate, defaultValue: Date())
-    var creditCardNotificationDate: Date {
+    @UserDefault("creditCardReminderDict", defaultValue: [:])
+    var creditCardReminderDict: [String:Date] {
         willSet {
             objectWillChange.send()
         }

@@ -30,6 +30,8 @@ struct CreatePaymentMethodView: View {
     @State var validationAlertMessage: String = ""
     @State var showValidationAlert: Bool = false
     @State var editingPaymentMethod: PaymentMethod?
+    @State var reminderEnabled: Bool = false
+    @State var reminderDate: Date = Date()
     var paymentMethodType: PaymentMethodType
     var numberFormatter: NumberFormatter!
     
@@ -56,7 +58,7 @@ struct CreatePaymentMethodView: View {
                             CurrencyFormattingView(numOfDecimalPoint: $numOfDecimalPoint, decimalSeparator: $decimalSeparator, groupingSeparator: $groupingSeparator, currencyText: $currencyText)
                         }
                         if paymentMethodType == .creditCard {
-                            PaymentMethodReminderSetupView(monthlyReminderOn: $settings.creditCardReminderEnabled, monthlyReminderDate: $settings.creditCardNotificationDate)
+                            PaymentMethodReminderSetupView(monthlyReminderOn: $reminderEnabled, monthlyReminderDate: $reminderDate)
                         }
                     }
                     .padding()
@@ -65,6 +67,15 @@ struct CreatePaymentMethodView: View {
             .navigationBarItems(leading: getLeadingNavigationItem(), trailing: getTrailingNavigationItem())
             .alert(isPresented: $showValidationAlert) {
                 Alert(title: Text("Error"), message: Text(validationAlertMessage), dismissButton: .default(Text("Got it")))
+            }
+        }
+        .onAppear {
+            let creditCardNotificationName = NotificationsName.creditCardNotification + cardName
+            let reminderDict = settings.creditCardReminderDict
+            let reminder = reminderDict[creditCardNotificationName]
+            if let date = reminder {
+                reminderEnabled = true
+                reminderDate = date
             }
         }
     }
@@ -368,7 +379,13 @@ struct CreatePaymentMethodView: View {
             return
         }
         
-        if settings.creditCardReminderEnabled {
+        if let method = editingPaymentMethod {
+            let methodName = method.name ?? ""
+            let notifName = NotificationsName.creditCardNotification + methodName
+            cancelExistingNotificationName(notificationName: notifName)
+        }
+        
+        if reminderEnabled {
             createReminderNotification()
         }
         let ccIdentifier = isIdentifierValidated ? identifierNumber : "XXXX"
@@ -418,6 +435,18 @@ struct CreatePaymentMethodView: View {
         }
     }
     
+    func cancelExistingNotificationName(notificationName: String) {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+           var identifiers: [String] = []
+           for notification:UNNotificationRequest in notificationRequests {
+            if notification.identifier == notificationName {
+                  identifiers.append(notification.identifier)
+               }
+           }
+           UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        }
+    }
+    
     func createReminderNotification() {
         UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
            var identifiers: [String] = []
@@ -431,16 +460,16 @@ struct CreatePaymentMethodView: View {
         
         let content = UNMutableNotificationContent()
         content.title = NotificationsName.creditCardNotificationTitle
-        content.subtitle = NotificationsName.creditCardNotificationDescription
+        content.subtitle = NotificationsName.creditCardNotificationDescription + " - " + cardName
         content.sound = UNNotificationSound.default
         
-        let nextReminderDate: Date = settings.creditCardNotificationDate
+        let nextReminderDate: Date = reminderDate
         let components = Calendar.current.dateComponents([.day, .hour, .minute], from: nextReminderDate)
 
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
         
         // Create the request
-        let creditCardNotificationName = NotificationsName.creditCardNotification
+        let creditCardNotificationName = NotificationsName.creditCardNotification + cardName
         let request = UNNotificationRequest(identifier: creditCardNotificationName,
                     content: content, trigger: trigger)
         
@@ -451,6 +480,12 @@ struct CreatePaymentMethodView: View {
               // Handle any errors.
            }
         }
+        
+        // Update user defaults
+        var reminderDict = settings.creditCardReminderDict
+        
+        reminderDict[creditCardNotificationName] = reminderDate
+        settings.creditCardReminderDict = reminderDict
     }
     
     func createDebitCardAndDismiss() {

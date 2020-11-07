@@ -9,23 +9,31 @@
 import SwiftUI
 
 struct ReminderDetailView: View {
-    @State var dateSelection = Date()
-    @State var reminderOn = false
+    @Binding var reminderDate: Date
+    @Binding var reminderEnabled: Bool
+    var notificationName: String
+    var cardName: String
     
     @ObservedObject var settings = UserSettings()
     var body: some View {
         VStack {
             Text("Reminder")
             VStack(spacing: .medium) {
-                Toggle(isOn: $settings.creditCardReminderEnabled, label: {
+                Toggle(isOn: $reminderEnabled, label: {
                     Text("Enable Reminder")
                 })
-                DatePicker("Date & Time", selection: $settings.creditCardNotificationDate)
+                DatePicker("Date & Time", selection: $reminderDate)
             }.padding()
             .frame(minHeight: 150)
-            .onChange(of: settings.creditCardReminderEnabled, perform: { value in
+            .onChange(of: reminderEnabled, perform: { value in
                 cancelExistingReminder()
                 if value {
+                    createReminderNotification()
+                }
+            })
+            .onChange(of: reminderDate, perform: { value in
+                cancelExistingReminder()
+                if reminderEnabled {
                     createReminderNotification()
                 }
             })
@@ -36,7 +44,7 @@ struct ReminderDetailView: View {
         UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
            var identifiers: [String] = []
            for notification:UNNotificationRequest in notificationRequests {
-            if notification.identifier == NotificationsName.creditCardNotification {
+            if notification.identifier == notificationName {
                   identifiers.append(notification.identifier)
                }
            }
@@ -48,16 +56,16 @@ struct ReminderDetailView: View {
         
         let content = UNMutableNotificationContent()
         content.title = NotificationsName.creditCardNotificationTitle
-        content.subtitle = NotificationsName.creditCardNotificationDescription
+        content.subtitle = NotificationsName.creditCardNotificationDescription + " - " + cardName
         content.sound = UNNotificationSound.default
         
-        let nextReminderDate: Date = settings.creditCardNotificationDate
+        let nextReminderDate: Date = reminderDate
         let components = Calendar.current.dateComponents([.day, .hour, .minute], from: nextReminderDate)
 
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
         
         // Create the request
-        let creditCardNotificationName = NotificationsName.creditCardNotification
+        let creditCardNotificationName = notificationName
         let request = UNNotificationRequest(identifier: creditCardNotificationName,
                     content: content, trigger: trigger)
         
@@ -68,11 +76,11 @@ struct ReminderDetailView: View {
               // Handle any errors.
            }
         }
-    }
-}
-
-struct ReminderDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        ReminderDetailView()
+        
+        // Update user defaults
+        var reminderDict = settings.creditCardReminderDict
+        
+        reminderDict[creditCardNotificationName] = reminderDate
+        settings.creditCardReminderDict = reminderDict
     }
 }

@@ -87,13 +87,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension UIApplication {
+    
+    func validateCategoriesSeed() {
+        PersistenceController.shared.validateCategoriesSeed()
+    }
+    
     func endEditing() {
         sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
-}
-
-public extension UIApplication {
-
+    
     func clearLaunchScreenCache() {
         do {
             try FileManager.default.removeItem(atPath: NSHomeDirectory()+"/Library/SplashBoard")
@@ -101,5 +103,4 @@ public extension UIApplication {
             print("Failed to delete launch screen cache: \(error)")
         }
     }
-
 }

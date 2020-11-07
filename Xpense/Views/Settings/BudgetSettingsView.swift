@@ -98,8 +98,11 @@ struct BudgetSettingsView: View {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = PeriodicBudget.fetchRequest()
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
 
+        let budgetRequest: NSFetchRequest<NSFetchRequestResult> = Budget.fetchRequest()
+        let budgetDeleteRequest = NSBatchDeleteRequest(fetchRequest: budgetRequest)
         do {
             try viewContext.execute(deleteRequest)
+            try viewContext.execute(budgetDeleteRequest)
             SPAlert.present(title: "Budget Deleted", preset: .done)
             presentationMode.wrappedValue.dismiss()
         } catch let error  {

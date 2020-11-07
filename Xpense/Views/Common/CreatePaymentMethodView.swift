@@ -13,7 +13,7 @@ import UserNotifications
 struct CreatePaymentMethodView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
-    @Binding var showSheetView: WalletViewSheet?
+    @Binding var showSheetView: SheetFlags?
     @Binding var sheetFlag: Bool
     @State var amount: Double = 0
     @State var currency: CurrencyValue
@@ -69,7 +69,7 @@ struct CreatePaymentMethodView: View {
         }
     }
     
-    init(paymentMethodType: PaymentMethodType, showSheetView: Binding<WalletViewSheet?>) {
+    init(paymentMethodType: PaymentMethodType, showSheetView: Binding<SheetFlags?>) {
         self.paymentMethodType = paymentMethodType
         self._showSheetView = showSheetView
         let defaultCurrency = "IDR"
@@ -88,7 +88,7 @@ struct CreatePaymentMethodView: View {
     
     init(paymentMethodType: PaymentMethodType, sheetFlag: Binding<Bool>, paymentMethod: PaymentMethod? = nil) {
         self.paymentMethodType = paymentMethodType
-        self._showSheetView = .init(get: { () -> WalletViewSheet? in
+        self._showSheetView = .init(get: { () -> SheetFlags? in
             return nil
         }, set: { (enu) in
         
@@ -525,7 +525,7 @@ struct CreatePaymentMethodView: View {
 
 struct CreatePaymentMethodView_Previews: PreviewProvider {
     static var previews: some View {
-        CreatePaymentMethodView(paymentMethodType: .creditCard, showSheetView: Binding<WalletViewSheet?>(get: { () -> WalletViewSheet in
+        CreatePaymentMethodView(paymentMethodType: .creditCard, showSheetView: Binding<SheetFlags?>(get: { () -> SheetFlags in
             return .addCreditCard
         }, set: { (flag) in
             

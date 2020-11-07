@@ -46,4 +46,19 @@ final class UserSettings: ObservableObject {
             objectWillChange.send()
         }
     }
+    
+    @UserDefault("hasSetupIntro", defaultValue: false)
+    var hasSetupIntro: Bool {
+        willSet {
+            objectWillChange.send()
+        }
+    }
+    
+    
+    @UserDefault("securityEnabled", defaultValue: false)
+    var securityEnabled: Bool {
+        willSet {
+            objectWillChange.send()
+        }
+    }
 }

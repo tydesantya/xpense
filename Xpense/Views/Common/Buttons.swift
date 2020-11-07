@@ -36,6 +36,7 @@ struct PrimaryButton: View {
     
     var title: String = "Button"
     var action: () -> Void
+    var destructive: Bool = false
     
     var body: some View {
         Button(action: {
@@ -43,7 +44,7 @@ struct PrimaryButton: View {
         }) {
             HStack {
                 Text(title)
-                    .foregroundColor(.theme)
+                    .foregroundColor(destructive ? Color(UIColor.systemRed) : .theme)
                     .padding(.horizontal, .small)
                 Spacer()
             }

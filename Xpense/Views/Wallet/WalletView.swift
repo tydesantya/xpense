@@ -9,7 +9,7 @@
 import SwiftUI
 import PartialSheet
 
-enum WalletViewSheet: Int, Identifiable {
+enum SheetFlags: Int, Identifiable {
     case cashDetail
     case addCreditCard
     case addDebitCard
@@ -18,6 +18,8 @@ enum WalletViewSheet: Int, Identifiable {
     case creditCardList
     case addEWallet
     case eWalletDetail
+    case intro
+    case wallet
     var id: Int {
         hashValue
     }
@@ -30,7 +32,7 @@ struct WalletView: View {
     private var paymentMethods: FetchedResults<PaymentMethod>
     
     @State var showModally: Bool = true
-    @State var activeSheet: WalletViewSheet?
+    @State var activeSheet: SheetFlags?
     
     var body: some View {
         GeometryReader { reader in

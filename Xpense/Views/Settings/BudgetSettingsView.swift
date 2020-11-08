@@ -54,6 +54,9 @@ struct BudgetSettingsView: View {
                                         .font(.sectionTitle)
                                         .padding()
                                         .background(Color(UIColor.secondarySystemBackground).cornerRadius(.normal))
+                                        .onTapGesture {
+                                            optionAction.toggle()
+                                        }
                                 }
                                 Spacer()
                             }

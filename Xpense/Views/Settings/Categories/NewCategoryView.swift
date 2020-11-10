@@ -157,9 +157,17 @@ struct NewCategoryView: View {
     
     func onDoneTapped() {
         if let category = existingCategory {
+            Analytics.logEvent("edit_category", parameters: [
+                "categoryName": categoryName,
+                "categoryType": categoryType.rawValue
+            ])
             editExistingCategory(category)
         }
         else {
+            Analytics.logEvent("create_category", parameters: [
+                "categoryName": categoryName,
+                "categoryType": categoryType.rawValue
+            ])
             createNewCategory()
         }
     }

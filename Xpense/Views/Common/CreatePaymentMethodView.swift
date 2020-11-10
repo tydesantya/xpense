@@ -9,6 +9,7 @@
 import SwiftUI
 import SPAlert
 import UserNotifications
+import Firebase
 
 struct CreatePaymentMethodView: View {
     
@@ -77,6 +78,10 @@ struct CreatePaymentMethodView: View {
                 reminderEnabled = true
                 reminderDate = date
             }
+            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                "screenName": "Create or Edit Payment Method",
+                "paymentMethodType": paymentMethodType.rawValue
+            ])
         }
     }
     
@@ -280,6 +285,10 @@ struct CreatePaymentMethodView: View {
         case .cash:
             return AnyView(
                 Button(action: {
+                    Analytics.logEvent("create_payment_method", parameters: [
+                        "paymentMethodType": "Cash",
+                        "paymentMethodName": cardName
+                    ])
                     self.createCashAndDismiss()
                 }) {
                     Text("Done").bold()
@@ -288,6 +297,10 @@ struct CreatePaymentMethodView: View {
         case .creditCard:
             return AnyView(
                 Button(action: {
+                    Analytics.logEvent("create_payment_method", parameters: [
+                        "paymentMethodType": "Credit Card",
+                        "paymentMethodName": cardName
+                    ])
                     self.createCreditCardAndDismiss()
                 }) {
                     Text("Done").bold()
@@ -296,6 +309,10 @@ struct CreatePaymentMethodView: View {
         case .debitCard:
             return AnyView(
                 Button(action: {
+                    Analytics.logEvent("create_payment_method", parameters: [
+                        "paymentMethodType": "Debit Card",
+                        "paymentMethodName": cardName
+                    ])
                     self.createDebitCardAndDismiss()
                 }) {
                     Text("Done").bold()
@@ -304,6 +321,10 @@ struct CreatePaymentMethodView: View {
         default:
             return AnyView(
                 Button(action: {
+                    Analytics.logEvent("create_payment_method", parameters: [
+                        "paymentMethodType": "E-Wallet",
+                        "paymentMethodName": cardName
+                    ])
                     self.createEWalletAndDismiss()
                 }) {
                     Text("Done").bold()

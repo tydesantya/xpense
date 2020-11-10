@@ -9,6 +9,7 @@
 import SwiftUI
 import SFSafeSymbols
 import SPAlert
+import Firebase
 
 struct AddExpenseView: View {
     
@@ -238,6 +239,14 @@ struct AddExpenseView: View {
         selectedCategory!.lastUsed = Date()
         
         deductSelectedPaymentMethodWithCurrentAmount()
+        
+        Analytics.logEvent("edit_transaction", parameters: [
+            "transactionType": "category",
+            "categoryName": selectedCategory?.name ?? "",
+            "date": Date().mediumDateTimeFormat(),
+            "paymentMethodName": selectedPaymentMethod?.name ?? "",
+            "categoryType": selectedCategory?.type ?? ""
+        ])
         do {
             try viewContext.save()
             refreshFlag = UUID()
@@ -279,6 +288,13 @@ struct AddExpenseView: View {
                 }
             }
         }
+        Analytics.logEvent("make_transaction", parameters: [
+            "transactionType": "category",
+            "categoryName": selectedCategory?.name ?? "",
+            "date": Date().mediumDateTimeFormat(),
+            "paymentMethodName": selectedPaymentMethod?.name ?? "",
+            "categoryType": selectedCategory?.type ?? ""
+        ])
         do {
             try viewContext.save()
             refreshFlag = UUID()
@@ -312,6 +328,13 @@ struct AddExpenseView: View {
         
         increaseTopUpTargetBalanceWithCurrentAmount()
         
+        Analytics.logEvent("make_transaction", parameters: [
+            "transactionType": "top_up",
+            "categoryName": transaction.category?.name ?? "",
+            "date": Date().mediumDateTimeFormat(),
+            "paymentMethodName": selectedPaymentMethod?.name ?? "",
+            "categoryType": "Top up"
+        ])
         do {
             try viewContext.save()
             refreshFlag = UUID()

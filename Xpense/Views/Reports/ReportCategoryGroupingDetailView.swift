@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct ReportCategoryGroupingDetailView: View {
     
@@ -71,6 +72,14 @@ struct ReportCategoryGroupingDetailView: View {
                     }
                 }.padding()
             }.id(refreshFlag)
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                    "screenName": "Report Category Grouping",
+                    "categoryName": chartModel.category?.name ?? "",
+                    "paymentMethodName": paymentMethodName ?? "",
+                    "period": chartModel.periodString
+                ])
+            }
         }.navigationTitle(chartModel.periodString)
     }
 }

@@ -57,9 +57,17 @@ struct NewCategoryStyleView: View {
                 Spacer()
                 Button(action: {
                     if self.type == .icon {
+                        Analytics.logEvent("new_category_style", parameters: [
+                            "styleType": type.rawValue,
+                            "symbol": symbolSelection.rawValue
+                        ])
                         self.completion(nil, colorSelection, symbolSelection)
                     }
                     else {
+                        Analytics.logEvent("new_category_style", parameters: [
+                            "styleType": type.rawValue,
+                            "inputText": inputText
+                        ])
                         self.completion(inputText, colorSelection, nil)
                     }
                     self.showSheetFlag = false

@@ -128,6 +128,12 @@ struct TransactionDetailView: View {
     }
     
     func deleteSelectedTransaction() {
+        Analytics.logEvent("delete_transaction", parameters: [
+            "categoryName": transaction.category?.name ?? "",
+            "date": Date().mediumDateTimeFormat(),
+            "paymentMethodName": transaction.paymentMethod?.name ?? "",
+            "categoryType": transaction.category?.type ?? ""
+        ])
         revertTransactionPaymentMethodAmount(transaction)
         if let budget = transaction.budget {
             let initialBudgetUsedAmount = budget.usedAmount!.toDouble()

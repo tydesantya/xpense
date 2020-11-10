@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SwiftUICharts
+import Firebase
 
 struct ReportPaymentMethodGroupingDetailView: View {
     
@@ -57,6 +58,13 @@ struct ReportPaymentMethodGroupingDetailView: View {
                 }.background(
                     Color(UIColor.secondarySystemBackground)
                 )
+            }
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                    "screenName": "Report Payment Method Grouping",
+                    "paymentMethodName": chartModel.paymentMethod?.name ?? "",
+                    "period": chartModel.periodString
+                ])
             }
         }.navigationTitle(chartModel.periodString)
     }

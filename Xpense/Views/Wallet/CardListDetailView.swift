@@ -295,6 +295,10 @@ struct CardListDetailView: View {
     
     func deleteSelectedCard() {
         guard let paymentMethod = selectedPaymentMethod else { return }
+        Analytics.logEvent("delete_payment_method", parameters: [
+            "paymentMethodName": paymentMethod.name ?? "",
+            "paymentMethodType": paymentMethod.type
+        ])
         viewContext.delete(paymentMethod)
         do {
             try viewContext.save()
@@ -311,6 +315,10 @@ struct CardListDetailView: View {
     }
     
     func migrateTransaction(from paymentMethod: PaymentMethod, toPaymentMethod: PaymentMethod) {
+        Analytics.logEvent("migrate_paymentMethod", parameters: [
+            "fromPaymentMethod": paymentMethod.name ?? "",
+            "toPaymentMethod": toPaymentMethod.name ?? ""
+        ])
         let transactions = paymentMethod.transactions!.allObjects as! [TransactionModel]
         if transactions.count > 0 {
             for transaction in transactions {

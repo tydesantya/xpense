@@ -236,6 +236,11 @@ struct EmptyBudgetCreationView: View {
             budget.usedAmount = DisplayCurrencyValue(currencyValue: CurrencyValue(amount: String(budgetUsedAmount), currency: inputModel.currencyValue.currency), numOfDecimalPoint: 0, decimalSeparator: ",", groupingSeparator: ".")
             index += 1
         }
+        
+        Analytics.logEvent("create_budget", parameters: [
+            "period": period.rawValue,
+            "categoryNames": inputModels.map{$0.category.name}
+        ])
         do {
             try viewContext.save()
             SPAlert.present(title: "Budget Added", preset: .done)

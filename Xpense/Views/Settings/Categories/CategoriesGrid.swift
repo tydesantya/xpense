@@ -9,6 +9,7 @@
 import SwiftUI
 import SFSafeSymbols
 import SPAlert
+import Firebase
 
 struct CategoriesGrid: View {
     
@@ -95,6 +96,10 @@ struct CategoriesGrid: View {
     }
     
     func onSelectCategoryToMigrate(_ category: CategoryModel) {
+        Analytics.logEvent("migrate_category", parameters: [
+            "fromCategory": longPressedCategory?.name ?? "",
+            "toCategory": category.name ?? ""
+        ])
         let budgetExists = longPressedCategory!.budgets!.count > 0
         categorySelectNavigation = false
         if let transactions = longPressedCategory!.transactions {
@@ -143,6 +148,9 @@ struct CategoriesGrid: View {
     }
     
     func deleteCategory(_ category: CategoryModel) {
+        Analytics.logEvent("delete_category", parameters: [
+            "categoryName": category.name ?? ""
+        ])
         do {
             viewContext.delete(category)
             try viewContext.save()
@@ -154,6 +162,9 @@ struct CategoriesGrid: View {
     }
     
     func deleteCategoryAlongWithBudget(_ category: CategoryModel) {
+        Analytics.logEvent("delete_category_with_budget", parameters: [
+            "categoryName": category.name ?? ""
+        ])
         do {
             let budgets = category.budgets!.allObjects as! [Budget]
             for budget in budgets {

@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct SignInView: View {
     var appleSignInCoordinator = AppleSignInCoordinator()
@@ -56,6 +57,11 @@ struct SignInView: View {
                 .onTapGesture {
                     settings.userName = "Teddy Santya"
                     settings.userEmail = "Teddysantya@gmail.com"
+                    Analytics.setDefaultEventParameters(
+                    [
+                        "userName": settings.userName,
+                        "userEmail": settings.userEmail
+                    ])
                     settings.hasSetupIntro = true
                     showSheetView = .wallet
                 }

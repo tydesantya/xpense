@@ -103,6 +103,11 @@ struct ContentView: View {
                     else {
                         self.checkPaymentMethods()
                     }
+                    Analytics.setDefaultEventParameters(
+                    [
+                        "userName": settings.userName,
+                        "userEmail": settings.userEmail
+                    ])
                 }
                 .addPartialSheet()
                 .accentColor(.theme)

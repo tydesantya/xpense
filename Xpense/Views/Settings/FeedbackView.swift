@@ -52,9 +52,31 @@ struct FeedbackView: View {
                 MailView(isShowing: self.$isShowingMailView, result: self.$result, body: $notes)
             }
         } else {
-            Text("Can't send emails from this device")
+            VStack {
+                Text("Mail is not set up on your device")
+                CTAButton(title: "e-Mail Feedback to Developer") {
+                    let _ = sendEmail()
+                }
+            }.padding()
+            .navigationTitle("Feedback")
         }
         
+    }
+    
+    func sendEmail() -> Bool {
+        guard var feedbackUrl = URLComponents.init(string: "mailto:teddy@santya.net") else {
+            return false
+        }
+        var queryItems: [URLQueryItem] = []
+        queryItems.append(URLQueryItem.init(name: "SUBJECT", value: "Xpense Feedback"))
+        feedbackUrl.queryItems = queryItems
+        if let url = feedbackUrl.url {
+            if UIApplication.shared.canOpenURL(url){
+                UIApplication.shared.open(url)
+                return true
+            }
+        }
+        return true
     }
 }
 

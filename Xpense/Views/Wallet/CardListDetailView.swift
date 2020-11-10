@@ -9,6 +9,7 @@
 import SwiftUI
 import SPAlert
 import PartialSheet
+import Firebase
 
 struct CardListDetailView: View {
     
@@ -80,6 +81,12 @@ struct CardListDetailView: View {
                 .background(Color.init(.secondarySystemBackground))
             }
             .edgesIgnoringSafeArea(.bottom)
+        }
+        .onAppear {
+            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                "screenName": "Card List Detail",
+                "paymentMethodType": self.paymentMethodType
+            ])
         }
         .onChange(of: pagerSelection, perform: { value in
             if pagerSelection >= 0 && pagerSelection < paymentMethods.count {
@@ -168,6 +175,10 @@ struct CardListDetailView: View {
         case .creditCard, .debitCard, .eWallet:
             return AnyView(
                 Button(action: {
+                    Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                        "screenName": "Add Card",
+                        "paymentMethodType": self.paymentMethodType
+                    ])
                     let select = selectedPaymentMethod
                     let edit = editedPaymentMethod
                     
@@ -361,6 +372,13 @@ struct ViewPager: View {
                 .offset(y: -50)
             }
         }
+        onChange(of: selection, perform: { value in
+            if cards.count > selection {
+                Analytics.logEvent(AnalyticsEventViewItem, parameters: [
+                    "cardName": cards[selection].name ?? "null"
+                ])
+            }
+        })
         .id(cards.count)
         .background(Color.init(.secondarySystemFill))
         .tabViewStyle(PageTabViewStyle())

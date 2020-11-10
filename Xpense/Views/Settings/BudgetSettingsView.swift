@@ -9,6 +9,7 @@
 import SwiftUI
 import CoreData
 import SPAlert
+import Firebase
 
 struct BudgetSettingsView: View {
     
@@ -69,6 +70,11 @@ struct BudgetSettingsView: View {
                 else {
                     BudgetPreviewView()
                 }
+            }
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                    "screenName": "Budget Settings"
+                ])
             }
             .actionSheet(isPresented: $optionAction, content: {
                 ActionSheet(title: Text("Options"), message: Text("Delete this budget to setup new budget"), buttons: [

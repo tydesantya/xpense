@@ -8,6 +8,7 @@
 
 import SwiftUI
 import MessageUI
+import Firebase
 
 struct FeedbackView: View {
     @State var notes: String = ""
@@ -40,7 +41,13 @@ struct FeedbackView: View {
                         }
                     }.padding()
                 }
-            }.navigationTitle("Feedback")
+            }
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                    "screenName": "Feedback"
+                ])
+            }
+            .navigationTitle("Feedback")
             .sheet(isPresented: $isShowingMailView) {
                 MailView(isShowing: self.$isShowingMailView, result: self.$result, body: $notes)
             }

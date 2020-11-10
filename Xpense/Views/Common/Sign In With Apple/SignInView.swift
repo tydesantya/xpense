@@ -54,6 +54,8 @@ struct SignInView: View {
             AppleSignInButton()
                 .frame(height: 60)
                 .onTapGesture {
+                    settings.userName = "Teddy Santya"
+                    settings.userEmail = "Teddysantya@gmail.com"
                     settings.hasSetupIntro = true
                     showSheetView = .wallet
                 }

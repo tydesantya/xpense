@@ -8,11 +8,17 @@
 
 import SwiftUI
 import WebKit
+import Firebase
 
 struct PrivacyPolicyView: View {
     var body: some View {
         WebView(fileName: "PrivacyPolicy")
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                    "screenName": "Privacy Policy"
+                ])
+            }
     }
 }
 

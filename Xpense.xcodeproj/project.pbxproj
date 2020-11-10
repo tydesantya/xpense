@@ -57,12 +57,14 @@
 		C36320A525530E5000DBEC08 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36320A425530E5000DBEC08 /* UserSettings.swift */; };
 		C369F62625572A5A008712E0 /* TermsOfUseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C369F62525572A5A008712E0 /* TermsOfUseView.swift */; };
 		C369F62925572AA4008712E0 /* TermsOfUse.html in Resources */ = {isa = PBXBuildFile; fileRef = C369F62825572AA4008712E0 /* TermsOfUse.html */; };
+		C369F62C255AE43D008712E0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C369F62B255AE43D008712E0 /* GoogleService-Info.plist */; };
+		C369F631255AE6BD008712E0 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C369F630255AE6BD008712E0 /* FirebaseAnalytics */; };
+		C369F633255AE6BD008712E0 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = C369F632255AE6BD008712E0 /* FirebaseCrashlytics */; };
 		C36D757F254E106A000596E2 /* KeyboardUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36D757E254E1069000596E2 /* KeyboardUtil.swift */; };
 		C380513125436E6000580A1E /* Persistence+CategorySeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C380513025436E6000580A1E /* Persistence+CategorySeed.swift */; };
 		C381C4B32544A557002DB1D7 /* DateFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4B22544A557002DB1D7 /* DateFormat.swift */; };
 		C381C4B62545D0B4002DB1D7 /* TransactionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */; };
 		C381C4CA254760BC002DB1D7 /* BarChart in Frameworks */ = {isa = PBXBuildFile; productRef = C381C4C9254760BC002DB1D7 /* BarChart */; };
-		C381C4CD254895C0002DB1D7 /* ChartsHomePieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4CC254895C0002DB1D7 /* ChartsHomePieView.swift */; };
 		C381C4D625489C14002DB1D7 /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = C381C4D525489C14002DB1D7 /* SwiftUICharts */; };
 		C381C4D92549C973002DB1D7 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C381C4D82549C973002DB1D7 /* ReportsView.swift */; };
 		C38912062532BD4700A646AD /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38912052532BD4700A646AD /* Persistence.swift */; };
@@ -139,11 +141,11 @@
 		C36320A425530E5000DBEC08 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 		C369F62525572A5A008712E0 /* TermsOfUseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsOfUseView.swift; sourceTree = "<group>"; };
 		C369F62825572AA4008712E0 /* TermsOfUse.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = TermsOfUse.html; sourceTree = "<group>"; };
+		C369F62B255AE43D008712E0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C36D757E254E1069000596E2 /* KeyboardUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardUtil.swift; sourceTree = "<group>"; };
 		C380513025436E6000580A1E /* Persistence+CategorySeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Persistence+CategorySeed.swift"; sourceTree = "<group>"; };
 		C381C4B22544A557002DB1D7 /* DateFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormat.swift; sourceTree = "<group>"; };
 		C381C4B52545D0B4002DB1D7 /* TransactionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListView.swift; sourceTree = "<group>"; };
-		C381C4CC254895C0002DB1D7 /* ChartsHomePieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsHomePieView.swift; sourceTree = "<group>"; };
 		C381C4D82549C973002DB1D7 /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
 		C38912052532BD4700A646AD /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		C389120E2540A5C700A646AD /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
@@ -170,10 +172,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C369F631255AE6BD008712E0 /* FirebaseAnalytics in Frameworks */,
 				C3A2342B254C95B2000B8A11 /* PartialSheet in Frameworks */,
 				C3369DBB2532580B00CA5647 /* SPAlert in Frameworks */,
 				C381C4CA254760BC002DB1D7 /* BarChart in Frameworks */,
 				C381C4D625489C14002DB1D7 /* SwiftUICharts in Frameworks */,
+				C369F633255AE6BD008712E0 /* FirebaseCrashlytics in Frameworks */,
 				C389120B253E133000A646AD /* Introspect in Frameworks */,
 				C35D41AA251FBC9000B45BD7 /* SFSafeSymbols in Frameworks */,
 			);
@@ -201,6 +205,7 @@
 		C32882582464894100F846DC /* Xpense */ = {
 			isa = PBXGroup;
 			children = (
+				C369F62B255AE43D008712E0 /* GoogleService-Info.plist */,
 				C3373EB02557081C0020C4CC /* XpenseDebug.entitlements */,
 				C32882672464894900F846DC /* Info.plist */,
 				C32882592464894100F846DC /* AppDelegate.swift */,
@@ -362,7 +367,6 @@
 		C381C4BE254601ED002DB1D7 /* Reports */ = {
 			isa = PBXGroup;
 			children = (
-				C381C4CC254895C0002DB1D7 /* ChartsHomePieView.swift */,
 				C381C4D82549C973002DB1D7 /* ReportsView.swift */,
 				C3CCD16C2549E5F200578B52 /* WeeklyExpenseChartView.swift */,
 				C31AE93E254B4017002B5A2F /* PieReportChartView.swift */,
@@ -446,6 +450,8 @@
 				C381C4C9254760BC002DB1D7 /* BarChart */,
 				C381C4D525489C14002DB1D7 /* SwiftUICharts */,
 				C3A2342A254C95B2000B8A11 /* PartialSheet */,
+				C369F630255AE6BD008712E0 /* FirebaseAnalytics */,
+				C369F632255AE6BD008712E0 /* FirebaseCrashlytics */,
 			);
 			productName = Xpense;
 			productReference = C32882562464894100F846DC /* Xpense.app */;
@@ -482,6 +488,7 @@
 				C381C4C8254760BC002DB1D7 /* XCRemoteSwiftPackageReference "BarChart" */,
 				C381C4D425489C14002DB1D7 /* XCRemoteSwiftPackageReference "ChartView" */,
 				C3A23429254C95B2000B8A11 /* XCRemoteSwiftPackageReference "PartialSheet" */,
+				C369F62F255AE6BD008712E0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = C32882572464894100F846DC /* Products */;
 			projectDirPath = "";
@@ -502,6 +509,7 @@
 				C32882632464894900F846DC /* Preview Assets.xcassets in Resources */,
 				C32882602464894900F846DC /* Assets.xcassets in Resources */,
 				C3373EB72557126D0020C4CC /* PrivacyPolicy.html in Resources */,
+				C369F62C255AE43D008712E0 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,7 +561,6 @@
 				C3369DA1253213EF00CA5647 /* PaymentMethodTypes.swift in Sources */,
 				C326DF7D254DC224006B50D0 /* ConfigureBudgetView.swift in Sources */,
 				C381C4D92549C973002DB1D7 /* ReportsView.swift in Sources */,
-				C381C4CD254895C0002DB1D7 /* ChartsHomePieView.swift in Sources */,
 				C30958CD2541BCD6006C0CB5 /* NewCategoryView.swift in Sources */,
 				C3E2678D2550687600519784 /* BudgetDetailView.swift in Sources */,
 				C31AE93F254B4017002B5A2F /* PieReportChartView.swift in Sources */,
@@ -727,7 +734,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.santya.xpense.Xpense;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = com.santya.xpense;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -748,6 +756,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.santya.xpense.Xpense;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -795,6 +804,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		C369F62F255AE6BD008712E0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 		C381C4C8254760BC002DB1D7 /* XCRemoteSwiftPackageReference "BarChart" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/dawigr/BarChart.git";
@@ -839,6 +856,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C35D41A8251FBC9000B45BD7 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */;
 			productName = SFSafeSymbols;
+		};
+		C369F630255AE6BD008712E0 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C369F62F255AE6BD008712E0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		C369F632255AE6BD008712E0 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C369F62F255AE6BD008712E0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 		C381C4C9254760BC002DB1D7 /* BarChart */ = {
 			isa = XCSwiftPackageProductDependency;

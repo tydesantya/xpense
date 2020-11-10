@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SPAlert
+import Firebase
 
 struct InputModel: Hashable {
     var category: CategoryModel
@@ -99,6 +100,11 @@ struct ConfigureBudgetView: View {
                 }
                 .environment(\.defaultMinListRowHeight, 100)
                 .frame(height: 116.0 * CGFloat(inputModels.count))
+            }
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                    "screenName": "Configure Budget"
+                ])
             }
             .navigationTitle("Configure Budget")
             .navigationBarItems(trailing: Button(action: {

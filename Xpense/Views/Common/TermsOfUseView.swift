@@ -7,11 +7,17 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct TermsOfUseView: View {
     var body: some View {
         WebView(fileName: "TermsOfUse")
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                    "screenName": "Terms of use"
+                ])
+            }
     }
 }
 

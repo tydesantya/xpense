@@ -8,6 +8,7 @@
 
 import SwiftUI
 import CoreData
+import Firebase
 
 private struct MonthlyTransaction: Hashable {
     var totalExpense: Double
@@ -56,6 +57,11 @@ struct TransactionListView: View {
                 
                 .id(refreshFlag)
             }.navigationTitle("Transactions")
+        }
+        .onAppear {
+            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                "screenName": "Transaction List"
+            ])
         }
     }
     

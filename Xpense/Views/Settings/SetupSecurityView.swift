@@ -9,6 +9,7 @@
 import SwiftUI
 import LocalAuthentication
 import SPAlert
+import Firebase
 
 struct SetupSecurityView: View {
     
@@ -46,6 +47,11 @@ struct SetupSecurityView: View {
             .background(RoundedRectangle(cornerRadius: .medium).fill(Color(UIColor.secondarySystemBackground)))
             .padding()
             Spacer()
+        }
+        .onAppear {
+            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                "screenName": "Security"
+            ])
         }
         .padding()
         .navigationTitle("Security")

@@ -9,6 +9,7 @@
 import SwiftUI
 import SFSafeSymbols
 import SPAlert
+import Firebase
 
 struct NewCategoryView: View {
     
@@ -123,6 +124,9 @@ struct NewCategoryView: View {
     }
     
     func onAppear() {
+        Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+            "screenName": "New Category"
+        ])
         if let category = existingCategory {
             categoryName = category.name ?? ""
             symbolSelection = SFSymbol(rawValue: category.symbolName ?? "") ?? .bagFill

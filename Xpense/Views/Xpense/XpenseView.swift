@@ -8,6 +8,7 @@
 
 import SwiftUI
 import CoreData
+import Firebase
 
 struct XpenseView: View {
     
@@ -161,6 +162,9 @@ struct BudgetHomeView: View {
                         })
                 }
                 .onTapGesture {
+                    Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                        "screenName": "Budget Detail"
+                    ])
                     DispatchQueue.main.async {
                         navigateToBudgetDetail = true
                     }
@@ -265,6 +269,9 @@ struct BudgetPreviewView: View {
                 }
             }
             .onTapGesture {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                    "screenName": "Add Budget"
+                ])
                 showAddBudget.toggle()
             }
             .sheet(isPresented: $showAddBudget, content: {

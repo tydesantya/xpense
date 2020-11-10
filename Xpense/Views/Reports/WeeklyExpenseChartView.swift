@@ -8,6 +8,7 @@
 
 import SwiftUI
 import BarChart
+import Firebase
 
 private struct DailyTransaction: Hashable {
     
@@ -84,6 +85,9 @@ struct WeeklyExpenseChartView: View {
             }
         }.id(transactions.count)
         .onAppear {
+            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                "screenName": "Weekly Expense"
+            ])
             activeData = update(transactions)
             refreshFlag = UUID()
         }

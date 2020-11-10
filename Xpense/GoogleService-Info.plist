@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>665576067667-ll7eo5f5uhpt0fmueb96ml4rsrmcrna7.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.665576067667-ll7eo5f5uhpt0fmueb96ml4rsrmcrna7</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBbHL7Syx1mZ5fv0j1MUz-6CmoQdF4Bvlg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>665576067667</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.santya.xpense</string>
+	<key>PROJECT_ID</key>
+	<string>xpense-f8732</string>
+	<key>STORAGE_BUCKET</key>
+	<string>xpense-f8732.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:665576067667:ios:90a1780c69a09a3b25aca6</string>
+	<key>DATABASE_URL</key>
+	<string>https://xpense-f8732.firebaseio.com</string>
+</dict>
+</plist>

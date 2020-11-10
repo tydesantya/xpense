@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct CategoriesView: View {
     
@@ -49,6 +50,11 @@ struct CategoriesView: View {
                 NewCategoryView(showSheetView: $addCategoryFlag, existingCategory: $selectedCategory, categoryType: getCategoryType(), refreshFlagUUID: $refreshID).environment(\.managedObjectContext, self.viewContext)
             }.accentColor(.theme)
         })
+        .onAppear {
+            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                "screenName": "Categories List"
+            ])
+        }
         .navigationTitle(migrationSelection != nil ? "Select Category" : "Categories")
         .toolbar(content: {
             ToolbarItem(placement: .primaryAction) {

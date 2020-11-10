@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct PaymentMethodMigrationSelectionView: View {
     
@@ -39,6 +40,11 @@ struct PaymentMethodMigrationSelectionView: View {
                     migrateAction(excludedPaymentMethod, selectedPaymentMethod!)
                 }, secondaryButton: .cancel())
             })
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                    "screenName": "Migrate Payment Method"
+                ])
+            }
         }.navigationTitle("Select Payment Method")
     }
     

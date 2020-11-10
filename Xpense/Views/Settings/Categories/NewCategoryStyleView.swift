@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SFSafeSymbols
+import Firebase
 
 enum CategoryStyleType: String {
     case text = "Text"
@@ -131,22 +132,10 @@ struct NewCategoryStyleView: View {
                 }
             }
         }.navigationBarTitle(Text(""), displayMode: .inline)
-//        .navigationBarItems(leading: Button(action: {
-//            self.showSheetFlag = false
-//        }) {
-//            Text("Cancel").bold()
-//        }, trailing: Button(action: {
-//            if self.type == .icon {
-//                self.completion(nil, colorSelection, symbolSelection)
-//            }
-//            else {
-//                self.completion(inputText, colorSelection, nil)
-//            }
-//            self.showSheetFlag = false
-//        }) {
-//            Text("Done").bold()
-//        }.disabled(inputText.count == 0 && self.type != .icon))
         .onAppear {
+            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                "screenName": "New Category Style"
+            ])
             segmentChanged(0)
         }
         

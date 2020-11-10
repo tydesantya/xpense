@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct ReminderDetailView: View {
     @Binding var reminderDate: Date
@@ -25,6 +26,11 @@ struct ReminderDetailView: View {
                 DatePicker("Date & Time", selection: $reminderDate)
             }.padding()
             .frame(minHeight: 150)
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                    "screenName": "Reminder Detail"
+                ])
+            }
             .onChange(of: reminderEnabled, perform: { value in
                 cancelExistingReminder()
                 if value {

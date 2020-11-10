@@ -9,6 +9,7 @@
 import SwiftUI
 import PartialSheet
 import LocalAuthentication
+import Firebase
 
 struct ContentView: View {
     
@@ -57,6 +58,9 @@ struct ContentView: View {
                             .environment(\.managedObjectContext, self.viewContext)
                     }
                     .navigationBarItems(trailing: Button(action: {
+                        Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                            "screenName": "Add Transaction"
+                        ])
                         self.addTransaction.toggle()
                     }, label: {
                         Image(systemName: "note.text.badge.plus")
@@ -69,12 +73,24 @@ struct ContentView: View {
                         switch value {
                         case 1:
                             self.navigationBarTitle = "Xpense"
+                            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                                "screenName": "Xpense"
+                            ])
                         case 2:
                             self.navigationBarTitle = "Wallet"
+                            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                                "screenName": "Wallet"
+                            ])
                         case 3:
                             self.navigationBarTitle = "Reports"
+                            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                                "screenName": "Reports"
+                            ])
                         case 4:
                             self.navigationBarTitle = "Settings"
+                            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                                "screenName": "Settings"
+                            ])
                         default:
                             break
                         }
@@ -148,6 +164,11 @@ struct ContentView: View {
                 }.padding()
                 .onAppear {
                     authenticate()
+                    Analytics.setDefaultEventParameters(
+                    [
+                        "userName": settings.userName,
+                        "userEmail": settings.userEmail
+                    ])
                 }
             }
         }
@@ -181,6 +202,7 @@ struct ContentView: View {
                 DispatchQueue.main.async {
                     if success {
                         isUnlocked = true
+                        Analytics.logEvent(AnalyticsEventLogin, parameters: [:])
                     } else {
                         isUnlocked = false
                     }

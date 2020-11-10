@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SPAlert
+import Firebase
 
 struct TransactionDetailView: View {
     
@@ -100,7 +101,13 @@ struct TransactionDetailView: View {
                         }
                     })
                     Spacer()
-                }.navigationTitle("Transaction Detail")
+                }
+                .onAppear {
+                    Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                        "screenName": "Transaction Detail"
+                    ])
+                }
+                .navigationTitle("Transaction Detail")
                 .navigationBarItems(trailing: Button(action: {
                     editTransaction = true
                 }, label: {

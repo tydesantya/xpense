@@ -9,6 +9,7 @@
 import SwiftUI
 import SwiftUICharts
 import PartialSheet
+import Firebase
 
 struct ChartModel: Hashable {
     var category: CategoryModel?
@@ -64,6 +65,10 @@ struct PieReportChartView: View {
             }.id(refreshFlag)
         }.navigationTitle(dateFormatter.string(from: selectedDate))
         .onAppear {
+            Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                "screenName": "Pie Report",
+                "categoryType": reportType.rawValue
+            ])
             setupCurrentMonth()
         }
         .navigationBarItems(trailing: HStack {

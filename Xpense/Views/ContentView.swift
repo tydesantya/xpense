@@ -13,6 +13,8 @@ import Firebase
 
 struct ContentView: View {
     
+    static var appUnlocked = false
+    
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(sortDescriptors: [])
     private var paymentMethods: FetchedResults<PaymentMethod>
@@ -194,27 +196,32 @@ struct ContentView: View {
     }
     
     func authenticate() {
-        let context = LAContext()
-        var error: NSError?
+        if !ContentView.appUnlocked {
+            let context = LAContext()
+            var error: NSError?
 
-        // check whether biometric authentication is possible
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            // it's possible, so go ahead and use it
-            let reason = "Only you can unlock your app"
+            // check whether biometric authentication is possible
+            if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+                // it's possible, so go ahead and use it
+                let reason = "Only you can unlock your app"
 
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
-                // authentication has now completed
-                DispatchQueue.main.async {
-                    if success {
-                        isUnlocked = true
-                        Analytics.logEvent(AnalyticsEventLogin, parameters: [:])
-                    } else {
-                        isUnlocked = false
+                context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
+                    // authentication has now completed
+                    DispatchQueue.main.async {
+                        if success {
+                            isUnlocked = true
+                            ContentView.appUnlocked = true
+                            Analytics.logEvent(AnalyticsEventLogin, parameters: [:])
+                        } else {
+                            isUnlocked = false
+                            ContentView.appUnlocked = false
+                        }
                     }
                 }
+            } else {
+                isUnlocked = false
+                ContentView.appUnlocked = false
             }
-        } else {
-            isUnlocked = false
         }
     }
 }

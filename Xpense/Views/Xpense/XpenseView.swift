@@ -69,6 +69,7 @@ struct XpenseView: View {
                     .id(refreshFlag)
                     .padding(.horizontal)
                 }
+                .id(refreshFlag)
             }
         }.onAppear(perform: {
             withAnimation {

@@ -19,6 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var viewContext: NSManagedObjectContext {
         let viewContext = persistenceController.container.viewContext
         viewContext.automaticallyMergesChangesFromParent = true
+        viewContext.mergePolicy = NSOverwriteMergePolicy
         return viewContext
     }
     

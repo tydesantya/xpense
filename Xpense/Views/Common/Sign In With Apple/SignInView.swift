@@ -61,9 +61,10 @@ struct SignInView: View {
             Spacer()
             AppleSignInButton()
                 .frame(height: 60)
-                .onTapGesture {settings.hasSetupIntro = true
+                .onTapGesture {
                     #if DEBUG
-                    
+                    settings.hasSetupIntro = true
+                    persistenceController.validateCategoriesSeed()
                     if paymentMethods.count == 0 {
                         showSheetView = .wallet
                     }

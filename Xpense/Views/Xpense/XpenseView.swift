@@ -66,10 +66,10 @@ struct XpenseView: View {
                             }.frame(minHeight: 200)
                         }
                     }
+                    .id(refreshFlag)
                     .padding(.horizontal)
                 }
             }
-            .id(refreshFlag)
         }.onAppear(perform: {
             withAnimation {
                 self.progressValue = 0.5

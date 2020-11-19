@@ -16,11 +16,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
         registerBackgroundTask()
-        
-        let operationQueue = OperationQueue()
-        let operation = BudgetFetcherOperation()
-        
-        operationQueue.addOperations([operation], waitUntilFinished: false)
+        DispatchQueue.main.async {
+            let operationQueue = OperationQueue()
+            let operation = BudgetFetcherOperation()
+
+            operationQueue.addOperations([operation], waitUntilFinished: false)
+        }
         return true
     }
     

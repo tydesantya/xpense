@@ -153,8 +153,8 @@ struct TransactionDetailView: View {
     
     func revertTransactionPaymentMethodAmount(_ transaction: TransactionModel) {
         let amountString = transaction.amount?.currencyValue.amount ?? ""
-        let amount = Double(amountString) ?? 00
-        let initialAmountString: String = transaction.amount?.currencyValue.amount ?? ""
+        let amount = Double(amountString) ?? 0
+        let initialAmountString: String = transaction.paymentMethod?.balance?.currencyValue.amount ?? ""
         let initialAmount = Double(initialAmountString) ?? 0
         let categoryType = CategoryType(rawValue: transaction.category?.type ?? "") ?? .expense
         let revertedAmount = categoryType == .expense ? initialAmount + amount : initialAmount - amount

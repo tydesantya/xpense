@@ -37,6 +37,8 @@ struct CreatePaymentMethodView: View {
     var numberFormatter: NumberFormatter!
     
     @ObservedObject var settings = UserSettings()
+    @FetchRequest(sortDescriptors: [])
+    private var paymentMethods: FetchedResults<PaymentMethod>
     
     var body: some View {
         NavigationView {
@@ -83,6 +85,12 @@ struct CreatePaymentMethodView: View {
                 "paymentMethodType": paymentMethodType.rawValue
             ])
         }
+        .onChange(of: amount, perform: { value in
+            if paymentMethods.count > 0 && paymentMethodType == .cash {
+                self.showSheetView = nil
+                self.sheetFlag = false
+            }
+        })
     }
     
     init(paymentMethodType: PaymentMethodType, showSheetView: Binding<SheetFlags?>) {

@@ -96,6 +96,9 @@ struct ContentView: View {
                         default:
                             break
                         }
+                        if paymentMethods.count == 0 {
+                            self.introSheet = .wallet
+                        }
                     })
                 }
                 .onAppear {

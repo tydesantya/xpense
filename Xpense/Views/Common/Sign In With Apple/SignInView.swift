@@ -13,6 +13,11 @@ struct SignInView: View {
     var appleSignInCoordinator = AppleSignInCoordinator()
     @Binding var showSheetView: SheetFlags?
     @ObservedObject var settings = UserSettings()
+    @FetchRequest(sortDescriptors: [])
+    private var paymentMethods: FetchedResults<PaymentMethod>
+    
+    let pub = NotificationCenter.default
+                .publisher(for: NSNotification.Name("AppleSignInSuccess"))
     
     var body: some View {
         VStack {
@@ -55,15 +60,7 @@ struct SignInView: View {
             AppleSignInButton()
                 .frame(height: 60)
                 .onTapGesture {
-                    settings.userName = "Teddy Santya"
-                    settings.userEmail = "Teddysantya@gmail.com"
-                    Analytics.setDefaultEventParameters(
-                    [
-                        "userName": settings.userName,
-                        "userEmail": settings.userEmail
-                    ])
-                    settings.hasSetupIntro = true
-                    showSheetView = .wallet
+                    appleSignInCoordinator.handleAuthorizationAppleIDButtonPress()
                 }
             Text("By signing in, you agree to our Terms of Use and Privacy Policy")
                 .font(.caption2)
@@ -72,5 +69,29 @@ struct SignInView: View {
                 .padding()
         }.navigationBarHidden(true)
         .padding()
+        .onReceive(pub) { (output) in
+            self.onSignInSuccess(output: output)
+        }
+    }
+    
+    func onSignInSuccess(output: NotificationCenter.Publisher.Output) {
+        if let userInfo = output.userInfo, let userName = userInfo["userName"], let userEmail = userInfo["userEmail"], let userIdentifier = userInfo["identifier"] {
+            settings.userName = userName as! String
+            settings.userEmail = userEmail as! String
+            settings.userIdentifier = userIdentifier as! String
+            Analytics.setDefaultEventParameters(
+            [
+                "userName": userName as! String,
+                "userEmail": userEmail as! String
+            ])
+            settings.hasSetupIntro = true
+            if paymentMethods.count == 0 {
+                showSheetView = .wallet
+            }
+            else {
+                showSheetView = nil
+            }
+            print("signed in: \(userName) \(userEmail) \(userIdentifier)")
+       }
     }
 }

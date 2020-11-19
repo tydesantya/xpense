@@ -29,6 +29,7 @@
 		C3288278246489FD00F846DC /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3288273246489FD00F846DC /* Design.swift */; };
 		C328827A24648A3100F846DC /* XpenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328827924648A3100F846DC /* XpenseView.swift */; };
 		C328827C2469C3C400F846DC /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C328827B2469C3C400F846DC /* SwiftUIView.swift */; };
+		C333A32625662D0200017374 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C333A32525662D0200017374 /* CloudKit.framework */; };
 		C3369D8B2532063100CA5647 /* CurrencyValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3369D8A2532063100CA5647 /* CurrencyValue.swift */; };
 		C3369D8F2532069000CA5647 /* DisplayCurrencyValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3369D8E2532069000CA5647 /* DisplayCurrencyValue.swift */; };
 		C3369D9E253212DF00CA5647 /* Financial.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C3369D9C253212DF00CA5647 /* Financial.xcdatamodeld */; };
@@ -114,6 +115,7 @@
 		C3288273246489FD00F846DC /* Design.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
 		C328827924648A3100F846DC /* XpenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XpenseView.swift; sourceTree = "<group>"; };
 		C328827B2469C3C400F846DC /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
+		C333A32525662D0200017374 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		C3369D8A2532063100CA5647 /* CurrencyValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyValue.swift; sourceTree = "<group>"; };
 		C3369D8E2532069000CA5647 /* DisplayCurrencyValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayCurrencyValue.swift; sourceTree = "<group>"; };
 		C3369D9D253212DF00CA5647 /* Financial.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Financial.xcdatamodel; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				C369F631255AE6BD008712E0 /* FirebaseAnalytics in Frameworks */,
 				C3A2342B254C95B2000B8A11 /* PartialSheet in Frameworks */,
 				C3369DBB2532580B00CA5647 /* SPAlert in Frameworks */,
+				C333A32625662D0200017374 /* CloudKit.framework in Frameworks */,
 				C381C4CA254760BC002DB1D7 /* BarChart in Frameworks */,
 				C381C4D625489C14002DB1D7 /* SwiftUICharts in Frameworks */,
 				C369F633255AE6BD008712E0 /* FirebaseCrashlytics in Frameworks */,
@@ -191,6 +194,7 @@
 			children = (
 				C32882582464894100F846DC /* Xpense */,
 				C32882572464894100F846DC /* Products */,
+				C333A32425662D0200017374 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -261,6 +265,14 @@
 				C36320A425530E5000DBEC08 /* UserSettings.swift */,
 			);
 			path = Util;
+			sourceTree = "<group>";
+		};
+		C333A32425662D0200017374 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C333A32525662D0200017374 /* CloudKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		C3369D8D2532067600CA5647 /* Financial */ = {

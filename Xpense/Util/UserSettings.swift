@@ -68,4 +68,11 @@ final class UserSettings: ObservableObject {
             objectWillChange.send()
         }
     }
+    
+    @UserDefault("userIdentifier", defaultValue: "")
+    var userIdentifier: String {
+        willSet {
+            objectWillChange.send()
+        }
+    }
 }

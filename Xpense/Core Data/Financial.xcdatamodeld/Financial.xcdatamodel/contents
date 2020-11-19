@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="19H2" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17511" systemVersion="20B29" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Account" representedClassName="Account" syncable="YES" codeGenerationType="class">
+        <attribute name="identifier" optional="YES" attributeType="String"/>
+        <attribute name="userEmail" optional="YES" attributeType="String"/>
+        <attribute name="userName" optional="YES" attributeType="String"/>
+    </entity>
     <entity name="Budget" representedClassName="Budget" syncable="YES" codeGenerationType="class">
         <attribute name="limit" optional="YES" attributeType="Transformable" valueTransformerName="DisplayCurrencyTransformer" customClassName="DisplayCurrencyValue"/>
         <attribute name="order" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
@@ -24,7 +29,7 @@
         <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Transaction" inverseName="category" inverseEntity="Transaction"/>
     </entity>
     <entity name="PaymentMethod" representedClassName="PaymentMethod" syncable="YES" codeGenerationType="class">
-        <attribute name="balance" attributeType="Transformable" valueTransformerName="DisplayCurrencyTransformer" customClassName="DisplayCurrencyValue"/>
+        <attribute name="balance" optional="YES" attributeType="Transformable" valueTransformerName="DisplayCurrencyTransformer" customClassName="DisplayCurrencyValue"/>
         <attribute name="color" optional="YES" attributeType="Binary"/>
         <attribute name="identifierNumber" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
@@ -50,8 +55,9 @@
     <elements>
         <element name="Budget" positionX="482.9765625" positionY="107.98046875" width="128" height="133"/>
         <element name="Category" positionX="168.60546875" positionY="87.7734375" width="128" height="238"/>
-        <element name="PaymentMethod" positionX="-442.26953125" positionY="42.140625" width="128" height="163"/>
+        <element name="PaymentMethod" positionX="-442.26953125" positionY="42.140625" width="128" height="149"/>
         <element name="PeriodicBudget" positionX="179.0859375" positionY="-49.703125" width="128" height="103"/>
         <element name="Transaction" positionX="195.53515625" positionY="474.32421875" width="128" height="133"/>
+        <element name="Account" positionX="-234" positionY="108" width="128" height="74"/>
     </elements>
 </model>

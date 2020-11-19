@@ -131,6 +131,7 @@
 		C3373EB9255715EA0020C4CC /* SetupSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSecurityView.swift; sourceTree = "<group>"; };
 		C3373EBD25571C910020C4CC /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		C3373EC025571DA10020C4CC /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
+		C352994725664E510092A9E8 /* XpenseRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XpenseRelease.entitlements; sourceTree = "<group>"; };
 		C35D419C251F9D3800B45BD7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C35D419F251FA96600B45BD7 /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
 		C35D41A2251FAAEE00B45BD7 /* CategoriesGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesGrid.swift; sourceTree = "<group>"; };
@@ -209,6 +210,7 @@
 		C32882582464894100F846DC /* Xpense */ = {
 			isa = PBXGroup;
 			children = (
+				C352994725664E510092A9E8 /* XpenseRelease.entitlements */,
 				C369F62B255AE43D008712E0 /* GoogleService-Info.plist */,
 				C3373EB02557081C0020C4CC /* XpenseDebug.entitlements */,
 				C32882672464894900F846DC /* Info.plist */,
@@ -758,6 +760,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Xpense/XpenseRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Xpense/Preview Content\"";
 				DEVELOPMENT_TEAM = MQ3AEKK6HW;
@@ -769,7 +772,7 @@
 					"@executable_path/Frameworks",
 				);
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = com.santya.xpense.Xpense;
+				PRODUCT_BUNDLE_IDENTIFIER = com.santya.xpense;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

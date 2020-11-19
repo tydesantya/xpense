@@ -16,6 +16,8 @@ struct SignInView: View {
     @FetchRequest(sortDescriptors: [])
     private var paymentMethods: FetchedResults<PaymentMethod>
     
+    let persistenceController = PersistenceController.shared
+    
     let pub = NotificationCenter.default
                 .publisher(for: NSNotification.Name("AppleSignInSuccess"))
     
@@ -59,8 +61,14 @@ struct SignInView: View {
             Spacer()
             AppleSignInButton()
                 .frame(height: 60)
-                .onTapGesture {
-                    appleSignInCoordinator.handleAuthorizationAppleIDButtonPress()
+                .onTapGesture {settings.hasSetupIntro = true
+                    if paymentMethods.count == 0 {
+                        showSheetView = .wallet
+                    }
+                    else {
+                        showSheetView = nil
+                    }
+//                    appleSignInCoordinator.handleAuthorizationAppleIDButtonPress()
                 }
             Text("By signing in, you agree to our Terms of Use and Privacy Policy")
                 .font(.caption2)
@@ -75,6 +83,7 @@ struct SignInView: View {
     }
     
     func onSignInSuccess(output: NotificationCenter.Publisher.Output) {
+        persistenceController.validateCategoriesSeed()
         if let userInfo = output.userInfo, let userName = userInfo["userName"], let userEmail = userInfo["userEmail"], let userIdentifier = userInfo["identifier"] {
             settings.userName = userName as! String
             settings.userEmail = userEmail as! String

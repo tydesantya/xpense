@@ -347,6 +347,7 @@ struct ViewPager: View {
     @Environment(\.managedObjectContext) private var viewContext
     var fetchRequest: FetchRequest<PaymentMethod>
     var cards : FetchedResults<PaymentMethod>{fetchRequest.wrappedValue}
+    @ObservedObject var settings = UserSettings()
     
     var body: some View {
         TabView(selection: $selection){
@@ -380,10 +381,10 @@ struct ViewPager: View {
                 .offset(y: -50)
             }
         }
-        onChange(of: selection, perform: { value in
+        .onChange(of: selection, perform: { value in
             if cards.count > selection {
                 Analytics.logEvent(AnalyticsEventViewItem, parameters: [
-                    "cardName": cards[selection].name ?? "null"
+                    "cardName": cards[safe: selection]?.name ?? "null"
                 ])
             }
         })
@@ -415,7 +416,7 @@ struct ViewPager: View {
                     }
                     Spacer()
                     HStack {
-                        Text("Teddy Santya")
+                        Text(settings.userName)
                             .bold()
                             .foregroundColor(.white)
                         Spacer()
@@ -485,4 +486,10 @@ private struct PaymentMethodTransactionsView: View {
         }
     }
     
+}
+
+extension Collection where Indices.Iterator.Element == Index {
+    subscript (safe index: Index) -> Iterator.Element? {
+        return indices.contains(index) ? self[index] : nil
+    }
 }

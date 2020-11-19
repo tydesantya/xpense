@@ -739,6 +739,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Xpense/XpenseDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"Xpense/Preview Content\"";
 				DEVELOPMENT_TEAM = MQ3AEKK6HW;
 				ENABLE_PREVIEWS = YES;
@@ -748,6 +749,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.santya.xpense;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -762,6 +764,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Xpense/XpenseRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"Xpense/Preview Content\"";
 				DEVELOPMENT_TEAM = MQ3AEKK6HW;
 				ENABLE_PREVIEWS = YES;
@@ -771,6 +774,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.santya.xpense;
 				PRODUCT_NAME = "$(TARGET_NAME)";

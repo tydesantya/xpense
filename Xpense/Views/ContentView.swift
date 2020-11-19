@@ -42,19 +42,23 @@ struct ContentView: View {
                                 .frame(width: 15, height: 15)
                             Text("Xpense")
                         }.tag(1)
+                        .environment(\.managedObjectContext, self.viewContext)
                         WalletView()
                             .tabItem {
                             Image(systemName: "creditcard")
                             Text("Wallet")
                         }.tag(2)
+                        .environment(\.managedObjectContext, self.viewContext)
                         ReportsView().tabItem {
                             Image(systemName: "chart.bar.doc.horizontal")
                             Text("Reports")
                         }.tag(3)
+                        .environment(\.managedObjectContext, self.viewContext)
                         SettingsView(parentIntroSheet: $introSheet, parentTabSelection: $selection).tabItem {
                             Image(systemName: "gear")
                             Text("Settings")
                         }.tag(4)
+                        .environment(\.managedObjectContext, self.viewContext)
                     }.sheet(isPresented: self.$addTransaction) {
                         AddExpenseView(showSheetView: self.$addTransaction, refreshFlag: $addTransactionRefreshFlag)
                             .environment(\.managedObjectContext, self.viewContext)

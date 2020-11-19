@@ -33,6 +33,7 @@ struct WalletView: View {
     
     @State var showModally: Bool = true
     @State var activeSheet: SheetFlags?
+    @ObservedObject var settings = UserSettings()
     
     var body: some View {
         GeometryReader { reader in
@@ -44,7 +45,7 @@ struct WalletView: View {
                         Spacer()
                     }.padding([.top, .horizontal])
                     VStack(alignment: .leading, spacing: .small) {
-                        Text("Teddy Santya's Wallet")
+                        Text("\(settings.userName)'s Wallet")
                             .font(.caption)
                             .bold()
                             .foregroundColor(.init(.secondaryLabel))
@@ -85,20 +86,27 @@ struct WalletView: View {
             switch item {
             case .cashDetail:
                 getCashCardSheet()
+                    .environment(\.managedObjectContext, viewContext)
             case .debitCardList:
                 getDebitCardSheet()
+                    .environment(\.managedObjectContext, viewContext)
             case .addDebitCard:
                 getAddDebitCardSheet()
+                    .environment(\.managedObjectContext, viewContext)
             case .creditCardList:
                 getCreditCardSheet()
-                    .addPartialSheet()
-                    .environmentObject(partialSheetManager)
+//                    .addPartialSheet()
+//                    .environmentObject(partialSheetManager)
+                    .environment(\.managedObjectContext, viewContext)
             case .addEWallet:
                 getAddEWalletSheet()
+                    .environment(\.managedObjectContext, viewContext)
             case .eWalletDetail:
                 getEWalletDetailSheet()
+                    .environment(\.managedObjectContext, viewContext)
             default:
                 getAddCreditCardSheet()
+                    .environment(\.managedObjectContext, viewContext)
             }
         }
     }
@@ -277,6 +285,7 @@ struct DebitCardWalletView: View {
     var parentWidth: CGFloat
     var addDebitAction: () -> Void
     var debitDetailAction: () -> Void
+    @ObservedObject var settings = UserSettings()
     
     var body: some View {
         let width = parentWidth > 0 ? parentWidth : 200
@@ -348,7 +357,7 @@ struct DebitCardWalletView: View {
                     }
                     Spacer()
                     HStack {
-                        Text("Teddy Santya")
+                        Text(settings.userName)
                             .bold()
                             .foregroundColor(.white)
                         Spacer()
@@ -370,6 +379,7 @@ struct CreditCardWalletView: View {
     var parentWidth: CGFloat
     var showSheetAction: () -> Void
     var creditCardDetail: () -> Void
+    @ObservedObject var settings = UserSettings()
     
     var body: some View {
         let width = parentWidth > 0 ? parentWidth : 200
@@ -441,7 +451,7 @@ struct CreditCardWalletView: View {
                     }
                     Spacer()
                     HStack {
-                        Text("Teddy Santya")
+                        Text(settings.userName)
                             .bold()
                             .foregroundColor(.white)
                         Spacer()

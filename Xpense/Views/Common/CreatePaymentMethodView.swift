@@ -205,7 +205,7 @@ struct CreatePaymentMethodView: View {
                 }
                 Spacer()
                 HStack {
-                    Text("Teddy Santya")
+                    Text(settings.userName)
                         .bold()
                         .foregroundColor(.white)
                     Spacer()

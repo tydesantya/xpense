@@ -19,7 +19,7 @@ struct SignInView: View {
     let persistenceController = PersistenceController.shared
     
     let pub = NotificationCenter.default
-                .publisher(for: NSNotification.Name("AppleSignInSuccess"))
+        .publisher(for: NSNotification.Name("AppleSignInSuccess"))
     
     var body: some View {
         VStack {
@@ -62,13 +62,18 @@ struct SignInView: View {
             AppleSignInButton()
                 .frame(height: 60)
                 .onTapGesture {settings.hasSetupIntro = true
+                    #if DEBUG
+                    
                     if paymentMethods.count == 0 {
                         showSheetView = .wallet
                     }
                     else {
                         showSheetView = nil
                     }
-//                    appleSignInCoordinator.handleAuthorizationAppleIDButtonPress()
+                    #else
+                    
+                    appleSignInCoordinator.handleAuthorizationAppleIDButtonPress()
+                    #endif
                 }
             Text("By signing in, you agree to our Terms of Use and Privacy Policy")
                 .font(.caption2)
@@ -89,10 +94,10 @@ struct SignInView: View {
             settings.userEmail = userEmail as! String
             settings.userIdentifier = userIdentifier as! String
             Analytics.setDefaultEventParameters(
-            [
-                "userName": userName as! String,
-                "userEmail": userEmail as! String
-            ])
+                [
+                    "userName": userName as! String,
+                    "userEmail": userEmail as! String
+                ])
             settings.hasSetupIntro = true
             if paymentMethods.count == 0 {
                 showSheetView = .wallet
@@ -101,6 +106,6 @@ struct SignInView: View {
                 showSheetView = nil
             }
             print("signed in: \(userName) \(userEmail) \(userIdentifier)")
-       }
+        }
     }
 }

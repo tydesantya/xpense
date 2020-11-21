@@ -13,6 +13,7 @@ import Firebase
 struct TransactionDetailView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.presentationMode) var presentationMode
     
     @Binding var navigationActive: Bool
     @ObservedObject var transaction: TransactionModel
@@ -125,6 +126,7 @@ struct TransactionDetailView: View {
                 })
             }
         }
+        .padding(.top, 0.3)
     }
     
     func deleteSelectedTransaction() {
@@ -134,7 +136,9 @@ struct TransactionDetailView: View {
             "paymentMethodName": transaction.paymentMethod?.name ?? "",
             "categoryType": transaction.category?.type ?? ""
         ])
-        revertTransactionPaymentMethodAmount(transaction)
+        if transaction.paymentMethod?.type != PaymentMethodType.creditCard.rawValue {
+            revertTransactionPaymentMethodAmount(transaction)
+        }
         if let budget = transaction.budget {
             let initialBudgetUsedAmount = budget.usedAmount!.toDouble()
             let newBudgetAmount = initialBudgetUsedAmount - transaction.amount!.toDouble()
@@ -144,8 +148,7 @@ struct TransactionDetailView: View {
         do {
             try viewContext.save()
             SPAlert.present(title: "Deleted", preset: .done)
-            navigationActive = false
-            refreshFlag = UUID()
+            presentationMode.wrappedValue.dismiss()
         } catch let createError {
             print("Failed to delete transaction \(createError)")
         }

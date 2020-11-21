@@ -8,6 +8,7 @@
 
 import SwiftUI
 import CoreData
+import StoreKit
 
 struct SettingsView: View {
     
@@ -50,6 +51,9 @@ struct SettingsView: View {
                         Divider()
                             .padding(.bottom, .tiny)
                         MenuView(iconName: "mail.fill", text: "Feedback", action: self.menuTapped(title:))
+                        Divider()
+                            .padding(.bottom, .tiny)
+                        MenuView(iconName: "star.fill", text: "Rate This App", action: self.menuTapped(title:))
                     }
                 }
                 .padding()
@@ -72,10 +76,12 @@ struct SettingsView: View {
                 }, secondaryButton: .cancel())
             }
         }
+        .padding(.top, 0.3)
         .navigationBarTitle("Settings")
     }
     
     func menuTapped(title: String) {
+        var shouldNavigate = true
         switch title {
         case "Budget":
             destinationView = AnyView(BudgetSettingsView())
@@ -101,10 +107,18 @@ struct SettingsView: View {
             destinationView = AnyView(
                 FeedbackView()
             )
+        case "Rate This App":
+            if let scene = UIApplication.shared.currentScene {
+                SKStoreReviewController.requestReview(in: scene)
+                settings.hasRequestReview = true
+                shouldNavigate = false
+            }
         default:
             destinationView = nil
         }
-        self.navigate = true
+        if shouldNavigate {
+            self.navigate = true
+        }
     }
     
     func deleteAllData() {

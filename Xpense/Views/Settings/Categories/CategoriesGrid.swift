@@ -156,6 +156,7 @@ struct CategoriesGrid: View {
             try viewContext.save()
             SPAlert.present(title: "Deleted Category", preset: .done)
             refreshFlag = UUID()
+            NotificationCenter.default.post(name: NSNotification.Name("CategoryUpdated"), object: nil)
         } catch let createError {
             print("Failed to delete Category \(createError)")
         }
@@ -174,6 +175,7 @@ struct CategoriesGrid: View {
             try viewContext.save()
             SPAlert.present(title: "Deleted Category", preset: .done)
             refreshFlag = UUID()
+            NotificationCenter.default.post(name: NSNotification.Name("CategoryUpdated"), object: nil)
         } catch let createError {
             print("Failed to delete Category \(createError)")
         }

@@ -36,89 +36,100 @@ struct ConfigureBudgetView: View {
     @State var showConfirmationAlert: Bool = false
     var segments = BudgetPeriod.allCases
     @State var segmentIndex = 0
+    var listId = 123
     
     var body: some View {
         ScrollView {
-            VStack {
-                Text("Budget Period")
-                    .font(.footnote)
-                    .padding(.top)
-                Picker(selection: self.$segmentIndex, label: Text("")) {
-                    ForEach(0..<self.segments.count) { index in
-                        Text(self.segments[index].rawValue)
-                    }
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .padding([.horizontal, .bottom])
-                let initialSize:CGFloat = 120.0
-                ZStack {
-                    ForEach(inputModels, id: \.self) {
-                        inputModel in
-                        let category = inputModel.category
-                        let index = inputModels.firstIndex(of: inputModel)!
-                        if index < inputModels.count {
-                            let size = initialSize - CGFloat((index * 30))
-                            let categoryColorData = category.color
-                            let categoryColor = UIColor.color(data: categoryColorData!)
-                            ProgressBar(progress: self.$progressValue, color: categoryColor!)
-                                .frame(width: size, height: size)
-                                .padding(.vertical)
+            ScrollViewReader {
+                value in
+                VStack {
+                    Text("Budget Period")
+                        .font(.footnote)
+                        .padding(.top)
+                    Picker(selection: self.$segmentIndex, label: Text("")) {
+                        ForEach(0..<self.segments.count) { index in
+                            Text(self.segments[index].rawValue)
                         }
                     }
-                }
-                Text("Budget Ring Preview")
-                    .font(.caption)
-                EmptyBudgetCreationView(showSheetView: $showSheetView, showConfirmationAlert: $showConfirmationAlert, segmentIndex: $segmentIndex, inputModels: $inputModels, fetchRequest: makeTransactionFetchRequest())
-                Text("Setup Budget Amount and Order")
-                    .font(.sectionTitle)
-                List {
-                    ForEach(0..<inputModels.count) {
-                        index in
-                        HStack {
-                            let inputModel = inputModels[index]
+                    .pickerStyle(SegmentedPickerStyle())
+                    .padding([.horizontal, .bottom])
+                    let initialSize:CGFloat = 120.0
+                    ZStack {
+                        ForEach(inputModels, id: \.self) {
+                            inputModel in
                             let category = inputModel.category
                             let index = inputModels.firstIndex(of: inputModel)!
                             if index < inputModels.count {
-                                CategoryIconDisplayView(category: category, iconWidth: 80.0, iconHeight: 80.0)
-                                    .padding()
-                                VStack {
-                                    HStack {
-                                        Text(category.name ?? "")
-                                            .font(.footnote)
-                                        Spacer()
-                                    }
-                                    CurrencyTextField(amount: $inputModels[index].amount, currency: $inputModels[index].currencyValue)
-                                    .background(Color(UIColor.secondarySystemBackground).cornerRadius(.normal))
-                                }
+                                let size = initialSize - CGFloat((index * 30))
+                                let categoryColorData = category.color
+                                let categoryColor = UIColor.color(data: categoryColorData!)
+                                ProgressBar(progress: self.$progressValue, color: categoryColor!)
+                                    .frame(width: size, height: size)
+                                    .padding(.vertical)
                             }
-                        }.frame(height: 100)
+                        }
                     }
-                    .onMove(perform: move)
-                    .alert(isPresented: $showErrorAlert, content: {
-                        Alert(title: Text("Error"), message: Text("Please enter all budget amount!"), dismissButton: .default(Text("Got it")))
-                    })
-                }
-                .environment(\.defaultMinListRowHeight, 100)
-                .frame(height: 116.0 * CGFloat(inputModels.count))
-            }
-            .onAppear {
-                Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                    "screenName": "Configure Budget"
-                ])
-            }
-            .navigationTitle("Configure Budget")
-            .navigationBarItems(trailing: Button(action: {
-                for inputModel in inputModels {
-                    if inputModel.amount == 0 {
-                        showErrorAlert = true
-                        return
+                    Text("Budget Ring Preview")
+                        .font(.caption)
+                    EmptyBudgetCreationView(showSheetView: $showSheetView, showConfirmationAlert: $showConfirmationAlert, segmentIndex: $segmentIndex, inputModels: $inputModels, fetchRequest: makeTransactionFetchRequest())
+                    Text("Setup Budget Amount and Order")
+                        .font(.sectionTitle)
+                    List {
+                        ForEach(0..<inputModels.count) {
+                            index in
+                            HStack {
+                                let inputModel = inputModels[index]
+                                let category = inputModel.category
+                                let index = inputModels.firstIndex(of: inputModel)!
+                                if index < inputModels.count {
+                                    CategoryIconDisplayView(category: category, iconWidth: 80.0, iconHeight: 80.0)
+                                        .padding()
+                                    VStack {
+                                        HStack {
+                                            Text(category.name ?? "")
+                                                .font(.footnote)
+                                            Spacer()
+                                        }
+                                        CurrencyTextField(amount: $inputModels[index].amount, currency: $inputModels[index].currencyValue, onFocus: {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                withAnimation {
+                                                    value.scrollTo(listId, anchor: .bottom)
+                                                }
+                                            }
+                                        })
+                                        .background(Color(UIColor.secondarySystemBackground).cornerRadius(.normal))
+                                    }
+                                }
+                            }.frame(height: 100)
+                        }
+                        .onMove(perform: move)
+                        .alert(isPresented: $showErrorAlert, content: {
+                            Alert(title: Text("Error"), message: Text("Please enter all budget amount!"), dismissButton: .default(Text("Got it")))
+                        })
                     }
+                    .environment(\.defaultMinListRowHeight, 100)
+                    .frame(height: 116.0 * CGFloat(inputModels.count))
+                    .id(listId)
                 }
-                showConfirmationAlert = true
-            }, label: {
-                Text("Done")
-                    .bold()
-            }))
+                .onAppear {
+                    Analytics.logEvent(AnalyticsEventScreenView, parameters:[
+                        "screenName": "Configure Budget"
+                    ])
+                }
+                .navigationTitle("Configure Budget")
+                .navigationBarItems(trailing: Button(action: {
+                    for inputModel in inputModels {
+                        if inputModel.amount == 0 {
+                            showErrorAlert = true
+                            return
+                        }
+                    }
+                    showConfirmationAlert = true
+                }, label: {
+                    Text("Done")
+                        .bold()
+                }))
+            }
         }
     }
     

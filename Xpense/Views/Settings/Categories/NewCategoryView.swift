@@ -203,6 +203,7 @@ struct NewCategoryView: View {
             refreshFlagUUID = UUID()
             self.showSheetView = false
             SPAlert.present(title: "Edited Category", preset: .done)
+            NotificationCenter.default.post(name: NSNotification.Name("CategoryUpdated"), object: nil)
         } catch let createError {
             print("Failed to edit Category \(createError)")
         }

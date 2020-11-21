@@ -75,4 +75,11 @@ final class UserSettings: ObservableObject {
             objectWillChange.send()
         }
     }
+    
+    @UserDefault("hasRequestReview", defaultValue: false)
+    var hasRequestReview: Bool {
+        willSet {
+            objectWillChange.send()
+        }
+    }
 }

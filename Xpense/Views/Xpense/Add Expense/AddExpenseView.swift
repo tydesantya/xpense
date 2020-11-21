@@ -231,14 +231,18 @@ struct AddExpenseView: View {
     }
     
     func editTransaction(_ transaction: TransactionModel) {
-        revertTransactionPaymentMethodAmount(transaction)
+        if transaction.paymentMethod?.type != PaymentMethodType.creditCard.rawValue {
+            revertTransactionPaymentMethodAmount(transaction)
+        }
         transaction.amount = getDisplayCurrencyValueFromAmount(amt: amount)
         transaction.note = notes
         transaction.category = selectedCategory
         transaction.paymentMethod = selectedPaymentMethod
         selectedCategory!.lastUsed = Date()
         
-        deductSelectedPaymentMethodWithCurrentAmount()
+        if transaction.paymentMethod?.type != PaymentMethodType.creditCard.rawValue {
+            deductSelectedPaymentMethodWithCurrentAmount()
+        }
         
         Analytics.logEvent("edit_transaction", parameters: [
             "transactionType": "category",
@@ -275,7 +279,9 @@ struct AddExpenseView: View {
         transaction.date = Date()
         selectedCategory!.lastUsed = Date()
         
-        deductSelectedPaymentMethodWithCurrentAmount()
+        if selectedPaymentMethod?.type != PaymentMethodType.creditCard.rawValue {
+            deductSelectedPaymentMethodWithCurrentAmount()
+        }
         
         if let periodicBudget = periodicBudgets.first {
             let budgets = periodicBudget.budgets!.allObjects as! [Budget]
@@ -316,7 +322,9 @@ struct AddExpenseView: View {
         transaction.date = transactionDate
         transaction.category = selectedTopUpMethod?.topupPaymentCategory
         
-        deductSelectedPaymentMethodWithCurrentAmount()
+        if selectedPaymentMethod?.type != PaymentMethodType.creditCard.rawValue {
+            deductSelectedPaymentMethodWithCurrentAmount()
+        }
         
         
         let topUpTargetTransaction = TransactionModel(context: viewContext)

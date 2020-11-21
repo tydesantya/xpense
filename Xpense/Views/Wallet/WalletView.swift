@@ -95,8 +95,8 @@ struct WalletView: View {
                     .environment(\.managedObjectContext, viewContext)
             case .creditCardList:
                 getCreditCardSheet()
-//                    .addPartialSheet()
-//                    .environmentObject(partialSheetManager)
+                    .addPartialSheet()
+                    .environmentObject(partialSheetManager)
                     .environment(\.managedObjectContext, viewContext)
             case .addEWallet:
                 getAddEWalletSheet()

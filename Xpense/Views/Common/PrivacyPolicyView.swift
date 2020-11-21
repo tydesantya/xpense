@@ -18,7 +18,8 @@ struct PrivacyPolicyView: View {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters:[
                     "screenName": "Privacy Policy"
                 ])
-            }
+            }.navigationBarTitle(Text("Privacy Policy"), displayMode: .inline)
+        
     }
 }
 

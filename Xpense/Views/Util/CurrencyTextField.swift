@@ -20,9 +20,14 @@ struct CurrencyTextField: View {
         }
     }
     @State var latestInputText: String = ""
+    var onFocus:(() -> Void)?
     var numberFormatter: NumberFormatter!
     var body: some View {
-        TextField(CurrencyHelper.string(from: amount, currency: self.currencySign), text: self.$amountInputText)
+        TextField(CurrencyHelper.string(from: amount, currency: self.currencySign), text: self.$amountInputText, onEditingChanged: { (editingChanged) in
+            if let focus = onFocus {
+                focus()
+            }
+        })
             .keyboardType(.numberPad)
             .introspectTextField(customize: UITextField.introspect())
             .padding()
@@ -46,6 +51,12 @@ struct CurrencyTextField: View {
     init(amount: Binding<Double>, currency: Binding<CurrencyValue>) {
         self._amount = amount
         self._currency = currency
+    }
+    
+    init(amount: Binding<Double>, currency: Binding<CurrencyValue>, onFocus:@escaping () -> Void) {
+        self._amount = amount
+        self._currency = currency
+        self.onFocus = onFocus
     }
 }
 

@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         DispatchQueue.main.async {
             let operationQueue = OperationQueue()
             let operation = BudgetFetcherOperation()
-
+            
             operationQueue.addOperations([operation], waitUntilFinished: false)
         }
         return true
@@ -102,5 +102,10 @@ extension UIApplication {
         } catch {
             print("Failed to delete launch screen cache: \(error)")
         }
+    }
+    
+    var currentScene: UIWindowScene? {
+        connectedScenes
+            .first { $0.activationState == .foregroundActive } as? UIWindowScene
     }
 }

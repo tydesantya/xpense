@@ -18,6 +18,7 @@ struct TermsOfUseView: View {
                     "screenName": "Terms of use"
                 ])
             }
+            .navigationBarTitle(Text("Terms & Conditions"), displayMode: .inline)
     }
 }
 

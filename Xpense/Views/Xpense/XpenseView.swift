@@ -9,13 +9,13 @@
 import SwiftUI
 import CoreData
 import Firebase
+import StoreKit
 
 struct XpenseView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     var fetchRequest: FetchRequest<TransactionModel>
     var transactions : FetchedResults<TransactionModel>{fetchRequest.wrappedValue}
-    @State var progressValue: Float = 1.0
     @Binding var refreshFlag: UUID
     var transactionLimit: Int {
         transactions.count > 3 ? 3 : transactions.count
@@ -27,6 +27,10 @@ struct XpenseView: View {
         ],
         predicate: NSPredicate(format: "startDate <= %@ && endDate >= %@", Date() as NSDate, Date() as NSDate)
     ) var periodicBudgets: FetchedResults<PeriodicBudget>
+    
+    let categoryNotification = NotificationCenter.default
+        .publisher(for: NSNotification.Name("CategoryUpdated"))
+    @ObservedObject var settings = UserSettings()
     
     var body: some View {
         ZStack {
@@ -71,10 +75,17 @@ struct XpenseView: View {
                 }
                 .id(refreshFlag)
             }
+            .padding(.top, 0.3)
         }.onAppear(perform: {
-            withAnimation {
-                self.progressValue = 0.5
+            if transactions.count > 2 && !settings.hasRequestReview {
+                if let scene = UIApplication.shared.currentScene {
+                    SKStoreReviewController.requestReview(in: scene)
+                    settings.hasRequestReview = true
+                }
             }
+            refreshFlag = UUID()
+        })
+        .onReceive(categoryNotification, perform: { _ in
             refreshFlag = UUID()
         })
     }

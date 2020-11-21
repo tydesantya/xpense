@@ -81,5 +81,6 @@ struct ReportCategoryGroupingDetailView: View {
                 ])
             }
         }.navigationTitle(chartModel.periodString)
+        .padding(.top, 0.3)
     }
 }

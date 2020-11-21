@@ -350,55 +350,61 @@ struct ViewPager: View {
     @ObservedObject var settings = UserSettings()
     
     var body: some View {
-        TabView(selection: $selection){
-            ForEach(cards, id: \.id) { card in
-                ZStack {
-                    PaymentMethodCard(backgroundColor: Color(getColorFromCard(card: card)))
-                    VStack {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading) {
-                                PlaceHolderView()
-                                    .frame(width: 150, height: 5)
-                                PlaceHolderView()
-                                    .frame(width: 100, height: 5)
-                                PlaceHolderView()
-                                    .frame(width: 50, height: 5)
+        if cards.count > 0 {
+            TabView(selection: $selection){
+                ForEach(cards, id: \.id) { card in
+                    ZStack {
+                        PaymentMethodCard(backgroundColor: Color(getColorFromCard(card: card)))
+                        VStack {
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading) {
+                                    PlaceHolderView()
+                                        .frame(width: 150, height: 5)
+                                    PlaceHolderView()
+                                        .frame(width: 100, height: 5)
+                                    PlaceHolderView()
+                                        .frame(width: 50, height: 5)
+                                }
+                                Spacer()
+                                if PaymentMethodType(rawValue: card.type) != .eWallet {
+                                    Text(card.name ?? "")
+                                        .bold()
+                                        .font(.title3)
+                                        .foregroundColor(.white)
+                                }
                             }
-                            Spacer()
-                            if PaymentMethodType(rawValue: card.type) != .eWallet {
-                                Text(card.name ?? "")
-                                    .bold()
-                                    .font(.title3)
-                                    .foregroundColor(.white)
-                            }
-                        }
-                        getCardBottomDesignFromCard(card: card)
-                    }.padding()
+                            getCardBottomDesignFromCard(card: card)
+                        }.padding()
+                    }
+                    .tag(cards.firstIndex(of: card)!)
+                    .aspectRatio(CGSize(width: 2, height: 1), contentMode: .fit)
+                    .padding(.top, 80)
+                    .offset(y: -50)
                 }
-                .tag(cards.firstIndex(of: card)!)
-                .aspectRatio(CGSize(width: 2, height: 1), contentMode: .fit)
-                .padding(.top, 80)
-                .offset(y: -50)
+            }
+            .onChange(of: selection, perform: { value in
+                if cards.count > selection {
+                    Analytics.logEvent(AnalyticsEventViewItem, parameters: [
+                        "cardName": cards[safe: selection]?.name ?? "null"
+                    ])
+                }
+            })
+            .id(cards.count)
+            .background(Color.init(.secondarySystemFill))
+            .tabViewStyle(PageTabViewStyle())
+            .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
+            .onAppear {
+                // WORKAROUND: simulate change of selection on appear !!
+                let value = selection
+                selection = -1
+                DispatchQueue.main.async {
+                    selection = value
+                }
             }
         }
-        .onChange(of: selection, perform: { value in
-            if cards.count > selection {
-                Analytics.logEvent(AnalyticsEventViewItem, parameters: [
-                    "cardName": cards[safe: selection]?.name ?? "null"
-                ])
-            }
-        })
-        .id(cards.count)
-        .background(Color.init(.secondarySystemFill))
-        .tabViewStyle(PageTabViewStyle())
-        .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
-        .onAppear {
-            // WORKAROUND: simulate change of selection on appear !!
-            let value = selection
-            selection = -1
-            DispatchQueue.main.async {
-                selection = value
-            }
+        else {
+            EmptyView()
+                .id(cards.count)
         }
     }
     

@@ -32,15 +32,23 @@ struct PrivacyPolicyView_Previews: PreviewProvider {
 
 struct WebView: UIViewRepresentable {
     
-    var fileName: String
+    var fileName: String?
+    var linkUrl: String?
     
     func makeUIView(context: Context) -> WKWebView {
         return WKWebView()
     }
     
     func updateUIView(_ uiView: WKWebView, context: Context) {
-        let url = Bundle.main.url(forResource: fileName, withExtension: "html")
-        let request = URLRequest(url: url!)
-        uiView.load(request)
+        if let urlString = linkUrl {
+            let url = URL(string: urlString)
+            let request = URLRequest(url: url!)
+            uiView.load(request)
+        }
+        else {
+            let url = Bundle.main.url(forResource: fileName, withExtension: "html")
+            let request = URLRequest(url: url!)
+            uiView.load(request)
+        }
     }
 }

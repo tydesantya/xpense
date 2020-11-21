@@ -72,6 +72,35 @@ struct XpenseView: View {
                     }
                     .id(refreshFlag)
                     .padding(.horizontal)
+                    HStack {
+                        Text("Tips")
+                            .font(.sectionTitle)
+                        Spacer()
+                        NavigationLink(destination: ArticleWebView()) {
+                            Text("Read Article")
+                        }
+                    }.padding(.horizontal)
+                    .padding(.top)
+                    VStack(alignment: .leading) {
+                        Text("4 Simple Ways to Take Control of Your Coronavirus Budget").bold()
+                        Text("1. Cancel something").font(.subheadline).bold()
+                            .padding(.vertical)
+                        Text("Sometimes the task of monitoring and planning your saving and spending feels too big, and the trick is to break down what you’re trying to achieve into smaller parts before starting with the easiest one...")
+                            .font(.body)
+                        Divider()
+                        HStack {
+                            Spacer()
+                            Text("nytimes.com")
+                                .font(.caption)
+                                .foregroundColor(Color(.secondaryLabel))
+                        }
+                    }.padding()
+                    .background(
+                        Color.init(.secondarySystemBackground)
+                            .cornerRadius(.medium)
+                    )
+                    .padding(.horizontal)
+                    
                 }
                 .id(refreshFlag)
             }

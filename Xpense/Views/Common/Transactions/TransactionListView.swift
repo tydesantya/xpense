@@ -60,7 +60,7 @@ struct TransactionListView: View {
         }
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                "screenName": "Transaction List"
+                AnalyticsParameterScreenName: "Transaction List"
             ])
         }
     }

@@ -86,7 +86,7 @@ struct WeeklyExpenseChartView: View {
         }.id(transactions.count)
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                "screenName": "Weekly Expense"
+                AnalyticsParameterScreenName: "Weekly Expense"
             ])
             activeData = update(transactions)
             refreshFlag = UUID()

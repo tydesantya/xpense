@@ -65,7 +65,7 @@ struct ContentView: View {
                     }
                     .navigationBarItems(trailing: Button(action: {
                         Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                            "screenName": "Add Transaction"
+                            AnalyticsParameterScreenName: "Add Transaction"
                         ])
                         self.addTransaction.toggle()
                     }, label: {
@@ -80,22 +80,22 @@ struct ContentView: View {
                         case 1:
                             self.navigationBarTitle = "Xpense"
                             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                                "screenName": "Xpense"
+                                AnalyticsParameterScreenName: "Xpense"
                             ])
                         case 2:
                             self.navigationBarTitle = "Wallet"
                             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                                "screenName": "Wallet"
+                                AnalyticsParameterScreenName: "Wallet"
                             ])
                         case 3:
                             self.navigationBarTitle = "Reports"
                             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                                "screenName": "Reports"
+                                AnalyticsParameterScreenName: "Reports"
                             ])
                         case 4:
                             self.navigationBarTitle = "Settings"
                             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                                "screenName": "Settings"
+                                AnalyticsParameterScreenName: "Settings"
                             ])
                         default:
                             break

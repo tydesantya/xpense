@@ -204,7 +204,7 @@ struct BudgetHomeView: View {
                 }
                 .onTapGesture {
                     Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                        "screenName": "Budget Detail"
+                        AnalyticsParameterScreenName: "Budget Detail"
                     ])
                     DispatchQueue.main.async {
                         navigateToBudgetDetail = true
@@ -311,7 +311,7 @@ struct BudgetPreviewView: View {
             }
             .onTapGesture {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                    "screenName": "Add Budget"
+                    AnalyticsParameterScreenName: "Add Budget"
                 ])
                 showAddBudget.toggle()
             }

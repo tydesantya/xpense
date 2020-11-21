@@ -113,7 +113,7 @@ struct ConfigureBudgetView: View {
                 }
                 .onAppear {
                     Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                        "screenName": "Configure Budget"
+                        AnalyticsParameterScreenName: "Configure Budget"
                     ])
                 }
                 .navigationTitle("Configure Budget")

@@ -15,7 +15,7 @@ struct ArticleWebView: View {
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                    "screenName": "Article"
+                    AnalyticsParameterScreenName: "Article"
                 ])
             }
             .navigationBarTitle(Text("Article"), displayMode: .inline)

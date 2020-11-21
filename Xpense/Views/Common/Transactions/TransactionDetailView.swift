@@ -105,7 +105,7 @@ struct TransactionDetailView: View {
                 }
                 .onAppear {
                     Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                        "screenName": "Transaction Detail"
+                        AnalyticsParameterScreenName: "Transaction Detail"
                     ])
                 }
                 .navigationTitle("Transaction Detail")

@@ -52,7 +52,7 @@ struct CategoriesView: View {
         })
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                "screenName": "Categories List"
+                AnalyticsParameterScreenName: "Categories List"
             ])
         }
         .navigationTitle(migrationSelection != nil ? "Select Category" : "Categories")

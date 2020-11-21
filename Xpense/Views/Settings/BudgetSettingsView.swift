@@ -73,7 +73,7 @@ struct BudgetSettingsView: View {
             }
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                    "screenName": "Budget Settings"
+                    AnalyticsParameterScreenName: "Budget Settings"
                 ])
             }
             .actionSheet(isPresented: $optionAction, content: {

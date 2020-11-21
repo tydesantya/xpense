@@ -16,7 +16,7 @@ struct PrivacyPolicyView: View {
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                    "screenName": "Privacy Policy"
+                    AnalyticsParameterScreenName: "Privacy Policy"
                 ])
             }.navigationBarTitle(Text("Privacy Policy"), displayMode: .inline)
         

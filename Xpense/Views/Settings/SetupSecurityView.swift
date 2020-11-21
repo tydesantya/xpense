@@ -50,7 +50,7 @@ struct SetupSecurityView: View {
         }
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                "screenName": "Security"
+                AnalyticsParameterScreenName: "Security"
             ])
         }
         .padding()

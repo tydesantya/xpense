@@ -61,7 +61,7 @@ struct ReportPaymentMethodGroupingDetailView: View {
             }
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                    "screenName": "Report Payment Method Grouping",
+                    AnalyticsParameterScreenName: "Report Payment Method Grouping",
                     "paymentMethodName": chartModel.paymentMethod?.name ?? "",
                     "period": chartModel.periodString
                 ])

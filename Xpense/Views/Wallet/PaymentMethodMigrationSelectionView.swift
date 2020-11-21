@@ -42,7 +42,7 @@ struct PaymentMethodMigrationSelectionView: View {
             })
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                    "screenName": "Migrate Payment Method"
+                    AnalyticsParameterScreenName: "Migrate Payment Method"
                 ])
             }
         }.navigationTitle("Select Payment Method")

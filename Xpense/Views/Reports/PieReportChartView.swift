@@ -66,7 +66,7 @@ struct PieReportChartView: View {
         }.navigationTitle(dateFormatter.string(from: selectedDate))
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                "screenName": "Pie Report",
+                AnalyticsParameterScreenName: "Pie Report",
                 "categoryType": reportType.rawValue
             ])
             setupCurrentMonth()

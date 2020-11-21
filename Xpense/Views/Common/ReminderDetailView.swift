@@ -28,7 +28,7 @@ struct ReminderDetailView: View {
             .frame(minHeight: 150)
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                    "screenName": "Reminder Detail"
+                    AnalyticsParameterScreenName: "Reminder Detail"
                 ])
             }
             .onChange(of: reminderEnabled, perform: { value in

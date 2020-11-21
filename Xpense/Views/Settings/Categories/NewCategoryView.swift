@@ -125,7 +125,7 @@ struct NewCategoryView: View {
     
     func onAppear() {
         Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-            "screenName": "New Category"
+            AnalyticsParameterScreenName: "New Category"
         ])
         if let category = existingCategory {
             categoryName = category.name ?? ""

@@ -44,7 +44,7 @@ struct FeedbackView: View {
             }
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                    "screenName": "Feedback"
+                    AnalyticsParameterScreenName: "Feedback"
                 ])
             }
             .navigationTitle("Feedback")

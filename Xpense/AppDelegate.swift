@@ -43,7 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func registerBackgroundTask() {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.xpense.refresh", using: nil) { task in
             //This task is cast with processing request (BGAppRefreshTask)
-            self.handleAppRefresh(task: task as! BGProcessingTask)
+            self.handleAppRefresh(task: task as! BGAppRefreshTask)
         }
     }
     
@@ -51,7 +51,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let request = BGAppRefreshTaskRequest(identifier: "com.xpense.refresh")
         // Fetch no earlier than 15 minutes from now
         // TODO: check from userdefaults for budget type: daily, monthly, or yearly
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 10)
+        let minute:TimeInterval = 1440.0 * 60.0;
+        request.earliestBeginDate = Date(timeIntervalSinceNow: minute)
         
         do {
             try BGTaskScheduler.shared.submit(request)
@@ -60,8 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func handleAppRefresh(task: BGProcessingTask) {
-        print("scheduled")
+    func handleAppRefresh(task: BGAppRefreshTask) {
         // Schedule a new refresh task
         scheduleAppRefresh()
         let operationQueue = OperationQueue()

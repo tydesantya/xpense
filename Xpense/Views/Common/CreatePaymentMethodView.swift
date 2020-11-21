@@ -81,7 +81,7 @@ struct CreatePaymentMethodView: View {
                 reminderDate = date
             }
             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                "screenName": "Create or Edit Payment Method",
+                AnalyticsParameterScreenName: "Create or Edit Payment Method",
                 "paymentMethodType": paymentMethodType.rawValue
             ])
         }

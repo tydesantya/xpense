@@ -9,6 +9,7 @@
 import SwiftUI
 import AuthenticationServices
 import CoreData
+import Firebase
 
 struct AppleSignInButton: UIViewRepresentable {
     func makeUIView(context: Context) -> ASAuthorizationAppleIDButton {
@@ -99,6 +100,9 @@ class AppleSignInCoordinator: NSObject, ASAuthorizationControllerDelegate {
                                                 "userEmail": email,
                                                 "identifier": userIdentifier
                                             ])
+            Analytics.logEvent(AnalyticsEventSignUp, parameters:[
+                "userName": name
+            ])
         } catch let createError {
             print("Failed to create Account \(createError)")
         }

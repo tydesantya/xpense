@@ -142,7 +142,7 @@ struct NewCategoryStyleView: View {
         }.navigationBarTitle(Text(""), displayMode: .inline)
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                "screenName": "New Category Style"
+                AnalyticsParameterScreenName: "New Category Style"
             ])
             segmentChanged(0)
         }

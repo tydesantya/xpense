@@ -74,7 +74,7 @@ struct ReportCategoryGroupingDetailView: View {
             }.id(refreshFlag)
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                    "screenName": "Report Category Grouping",
+                    AnalyticsParameterScreenName: "Report Category Grouping",
                     "categoryName": chartModel.category?.name ?? "",
                     "paymentMethodName": paymentMethodName ?? "",
                     "period": chartModel.periodString

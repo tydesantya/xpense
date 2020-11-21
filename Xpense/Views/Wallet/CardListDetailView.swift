@@ -84,7 +84,7 @@ struct CardListDetailView: View {
         }
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                "screenName": "Card List Detail",
+                AnalyticsParameterScreenName: "Card List Detail",
                 "paymentMethodType": self.paymentMethodType
             ])
         }
@@ -176,7 +176,7 @@ struct CardListDetailView: View {
             return AnyView(
                 Button(action: {
                     Analytics.logEvent(AnalyticsEventScreenView, parameters:[
-                        "screenName": "Add Card",
+                        AnalyticsParameterScreenName: "Add Card",
                         "paymentMethodType": self.paymentMethodType
                     ])
                     let select = selectedPaymentMethod

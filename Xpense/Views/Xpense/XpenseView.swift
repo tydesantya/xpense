@@ -99,8 +99,7 @@ struct XpenseView: View {
                         Color.init(.secondarySystemBackground)
                             .cornerRadius(.medium)
                     )
-                    .padding(.horizontal)
-                    
+                    .padding([.horizontal, .bottom])
                 }
                 .id(refreshFlag)
             }

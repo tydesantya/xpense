@@ -569,6 +569,7 @@ struct EWalletWalletView: View {
                 }.onTapGesture {
                     eWalletDetailAction()
                 }
+                .padding(.bottom, (.small * (CGFloat(eWalletPaymentMethod.count) + 1)))
             }.padding(.bottom)
         }
         else {
@@ -612,7 +613,7 @@ struct EWalletWalletView: View {
                     HStack(alignment: .bottom) {
                         VStack(alignment: .leading) {
                             Spacer()
-                            Text(getTotalWalletBalance())
+                            Text(getEWalletBalance(method: paymentMethod))
                                 .bold()
                                 .foregroundColor(.white)
                         }
@@ -628,15 +629,13 @@ struct EWalletWalletView: View {
         )
     }
     
-    func getTotalWalletBalance() -> String {
+    func getEWalletBalance(method: PaymentMethod) -> String {
         var balance: Double = 0.0
         var currencySign: String = ""
-        for method in eWalletPaymentMethod {
-            let amount = method.balance!.toDouble()
-            balance += amount
-            if currencySign.count == 0 {
-                currencySign = CurrencyHelper.getCurrencySignFromCurrency(method.balance?.currencyValue.currency ?? "") ?? ""
-            }
+        let amount = method.balance!.toDouble()
+        balance += amount
+        if currencySign.count == 0 {
+            currencySign = CurrencyHelper.getCurrencySignFromCurrency(method.balance?.currencyValue.currency ?? "") ?? ""
         }
         return CurrencyHelper.string(from: balance, currency: currencySign)
     }

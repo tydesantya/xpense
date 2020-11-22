@@ -164,6 +164,7 @@ struct ReportsView: View {
                     })
             }
         }
+        .padding(.top, 0.3)
     }
     
     func getTotalExpenseTransactionThisWeek() -> String {

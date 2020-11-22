@@ -299,6 +299,7 @@ private struct ReportPieChartDetailView: View {
                     .chartStyle(dataAndStyle.0)
                     .padding()
                     .aspectRatio(CGSize(width: 1, height: 0.7), contentMode: .fit)
+                    .frame(maxWidth: 500)
                 ReportDetailListView(chartData: listData.0, totalAmount: listData.1, elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod: elapsedDayOfThisPeriodAndCheckIsSamePeriodAndTotalDaysOfSelectedPeriod, reportType: reportType, amountColor: amountColor, groupingType: groupingType, oppositeTotalAmount: getTotalOppositeAmount(expenseDataForNetCalculation), calculateNetBalance: calculateNetBalance, refreshFlag: $refreshFlag).padding(.top)
             }.id(listData.0.count)
         }

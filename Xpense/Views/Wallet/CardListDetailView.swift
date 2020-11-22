@@ -58,6 +58,30 @@ struct CardListDetailView: View {
                 ViewPager(paymentMethodType: paymentMethodType, selection: $pagerSelection)
                     .environment(\.managedObjectContext, self.viewContext)
                     .frame(height: 220)
+                    .actionSheet(isPresented: $showingAlert, content: {
+                        let transactionCount = selectedPaymentMethod?.transactions?.count ?? 0
+                        let transactionExists = transactionCount > 0
+                        if transactionExists {
+                            return ActionSheet(title: Text("Delete Confirmation"), message: Text("There are \(transactionCount) transactions in this payment method, do you want to merge it to another payment method or delete all of it ?"), buttons: [
+                                .default(Text("Merge to another Payment Method")) {
+                                    destinationView = AnyView(PaymentMethodMigrationSelectionView(excludedPaymentMethod: selectedPaymentMethod!, migrateAction: migrateTransaction))
+                                    navigate = true
+                                },
+                                .destructive(Text("Delete")) {
+                                    pagerSelection -= 1
+                                    deleteSelectedCard()
+                                },
+                                .cancel()
+                            ])
+                        }
+                        return ActionSheet(title: Text("Delete Confirmation"), message: Text("Are you sure you want to delete this payment method ?"), buttons: [
+                            .destructive(Text("Delete")) {
+                                pagerSelection -= 1
+                                deleteSelectedCard()
+                            },
+                            .cancel()
+                        ])
+                    })
                 VStack(spacing: 0) {
                     HStack {
                         VStack(alignment: .leading, spacing: .tiny) {
@@ -107,30 +131,6 @@ struct CardListDetailView: View {
             CreatePaymentMethodView(paymentMethodType: paymentMethodType, sheetFlag: $createPaymentMethodFlag, paymentMethod: editedPaymentMethod)
                 .accentColor(.theme)
         }
-        .actionSheet(isPresented: $showingAlert, content: {
-            let transactionCount = selectedPaymentMethod?.transactions?.count ?? 0
-            let transactionExists = transactionCount > 0
-            if transactionExists {
-                return ActionSheet(title: Text("Delete Confirmation"), message: Text("There are \(transactionCount) transactions in this payment method, do you want to merge it to another payment method or delete all of it ?"), buttons: [
-                    .default(Text("Merge to another Payment Method")) {
-                        destinationView = AnyView(PaymentMethodMigrationSelectionView(excludedPaymentMethod: selectedPaymentMethod!, migrateAction: migrateTransaction))
-                        navigate = true
-                    },
-                    .destructive(Text("Delete")) {
-                        pagerSelection -= 1
-                        deleteSelectedCard()
-                    },
-                    .cancel()
-                ])
-            }
-            return ActionSheet(title: Text("Delete Confirmation"), message: Text("Are you sure you want to delete this payment method ?"), buttons: [
-                .destructive(Text("Delete")) {
-                    pagerSelection -= 1
-                    deleteSelectedCard()
-                },
-                .cancel()
-            ])
-        })
     }
     
     func navigateToView(_ destination: AnyView?) {

@@ -45,41 +45,6 @@ struct CategoriesGrid: View {
                                 }.foregroundColor(.red)
                             }
                         }
-                        .actionSheet(isPresented: $showDeleteConfirmation, content: {
-                            let budgetExists = longPressedCategory!.budgets!.count > 0
-                            if longPressedCategory?.transactions?.count ?? 0 > 0 {
-                                let transactionsCount = longPressedCategory!.transactions!.count
-                                let budgetText = budgetExists ? "and budget setup " : ""
-                                return ActionSheet(title: Text("Delete Confirmation"), message: Text("There are \(transactionsCount) transactions \(budgetText)in this category, do you want to merge it to another category or delete all of it ?"), buttons: [
-                                    .default(Text("Merge to another category")) {
-                                        categorySelectNavigation = true
-                                    },
-                                    .destructive(Text("Delete")) {
-                                        revertCategoryAmount()
-                                        deleteCategory(longPressedCategory!)
-                                    },
-                                    .cancel()
-                                ])
-                            }
-                            else if budgetExists {
-                                return ActionSheet(title: Text("Delete Confirmation"), message: Text("There are budget setup in this category, do you want to merge it to another category or delete from budget"), buttons: [
-                                    .default(Text("Merge to another category")) {
-                                        categorySelectNavigation = true
-                                    },
-                                    .destructive(Text("Delete")) {
-                                        revertCategoryAmount()
-                                        deleteCategoryAlongWithBudget(longPressedCategory!)
-                                    },
-                                    .cancel()
-                                ])
-                            }
-                            return ActionSheet(title: Text("Delete Confirmation"), message: Text("Are you sure you want to delete this category ?"), buttons: [
-                                .destructive(Text("Delete")) {
-                                    deleteCategory(longPressedCategory!)
-                                },
-                                .cancel()
-                            ])
-                        })
                 }
                 NavigationLink(
                     destination: CategoriesView(selectionAction: onSelectCategoryToMigrate, migrationSelection: longPressedCategory)
@@ -92,6 +57,41 @@ struct CategoriesGrid: View {
                 Spacer()
             }
             .padding(.horizontal)
+            .actionSheet(isPresented: $showDeleteConfirmation, content: {
+                let budgetExists = longPressedCategory!.budgets!.count > 0
+                if longPressedCategory?.transactions?.count ?? 0 > 0 {
+                    let transactionsCount = longPressedCategory!.transactions!.count
+                    let budgetText = budgetExists ? "and budget setup " : ""
+                    return ActionSheet(title: Text("Delete Confirmation"), message: Text("There are \(transactionsCount) transactions \(budgetText)in this category, do you want to merge it to another category or delete all of it ?"), buttons: [
+                        .default(Text("Merge to another category")) {
+                            categorySelectNavigation = true
+                        },
+                        .destructive(Text("Delete")) {
+                            revertCategoryAmount()
+                            deleteCategory(longPressedCategory!)
+                        },
+                        .cancel()
+                    ])
+                }
+                else if budgetExists {
+                    return ActionSheet(title: Text("Delete Confirmation"), message: Text("There are budget setup in this category, do you want to merge it to another category or delete from budget"), buttons: [
+                        .default(Text("Merge to another category")) {
+                            categorySelectNavigation = true
+                        },
+                        .destructive(Text("Delete")) {
+                            revertCategoryAmount()
+                            deleteCategoryAlongWithBudget(longPressedCategory!)
+                        },
+                        .cancel()
+                    ])
+                }
+                return ActionSheet(title: Text("Delete Confirmation"), message: Text("Are you sure you want to delete this category ?"), buttons: [
+                    .destructive(Text("Delete")) {
+                        deleteCategory(longPressedCategory!)
+                    },
+                    .cancel()
+                ])
+            })
         }
     }
     

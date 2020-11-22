@@ -8,12 +8,14 @@
 
 import SwiftUI
 import SFSafeSymbols
+import PartialSheet
 
 struct ReportsView: View {
     
     @State var navigate: Bool = false
     @State var destinationView: AnyView?
     
+    @EnvironmentObject var partialSheetManager: PartialSheetManager
     @Environment(\.managedObjectContext) private var viewContext
     var weeklyExpenseFetchRequest: FetchRequest<TransactionModel>
     var weeklyExpenseTransactions : FetchedResults<TransactionModel>{weeklyExpenseFetchRequest.wrappedValue}
@@ -100,7 +102,9 @@ struct ReportsView: View {
                             .cornerRadius(.medium)
                     )
                     .onTapGesture {
-                        destinationView = AnyView(PieReportChartView(reportType: .income))
+                        destinationView = AnyView(
+                            PieReportChartView(reportType: .income)
+                        )
                         navigate.toggle()
                     }
                     let totalExpenseThisMonth = getTotalExpenseThisMonth()
@@ -136,7 +140,9 @@ struct ReportsView: View {
                             .cornerRadius(.medium)
                     )
                     .onTapGesture {
-                        destinationView = AnyView(PieReportChartView(reportType: .expense))
+                        destinationView = AnyView(
+                            PieReportChartView(reportType: .expense)
+                        )
                         navigate.toggle()
                     }
                     if weeklyExpenseTransactions.count > 0 || monthlyExpenseTransactions.count > 0 {
@@ -162,6 +168,7 @@ struct ReportsView: View {
                     label: {
                         EmptyView()
                     })
+                    .addPartialSheet()
             }
         }
         .padding(.top, 0.3)

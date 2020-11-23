@@ -185,7 +185,10 @@ struct PieReportChartView: View {
         let endOfDay = selectedDate.endOfDay
         let sort = NSSortDescriptor(key: "date", ascending: true)
         let categoryType = reportType.rawValue
-        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == %@", startOfDay as NSDate, endOfDay as NSDate, categoryType, NSNumber(booleanLiteral: showTopUp))
+        var predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == 0", startOfDay as NSDate, endOfDay as NSDate, categoryType)
+        if showTopUp {
+            predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfDay as NSDate, endOfDay as NSDate, categoryType)
+        }
         return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
     }
     
@@ -194,7 +197,10 @@ struct PieReportChartView: View {
         let endOfMonth = selectedDate.endOfMonth
         let sort = NSSortDescriptor(key: "date", ascending: true)
         let categoryType = reportType.rawValue
-        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == %@", startOfMonth as NSDate , endOfMonth as NSDate, categoryType, NSNumber(booleanLiteral: showTopUp))
+        var predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == 0", startOfMonth as NSDate , endOfMonth as NSDate, categoryType)
+        if showTopUp {
+            predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfMonth as NSDate , endOfMonth as NSDate, categoryType)
+        }
         return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
     }
     
@@ -204,7 +210,10 @@ struct PieReportChartView: View {
         
         let sort = NSSortDescriptor(key: "date", ascending: true)
         let categoryType = reportType.rawValue
-        let predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == %@", startOfYear as NSDate, endOfYear as NSDate, categoryType, NSNumber(booleanLiteral: showTopUp))
+        var predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@ && category.shouldHide == 0", startOfYear as NSDate, endOfYear as NSDate, categoryType)
+        if showTopUp {
+            predicate = NSPredicate(format: "date >= %@ && date <= %@ && category.type == %@", startOfYear as NSDate, endOfYear as NSDate, categoryType)
+        }
         return FetchRequest<TransactionModel>(entity: TransactionModel.entity(), sortDescriptors: [sort], predicate: predicate, animation: .spring())
     }
     

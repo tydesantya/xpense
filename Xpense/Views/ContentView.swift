@@ -18,6 +18,8 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(sortDescriptors: [])
     private var paymentMethods: FetchedResults<PaymentMethod>
+    @FetchRequest(sortDescriptors: [])
+    private var accounts: FetchedResults<Account>
     
     @State private var selection: Int = 1
     @State var navigationBarTitle: String = "Xpense"
@@ -28,6 +30,7 @@ struct ContentView: View {
     
     @ObservedObject var settings = UserSettings()
     @State private var isUnlocked = false
+    let updated = NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)
     
     var body: some View {
         VStack {
@@ -74,6 +77,9 @@ struct ContentView: View {
                             .scaledToFit()
                             .scaleEffect(1.2)
                     }))
+                    .onReceive(updated, perform: { _ in
+                        checkForAccounts()
+                    })
                     .navigationBarTitle(self.navigationBarTitle)
                     .onChange(of: selection, perform: { value in
                         switch value {
@@ -103,6 +109,7 @@ struct ContentView: View {
                         if paymentMethods.count == 0 {
                             self.introSheet = .wallet
                         }
+                        checkForAccounts()
                     })
                 }
                 .onAppear {
@@ -199,6 +206,30 @@ struct ContentView: View {
     func checkPaymentMethods() {
         if paymentMethods.count == 0 {
             self.introSheet = .wallet
+        }
+    }
+    
+    func checkForAccounts() {
+        var shouldDeleteAccounts:[Account] = []
+        DispatchQueue.main.async {
+            for account in accounts {
+                if let userName = account.userName, let userEmail = account.userEmail {
+                    if userName.isEmpty || userEmail .isEmpty {
+                        shouldDeleteAccounts.append(account)
+                    }
+                    else {
+                        settings.userEmail = userEmail
+                        settings.userName = userName
+                    }
+                }
+            }
+            
+        }
+        if accounts.count > shouldDeleteAccounts.count && !settings.userEmail.isEmpty {
+            for account in shouldDeleteAccounts {
+                viewContext.delete(account)
+            }
+            try! viewContext.save()
         }
     }
     

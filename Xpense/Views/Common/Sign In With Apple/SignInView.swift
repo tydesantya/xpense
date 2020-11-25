@@ -15,77 +15,92 @@ struct SignInView: View {
     @ObservedObject var settings = UserSettings()
     @FetchRequest(sortDescriptors: [])
     private var paymentMethods: FetchedResults<PaymentMethod>
+    @State var refreshFlag = UUID()
+    @State var finishSignIn = false
+    @State var finishSync = false
+    @State var showLoading = false
     
     let persistenceController = PersistenceController.shared
     
     let pub = NotificationCenter.default
         .publisher(for: NSNotification.Name("AppleSignInSuccess"))
+    let updated = NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)
     
     var body: some View {
         VStack {
-            HStack {
-                Text("Sign In")
-                    .font(.hero)
-                    .fontWeight(.heavy)
-                Spacer()
+            if showLoading {
+                ProgressView()
             }
-            .padding()
-            Spacer()
-            Image(systemSymbol: .icloudFill)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 80, height: 80)
-                .padding(.vertical, .large)
-            Text("We use iCloud to store all your transactions so you can use this across different devices with the same Apple ID")
-                .multilineTextAlignment(.center)
-                .padding()
-            Spacer()
-            HStack {
-                Image(uiImage: UIImage(named: "logo")!)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 80, height: 80)
-                    .cornerRadius(.medium)
-                    .padding()
-                Text("-")
-                    .font(.largeTitle)
-                Image(systemSymbol: .arrow2Circlepath)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 80, height: 80)
-                    .padding()
-            }
-            Text("Sign in to make sure you're signed in to your iCloud account to sync your data")
-                .multilineTextAlignment(.center)
-                .padding()
-            Spacer()
-            AppleSignInButton()
-                .frame(height: 60)
-                .onTapGesture {
-                    #if DEBUG
-                    settings.hasSetupIntro = true
-                    persistenceController.validateCategoriesSeed()
-                    if paymentMethods.count == 0 {
-                        showSheetView = .wallet
-                    }
-                    else {
-                        showSheetView = nil
-                    }
-                    #else
-                    
-                    appleSignInCoordinator.handleAuthorizationAppleIDButtonPress()
-                    #endif
+            else {
+                HStack {
+                    Text("Sign In")
+                        .font(.hero)
+                        .fontWeight(.heavy)
+                    Spacer()
                 }
-            Text("By signing in, you agree to our Terms of Use and Privacy Policy")
-                .font(.caption2)
-                .foregroundColor(Color(UIColor.secondaryLabel))
-                .multilineTextAlignment(.center)
                 .padding()
+                Spacer()
+                Image(systemSymbol: .icloudFill)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 80, height: 80)
+                    .padding(.vertical, .large)
+                Text("We use iCloud to store all your transactions so you can use this across different devices with the same Apple ID")
+                    .multilineTextAlignment(.center)
+                    .padding()
+                    .id(refreshFlag)
+                Spacer()
+                HStack {
+                    Image(uiImage: UIImage(named: "logo")!)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(.medium)
+                        .padding()
+                    Text("-")
+                        .font(.largeTitle)
+                    Image(systemSymbol: .arrow2Circlepath)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .padding()
+                }
+                Text("Sign in to make sure you're signed in to your iCloud account to sync your data")
+                    .multilineTextAlignment(.center)
+                    .padding()
+                Spacer()
+                AppleSignInButton()
+                    .frame(height: 60)
+                    .onTapGesture {
+                        #if DEBUG
+                        settings.hasSetupIntro = true
+                        persistenceController.validateCategoriesSeed()
+                        finishSignIn = true
+                        verifyCompletion(showLoading: true)
+                        
+                        #else
+                        
+                        appleSignInCoordinator.handleAuthorizationAppleIDButtonPress()
+                        #endif
+                    }
+                Text("By signing in, you agree to our Terms of Use and Privacy Policy")
+                    .font(.caption2)
+                    .foregroundColor(Color(UIColor.secondaryLabel))
+                    .multilineTextAlignment(.center)
+                    .padding()
+            }
         }.navigationBarHidden(true)
         .padding()
         .onReceive(pub) { (output) in
             self.onSignInSuccess(output: output)
         }
+        .onReceive(updated, perform: { _ in
+            DispatchQueue.main.async {
+                refreshFlag = UUID()
+                finishSync = true
+                verifyCompletion()
+            }
+        })
     }
     
     func onSignInSuccess(output: NotificationCenter.Publisher.Output) {
@@ -99,14 +114,29 @@ struct SignInView: View {
                     "userName": userName as! String,
                     "userEmail": userEmail as! String
                 ])
-            settings.hasSetupIntro = true
-            if paymentMethods.count == 0 {
-                showSheetView = .wallet
+            Analytics.logEvent(AnalyticsEventSignUp, parameters:[
+                "userName": userName as! String,
+                "userEmail": userEmail as! String
+            ])
+            finishSignIn = true
+            verifyCompletion(showLoading: true)
+        }
+    }
+    
+    func verifyCompletion(showLoading:Bool = false) {
+        if showLoading {
+            self.showLoading = true
+        }
+        if finishSignIn && finishSync {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                settings.hasSetupIntro = true
+                if paymentMethods.count == 0 {
+                    showSheetView = .wallet
+                }
+                else {
+                    showSheetView = nil
+                }
             }
-            else {
-                showSheetView = nil
-            }
-            print("signed in: \(userName) \(userEmail) \(userIdentifier)")
         }
     }
 }

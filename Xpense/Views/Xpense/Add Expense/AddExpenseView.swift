@@ -171,23 +171,26 @@ struct AddExpenseView: View {
                 if selectedPaymentMethod == nil {
                     selectedPaymentMethod = paymentMethods.first
                 }
+                var expectedIndex = 0
                 if let transaction = selectedTransaction {
                     if !populatedTransactionDetail {
                         populatedTransactionDetail = true
                         populateSelectedTransactionDetail(transaction)
+                        if transaction.category?.type == CategoryType.income.rawValue {
+                            expectedIndex = 1
+                        }
                     }
                 }
                 
                 if transactionTypes.count == 0 {
                     if eWallets.count > 0 {
                         transactionTypes.append("Top Up")
-                        transactionTypeSelectedIndex = 1
+                        transactionTypeSelectedIndex = expectedIndex + 1
                     }
                     else {
-                        transactionTypeSelectedIndex = 0
+                        transactionTypeSelectedIndex = expectedIndex
                     }
                     transactionTypes.append(contentsOf: CategoryType.allCases.map{$0.rawValue})
-                    
                 }
             }
         }.alert(isPresented: $showValidationAlert) {
@@ -375,13 +378,18 @@ struct AddExpenseView: View {
     func revertTransactionPaymentMethodAmount(_ transaction: TransactionModel) {
         let amountString = transaction.amount?.currencyValue.amount ?? ""
         let amount = Double(amountString) ?? 0
-        let initialAmountString: String = transaction.amount?.currencyValue.amount ?? ""
+        let initialAmountString: String = transaction.paymentMethod?.balance?.currencyValue.amount ?? ""
         let initialAmount = Double(initialAmountString) ?? 0
         let categoryType = CategoryType(rawValue: transaction.category?.type ?? "") ?? .expense
         let revertedAmount = categoryType == .expense ? initialAmount + amount : initialAmount - amount
         
         let balance = getDisplayCurrencyValueFromAmount(amt: revertedAmount)
         transaction.paymentMethod?.balance = balance
+        do {
+            try viewContext.save()
+        } catch let createError {
+            print("Failed to edit Transaction \(createError)")
+        }
     }
     
     func getDisplayCurrencyValueFromAmount(amt: Double) -> DisplayCurrencyValue {

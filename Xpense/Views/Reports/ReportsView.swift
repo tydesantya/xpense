@@ -421,13 +421,12 @@ private struct MonthlyHighlightReportView: View {
                 Divider()
                 if let transaction = largestMonthlyIncomeTuple.1 {
                     if let largestIncomeCategory = transaction.category {
-                        let largestIncomeTransaction = largestWeeklyExpenseTuple.1
                         Text("You earned a total of \(totalMonthlyIncome) this month").fixedSize(horizontal: false, vertical: true).padding(.bottom, .tiny)
                             .font(.footnote)
                         Text(largestMonthlyIncomeTuple.0 == totalMonthlyIncome ? "Purely from a single income from " : "Highlighting the largest income of the month from").fixedSize(horizontal: false, vertical: true).font(.footnote)
                         HStack {
                             CategoryIconDisplayView(category: largestIncomeCategory, iconWidth: 20, iconHeight: 20)
-                            Text("\(largestIncomeCategory.name ?? ""): \(largestIncomeTransaction!.date!.dateTimeFormat())").font(.footnote)
+                            Text("\(largestIncomeCategory.name ?? ""): \(transaction.date?.dateTimeFormat() ?? "")").font(.footnote)
                         }
                         if largestWeeklyExpenseTuple == largestMonthlyExpenseTuple {
                             Text("While the largest expense of this month is the same largest expense of this week").fixedSize(horizontal: false, vertical: true).padding(.bottom, .tiny)
@@ -437,10 +436,11 @@ private struct MonthlyHighlightReportView: View {
                             Text("While largest expense amount is \(largestMonthlyExpenseTuple.0) from")
                                 .font(.footnote)
                             let transaction = largestMonthlyExpenseTuple.1
-                            let category = transaction!.category!
-                            HStack {
-                                CategoryIconDisplayView(category: category, iconWidth: 20, iconHeight: 20)
-                                Text("\(category.name ?? ""): \(transaction!.date!.dateTimeFormat())").font(.footnote)
+                            if let category = transaction?.category {
+                                HStack {
+                                    CategoryIconDisplayView(category: category, iconWidth: 20, iconHeight: 20)
+                                    Text("\(category.name ?? ""): \(transaction!.date!.dateTimeFormat())").font(.footnote)
+                                }
                             }
                         }
                         let income = CurrencyHelper.getAmountFrom(formattedCurrencyString: totalMonthlyIncome, currency: "Rp ")

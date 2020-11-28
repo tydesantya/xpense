@@ -30,7 +30,9 @@ struct ContentView: View {
     
     @ObservedObject var settings = UserSettings()
     @State private var isUnlocked = false
-    let updated = NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)
+    @State private var toggleCheckAccount = false
+    @State var timer: Timer.TimerPublisher = Timer.publish (every: 1, on: .main, in: .common)
+    let updated = NotificationCenter.default.publisher(for: NSNotification.Name("RemoteObjectReceived"))
     
     var body: some View {
         VStack {
@@ -78,6 +80,19 @@ struct ContentView: View {
                             .scaleEffect(1.2)
                     }))
                     .onReceive(updated, perform: { _ in
+                        DispatchQueue.main.async {
+                            self.cancelTimer()
+                            self.instantiateTimer()
+                            let _ = self.timer.connect()
+                        }
+                    })
+                    .onReceive(timer) { _ in
+                        DispatchQueue.main.async {
+                            onNoLongerReceiveObjectAfterTimer()
+                            self.cancelTimer()
+                        }
+                    }
+                    .onChange(of: toggleCheckAccount, perform: { value in
                         checkForAccounts()
                     })
                     .navigationBarTitle(self.navigationBarTitle)
@@ -209,21 +224,34 @@ struct ContentView: View {
         }
     }
     
+    func instantiateTimer() {
+        self.timer = Timer.publish (every: 5, on: .main, in: .common)
+        return
+    }
+    
+    func cancelTimer() {
+        self.timer.connect().cancel()
+        return
+    }
+    
+    func onNoLongerReceiveObjectAfterTimer() {
+        toggleCheckAccount.toggle()
+    }
+    
     func checkForAccounts() {
         var shouldDeleteAccounts:[Account] = []
-        DispatchQueue.main.async {
-            for account in accounts {
-                if let userName = account.userName, let userEmail = account.userEmail {
-                    if userName.isEmpty || userEmail .isEmpty {
-                        shouldDeleteAccounts.append(account)
-                    }
-                    else {
+        for account in accounts {
+            if let userName = account.userName, let userEmail = account.userEmail {
+                if userName.isEmpty || userEmail .isEmpty {
+                    shouldDeleteAccounts.append(account)
+                }
+                else {
+                    DispatchQueue.main.async {
                         settings.userEmail = userEmail
                         settings.userName = userName
                     }
                 }
             }
-            
         }
         if accounts.count > shouldDeleteAccounts.count && !settings.userEmail.isEmpty {
             for account in shouldDeleteAccounts {

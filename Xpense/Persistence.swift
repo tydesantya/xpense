@@ -28,6 +28,7 @@ struct PersistenceController {
     }()
     
     let container: NSPersistentCloudKitContainer
+    let listener: RemoteObjectListener
     
     init(inMemory: Bool = false) {
         container = NSPersistentCloudKitContainer(name: "Financial")
@@ -51,6 +52,7 @@ struct PersistenceController {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+        listener = RemoteObjectListener(container: container)
     }
     
     func validateCategoriesSeed() {
@@ -67,4 +69,21 @@ struct PersistenceController {
         }
     }
     
+    
+}
+
+class RemoteObjectListener {
+    var container: NSPersistentCloudKitContainer
+    
+    init(container: NSPersistentCloudKitContainer) {
+        self.container = container
+        NotificationCenter.default.addObserver(self, selector: #selector(self.notifyReceiveRemoteObjects), name: .NSPersistentStoreRemoteChange, object: container.persistentStoreCoordinator)
+    }
+    
+    @objc
+    func notifyReceiveRemoteObjects() {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: NSNotification.Name("RemoteObjectReceived"), object: nil)
+        }
+    }
 }

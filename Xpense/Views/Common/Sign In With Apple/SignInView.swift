@@ -19,12 +19,13 @@ struct SignInView: View {
     @State var finishSignIn = false
     @State var finishSync = false
     @State var showLoading = false
+    @State var timer: Timer.TimerPublisher = Timer.publish (every: 1, on: .main, in: .common)
     
     let persistenceController = PersistenceController.shared
     
     let pub = NotificationCenter.default
         .publisher(for: NSNotification.Name("AppleSignInSuccess"))
-    let updated = NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)
+    let updated = NotificationCenter.default.publisher(for: NSNotification.Name("RemoteObjectReceived"))
     
     var body: some View {
         VStack {
@@ -95,16 +96,34 @@ struct SignInView: View {
             self.onSignInSuccess(output: output)
         }
         .onReceive(updated, perform: { _ in
-            DispatchQueue.main.async {
-                refreshFlag = UUID()
-                finishSync = true
-                verifyCompletion()
-            }
+            self.cancelTimer()
+            self.instantiateTimer()
+            let _ = self.timer.connect()
         })
+        .onReceive(timer) { _ in
+            onNoLongerReceiveObjectAfterTimer()
+            self.cancelTimer()
+        }
+    }
+    
+    
+    func instantiateTimer() {
+        self.timer = Timer.publish (every: 3, on: .main, in: .common)
+        return
+    }
+    
+    func cancelTimer() {
+        self.timer.connect().cancel()
+        return
+    }
+    
+    func onNoLongerReceiveObjectAfterTimer() {
+        refreshFlag = UUID()
+        finishSync = true
+        verifyCompletion()
     }
     
     func onSignInSuccess(output: NotificationCenter.Publisher.Output) {
-        persistenceController.validateCategoriesSeed()
         if let userInfo = output.userInfo, let userName = userInfo["userName"], let userEmail = userInfo["userEmail"], let userIdentifier = userInfo["identifier"] {
             settings.userName = userName as! String
             settings.userEmail = userEmail as! String
@@ -129,6 +148,7 @@ struct SignInView: View {
         }
         if finishSignIn && finishSync {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                persistenceController.validateCategoriesSeed()
                 settings.hasSetupIntro = true
                 if paymentMethods.count == 0 {
                     showSheetView = .wallet

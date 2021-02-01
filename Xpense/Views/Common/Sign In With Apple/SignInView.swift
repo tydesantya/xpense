@@ -19,7 +19,7 @@ struct SignInView: View {
     @State var finishSignIn = false
     @State var finishSync = false
     @State var showLoading = false
-    @State var timer: Timer.TimerPublisher = Timer.publish (every: 1, on: .main, in: .common)
+    @State var timer: Timer.TimerPublisher = Timer.publish (every: 5, on: .main, in: .common)
     
     let persistenceController = PersistenceController.shared
     
@@ -108,7 +108,7 @@ struct SignInView: View {
     
     
     func instantiateTimer() {
-        self.timer = Timer.publish (every: 3, on: .main, in: .common)
+        self.timer = Timer.publish (every: 5, on: .main, in: .common)
         return
     }
     

@@ -56,6 +56,10 @@ struct AddExpenseView: View {
         eWallets.count > 0 && transactionTypeSelectedIndex == 0
     }
     
+    @State var nowDateToggle: Bool = true
+    @State var dateSelection: Date = Date()
+    var bottomId = 12345
+    
     init(showSheetView:Binding<Bool>, refreshFlag:Binding<UUID>, selectedTransaction: TransactionModel? = nil) {
         self._showSheetView = showSheetView
         _refreshFlag = refreshFlag
@@ -67,88 +71,122 @@ struct AddExpenseView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(alignment: .center) {
-                    Picker(selection: $transactionTypeSelectedIndex, label: Text("")) {
-                        ForEach(0..<transactionTypes.count) {
-                            index in
-                            Text(transactionTypes[index])
-                        }
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .id(transactionTypes.count)
-                    .padding()
-                    if isSelectingTopUp {
-                        EWalletSelectionView(eWallets: eWallets, topUpSelection: $selectedTopUpMethod)
-                    }
-                    else if transactionTypeSelectedIndex < transactionTypes.count {
-                        let categoryType = CategoryType(rawValue: transactionTypes[transactionTypeSelectedIndex])
-                        CategorySelectionView(selectedCategory: $selectedCategory, onCategoriesViewSelectedCategory: onCategoriesViewSelectedCategory(_:), categorySelectNavigation: $categorySelectNavigation, fetchRequest: makeCategoriesFetchRequest(), type: categoryType)
-                    }
-                    VStack {
-                        Text("Enter amount")
-                            .font(.footnote)
-                            .foregroundColor(.init(.secondaryLabel))
-                        CurrencyTextField(amount: self.$amount, currency: self.$currency)
-                            .background(Color.init(.secondarySystemBackground)
-                                            .cornerRadius(.normal))
-                    }.padding(.horizontal)
-                    HStack {
-                        ForEach(amountTemplates, id:\.self) { amnt in
-                            Button(action: {
-                                self.amount = amnt
-                            }) {
-                                VStack {
-                                    Image(systemName: "cylinder.split.1x2.fill")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 30, height: 30)
-                                        .padding(.top)
-                                        .padding(.bottom, .tiny)
-                                    Text(CurrencyHelper.string(from: amnt, currency: CurrencyHelper.getCurrencySignFromCurrency(self.currency.currency)!))
-                                        .padding(.bottom)
-                                }.foregroundColor(Color(UIColor.label))
-                                .frame(minWidth: 50, maxWidth: .infinity, minHeight: 80, maxHeight: 80)
-                                .background(Color.init(.secondarySystemBackground))
-                                .cornerRadius(.normal)
-                                .font(.caption)
+            ScrollViewReader {
+                value in
+                ScrollView {
+                    VStack(alignment: .center) {
+                        Picker(selection: $transactionTypeSelectedIndex, label: Text("")) {
+                            ForEach(0..<transactionTypes.count) {
+                                index in
+                                Text(transactionTypes[index])
                             }
                         }
-                    }
-                    .padding(.horizontal)
-                    Text("Select Payment Method")
-                        .font(.footnote)
-                        .foregroundColor(.init(.secondaryLabel))
-                        .padding(.top)
-                    ScrollView (.horizontal, showsIndicators: false) {
-                        let width = CGFloat(150)
-                        let height = CGFloat(80)
-                        LazyHStack {
-                            ForEach(getPaymentMethods()) { paymentMethod in
-                                PaymentMethodCardView(paymentMethod: paymentMethod, selectedPaymentMethod: $selectedPaymentMethod)
-                                    .frame(width: width, height: height)
+                        .pickerStyle(SegmentedPickerStyle())
+                        .id(transactionTypes.count)
+                        .padding()
+                        if isSelectingTopUp {
+                            EWalletSelectionView(eWallets: eWallets, topUpSelection: $selectedTopUpMethod)
+                        }
+                        else if transactionTypeSelectedIndex < transactionTypes.count {
+                            let categoryType = CategoryType(rawValue: transactionTypes[transactionTypeSelectedIndex])
+                            CategorySelectionView(selectedCategory: $selectedCategory, onCategoriesViewSelectedCategory: onCategoriesViewSelectedCategory(_:), categorySelectNavigation: $categorySelectNavigation, fetchRequest: makeCategoriesFetchRequest(), type: categoryType)
+                        }
+                        VStack {
+                            Text("Enter amount")
+                                .font(.footnote)
+                                .foregroundColor(.init(.secondaryLabel))
+                            CurrencyTextField(amount: self.$amount, currency: self.$currency)
+                                .background(Color.init(.secondarySystemBackground)
+                                                .cornerRadius(.normal))
+                        }.padding(.horizontal)
+                        HStack {
+                            ForEach(amountTemplates, id:\.self) { amnt in
+                                Button(action: {
+                                    self.amount += amnt
+                                }) {
+                                    VStack {
+                                        Image(systemName: "cylinder.split.1x2.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 30, height: 30)
+                                            .padding(.top)
+                                            .padding(.bottom, .tiny)
+                                        Text("+" + CurrencyHelper.string(from: amnt, currency: CurrencyHelper.getCurrencySignFromCurrency(self.currency.currency)!))
+                                            .padding(.bottom)
+                                    }.foregroundColor(Color(UIColor.label))
+                                    .frame(minWidth: 50, maxWidth: .infinity, minHeight: 80, maxHeight: 80)
+                                    .background(Color.init(.secondarySystemBackground))
+                                    .cornerRadius(.normal)
+                                    .font(.caption2)
+                                }
                             }
                         }
                         .padding(.horizontal)
-                    }
-                    ZStack {
-                        Color.init(.secondarySystemBackground)
-                            .cornerRadius(.normal)
-                        ZStack(alignment: .topLeading) {
-                            let labelText = notes.count > 0 ? notes : "Notes"
-                            let textColor = notes.count > 0 ? Color.init(.label) : Color.init(.tertiaryLabel)
-                            Text(labelText)
-                                .padding([.leading, .trailing], 5)
-                                .padding([.top, .bottom], 8)
-                                .foregroundColor(textColor)
-                            TextEditor(text: self.$notes)
+                        Text("Date & Time")
+                            .font(.footnote)
+                            .foregroundColor(.init(.secondaryLabel))
+                            .padding(.top)
+                        VStack {
+                            HStack {
+                                Image(systemName: "calendar")
+                                    .foregroundColor(.theme)
+                                Toggle(isOn: $nowDateToggle, label: {
+                                    Text(nowDateToggle ? "Now" : dateSelection.mediumDateTimeFormat()).foregroundColor(Color(.label))
+                                })
+                            }
+                            if !nowDateToggle {
+                                Divider().padding(.small)
+                                DatePicker("", selection: $dateSelection)
+                                    .padding(.horizontal).foregroundColor(Color(.label))
+                            }
                         }
-                        .padding(.small)
+                        .padding()
+                        .background(Color.init(.secondarySystemBackground)
+                                        .cornerRadius(.normal))
+                        .padding(.horizontal)
+                        Text("Select Payment Method")
+                            .font(.footnote)
+                            .foregroundColor(.init(.secondaryLabel))
+                            .padding(.top)
+                        ScrollView (.horizontal, showsIndicators: false) {
+                            let width = CGFloat(150)
+                            let height = CGFloat(80)
+                            LazyHStack {
+                                ForEach(getPaymentMethods()) { paymentMethod in
+                                    PaymentMethodCardView(paymentMethod: paymentMethod, selectedPaymentMethod: $selectedPaymentMethod)
+                                        .frame(width: width, height: height)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                        ZStack {
+                            Color.init(.secondarySystemBackground)
+                                .cornerRadius(.normal)
+                            ZStack(alignment: .topLeading) {
+                                let labelText = notes.count > 0 ? notes : "Notes"
+                                let textColor = notes.count > 0 ? Color.init(.label) : Color.init(.tertiaryLabel)
+                                Text(labelText)
+                                    .padding([.leading, .trailing], 5)
+                                    .padding([.top, .bottom], 8)
+                                    .foregroundColor(textColor)
+                                TextEditor(text: self.$notes)
+                                    .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+                                        DispatchQueue.main.async {
+                                            withAnimation {
+                                                value.scrollTo(bottomId, anchor: .bottom)
+                                            }
+                                        }
+                                    }
+                            }
+                            .padding(.small)
+                        }
+                        .padding()
+                        .frame(minHeight: 200)
+                        .id(bottomId)
                     }
-                    .padding()
-                    .frame(minHeight: 200)
-                }
-            }.navigationBarTitle(Text("Add Transaction"), displayMode: .inline)
+                    .animation(.default)
+                }.navigationBarTitle(Text("Add Transaction"), displayMode: .inline)
+            }
             .navigationBarItems(leading: Button(action: {
                 self.showSheetView = false
             }) {
@@ -274,12 +312,14 @@ struct AddExpenseView: View {
     }
     
     func createCategoryTransaction() {
+        let transactionDate = nowDateToggle ? Date() : dateSelection
+        
         let transaction = TransactionModel(context: viewContext)
         transaction.amount = getDisplayCurrencyValueFromAmount(amt: amount)
         transaction.note = notes
         transaction.category = selectedCategory
         transaction.paymentMethod = selectedPaymentMethod
-        transaction.date = Date()
+        transaction.date = transactionDate
         selectedCategory!.lastUsed = Date()
         
         if selectedPaymentMethod?.type != PaymentMethodType.creditCard.rawValue {
@@ -316,7 +356,7 @@ struct AddExpenseView: View {
     
     func createTopUpTransaction() {
         // create transaction from source payment method
-        let transactionDate = Date()
+        let transactionDate = nowDateToggle ? Date() : dateSelection
         
         let transaction = TransactionModel(context: viewContext)
         transaction.amount = getDisplayCurrencyValueFromAmount(amt: amount)

@@ -34,15 +34,17 @@ struct BudgetRingView: View {
                         .frame(width: size, height: size)
                         .padding(.vertical)
                         .onAppear {
-                            withAnimation {
-                                let limit = budget.limit
-                                let limitAmount = limit?.toDouble() ?? 1
-                                
-                                let used = budget.usedAmount
-                                let usedAmount = used?.toDouble() ?? 1
-                                
-                                let progress = 1 - usedAmount / limitAmount
-                                budgetsProgress[index!] = Float(progress)
+                            let limit = budget.limit
+                            let limitAmount = limit?.toDouble() ?? 1
+                            
+                            let used = budget.usedAmount
+                            let usedAmount = used?.toDouble() ?? 1
+                            
+                            let progress = 1 - usedAmount / limitAmount
+                            if budgetsProgress[index!] != Float(progress) {
+                                withAnimation {
+                                    budgetsProgress[index!] = Float(progress)
+                                }
                             }
                         }
                 }

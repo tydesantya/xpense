@@ -21,7 +21,6 @@ struct XpenseView: View {
         transactions.count > 3 ? 3 : transactions.count
     }
     
-    let updated = NotificationCenter.default.publisher(for: NSNotification.Name("RemoteObjectReceived"))
     @FetchRequest(
         entity: PeriodicBudget.entity(),
         sortDescriptors: [
@@ -39,7 +38,6 @@ struct XpenseView: View {
                 VStack(alignment: .leading) {
                     if periodicBudgets.count > 0 {
                         BudgetHomeView(periodicBudgets: periodicBudgets)
-                            .id(refreshFlag)
                     }
                     else {
                         BudgetPreviewView()
@@ -116,9 +114,6 @@ struct XpenseView: View {
             refreshFlag = UUID()
         })
         .onReceive(categoryNotification, perform: { _ in
-            refreshFlag = UUID()
-        })
-        .onReceive(updated, perform: { _ in
             refreshFlag = UUID()
         })
     }

@@ -57,6 +57,22 @@ struct CoreDataManager {
         return nil
     }
     
+    
+    func fetchPeriodicBudgetWithDate(selectedDate: Date) -> [PeriodicBudget]? {
+        let context = persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<PeriodicBudget>(entityName: "PeriodicBudget")
+        fetchRequest.predicate = NSPredicate(format: "startDate <= %@ && endDate >= %@", selectedDate as NSDate, selectedDate as NSDate)
+        
+        do {
+            let periodicBudget = try context.fetch(fetchRequest)
+            return periodicBudget
+        } catch let fetchError {
+            print("Failed to fetch Periodic Budget \(fetchError)")
+        }
+        
+        return nil
+    }
+    
     func deletePaymentMethods() {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "PaymentMethod")
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)

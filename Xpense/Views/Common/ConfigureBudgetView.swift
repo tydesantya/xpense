@@ -90,7 +90,6 @@ struct ConfigureBudgetView: View {
                                                 .font(.footnote)
                                             Spacer()
                                         }
-                                        TextEditor(text: /*@START_MENU_TOKEN@*/.constant("Placeholder")/*@END_MENU_TOKEN@*/)
                                         CurrencyTextField(amount: $inputModels[index].amount, currency: $inputModels[index].currencyValue, onFocus: {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                                 withAnimation {

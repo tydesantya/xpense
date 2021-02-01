@@ -10,6 +10,7 @@ import SwiftUI
 import SFSafeSymbols
 import SPAlert
 import Firebase
+import CoreData
 
 struct AddExpenseView: View {
     
@@ -46,12 +47,6 @@ struct AddExpenseView: View {
     var selectedTransaction: TransactionModel?
     @State var populatedTransactionDetail = false
     
-    @FetchRequest(
-        entity: PeriodicBudget.entity(),
-        sortDescriptors: [
-        ],
-        predicate: NSPredicate(format: "startDate <= %@ && endDate >= %@", Date() as NSDate, Date() as NSDate)
-    ) var periodicBudgets: FetchedResults<PeriodicBudget>
     var isSelectingTopUp: Bool {
         eWallets.count > 0 && transactionTypeSelectedIndex == 0
     }
@@ -59,6 +54,8 @@ struct AddExpenseView: View {
     @State var nowDateToggle: Bool = true
     @State var dateSelection: Date = Date()
     var bottomId = 12345
+    
+    @State var periodicBudgets: [PeriodicBudget] = []
     
     init(showSheetView:Binding<Bool>, refreshFlag:Binding<UUID>, selectedTransaction: TransactionModel? = nil) {
         self._showSheetView = showSheetView
@@ -138,6 +135,9 @@ struct AddExpenseView: View {
                                 Divider().padding(.small)
                                 DatePicker("", selection: $dateSelection)
                                     .padding(.horizontal).foregroundColor(Color(.label))
+                                    .onChange(of: dateSelection, perform: { value in
+                                        updatePeriodicBudget()
+                                    })
                             }
                         }
                         .padding()
@@ -230,6 +230,8 @@ struct AddExpenseView: View {
                     }
                     transactionTypes.append(contentsOf: CategoryType.allCases.map{$0.rawValue})
                 }
+                
+                updatePeriodicBudget()
             }
         }.alert(isPresented: $showValidationAlert) {
             Alert(title: Text("Error"), message: Text("Please enter transaction amount!"), dismissButton: .default(Text("Got it")))
@@ -457,6 +459,28 @@ struct AddExpenseView: View {
         }
     }
     
+    func updatePeriodicBudget() {
+        let selectedDate = nowDateToggle ? Date() : dateSelection
+        self.periodicBudgets = self.fetchPeriodicBudgetWithDate(selectedDate: selectedDate) ?? []
+        if self.periodicBudgets.count > 0 {
+            print(self.periodicBudgets)
+        }
+    }
+    
+    func fetchPeriodicBudgetWithDate(selectedDate: Date) -> [PeriodicBudget]? {
+        let context = self.viewContext
+        let fetchRequest: NSFetchRequest<PeriodicBudget> = PeriodicBudget.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "startDate <= %@ && endDate >= %@", selectedDate as NSDate, selectedDate as NSDate)
+        
+        do {
+            let periodicBudget = try context.fetch(fetchRequest)
+            return periodicBudget
+        } catch let fetchError {
+            print("Failed to fetch Periodic Budget \(fetchError)")
+        }
+        
+        return nil
+    }
 }
 
 struct PaymentMethodCardView: View {
